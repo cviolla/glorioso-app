@@ -37,6 +37,8 @@ export default function Home() {
 
       {/* Header / Hero Section */}
       <header className="bg-[#532120] text-[#f8ece3] pt-16 pb-12 px-6 rounded-b-[40px] shadow-lg relative overflow-hidden">
+        <StoreStatus className="absolute top-4 right-4 z-40" />
+        
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -86,8 +88,6 @@ export default function Home() {
       </header>
 
       <main className="max-w-md mx-auto px-4 mt-[-20px] relative z-10">
-        <StoreStatus />
-
         {/* WhatsApp Button */}
         <a 
           href="https://wa.me/5521990062956?text=Olá, gostaria de fazer um pedido!" 

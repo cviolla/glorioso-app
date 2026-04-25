@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 
-export function StoreStatus() {
+export function StoreStatus({ className = "" }: { className?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -40,17 +40,18 @@ export function StoreStatus() {
   if (loading) return null;
 
   return (
-    <div className="flex justify-center mt-4 mb-6">
+    <div className={`flex justify-center ${className}`}>
       <div 
-        className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-sm ${
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shadow-md border-2 ${
           isOpen 
-            ? "bg-[#532120] text-[#f8ece3]" 
-            : "bg-gray-300 text-gray-600"
+            ? "bg-[#25D366] text-white border-[#25D366]" 
+            : "bg-gray-800 text-gray-200 border-gray-600"
         } animate-blink`}
       >
-        <Clock className="w-5 h-5" />
+        <Clock className="w-4 h-4" />
         {isOpen ? "LOJA ABERTA" : "LOJA FECHADA"}
       </div>
     </div>
   );
 }
+
