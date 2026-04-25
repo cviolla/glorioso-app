@@ -32,7 +32,7 @@ export default function CartPage() {
         <Link href="/" className="mr-4 hover:bg-[#381010] p-2 rounded-full transition-colors">
           <ArrowLeft className="w-6 h-6" />
         </Link>
-        <h1 className="text-xl font-bold flex-1">Seu Carrinho</h1>
+        <h1 className="text-xl font-bold flex-1">Sua Sacola</h1>
         {items.length > 0 && (
           <button onClick={clearCart} className="text-sm underline opacity-80 hover:opacity-100">
             Limpar

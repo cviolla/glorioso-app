@@ -38,7 +38,7 @@ export function BottomNav() {
                 </span>
               )}
             </div>
-            <span className="text-[10px] font-bold">Carrinho</span>
+            <span className="text-[10px] font-bold">Sacola</span>
           </Link>
 
           <Link 
