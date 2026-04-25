@@ -77,7 +77,7 @@ export default function Home() {
           </Link>
 
           <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
-            <div className="flex flex-col gap-1.5 sm:gap-2 text-[10px] sm:text-sm text-[#f8ece3]/80">
+            <div className="flex flex-col items-center gap-2 sm:gap-3 text-[11px] sm:text-sm text-[#f8ece3]/80">
               <a 
                 href="https://wa.me/5521990062956?text=Olá!" 
                 target="_blank" 
@@ -93,12 +93,12 @@ export default function Home() {
                 href="https://maps.app.goo.gl/DM5P4tAFEQ8G99rJ7" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center justify-center gap-1.5 text-center hover:text-[#ff914a] transition-colors"
+                className="flex items-center justify-center gap-1.5 text-center hover:text-[#ff914a] transition-colors max-w-[280px]"
               >
                 <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff914a] shrink-0" />
-                <span className="font-medium underline underline-offset-2 w-5/6 mx-auto sm:w-auto">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
+                <span className="font-medium underline underline-offset-2 leading-snug">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
               </a>
-              <div className="flex items-center justify-center gap-1.5 text-center text-[#f8ece3]/60 mt-1">
+              <div className="flex items-center justify-center gap-1.5 text-center text-[#f8ece3]/60">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff914a] shrink-0" />
                 <span className="font-medium">Terça a Domingo das 15h às 00h</span>
               </div>
