@@ -106,7 +106,7 @@ export default function Home() {
           <span>Terça a Domingo das 15h às 00h</span>
         </div>
         <p className="opacity-80">
-          Ao pedir, você aceita nossos <a href="#" className="font-bold text-[#ff914a] hover:underline">TERMOS</a> e <a href="#" className="font-bold text-[#ff914a] hover:underline">PRIVACIDADE</a>.
+          Ao pedir, você aceita nossos <Link href="/termos" className="font-bold text-[#ff914a] hover:underline">TERMOS</Link> e <Link href="/privacidade" className="font-bold text-[#ff914a] hover:underline">PRIVACIDADE</Link>.
         </p>
       </footer>
     </div>
