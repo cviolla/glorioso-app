@@ -71,10 +71,15 @@ export default function Home() {
                 <Phone className="w-5 h-5 text-[#ff914a]" />
                 <span className="font-medium">(21) 99006-2956</span>
               </div>
-              <div className="flex items-center justify-center gap-2 text-center">
+              <a 
+                href="https://maps.app.goo.gl/DM5P4tAFEQ8G99rJ7" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center justify-center gap-2 text-center hover:text-[#ff914a] transition-colors"
+              >
                 <MapPin className="w-5 h-5 text-[#ff914a] shrink-0" />
-                <span className="font-medium">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
-              </div>
+                <span className="font-medium underline underline-offset-2">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
+              </a>
             </div>
 
             <button 
