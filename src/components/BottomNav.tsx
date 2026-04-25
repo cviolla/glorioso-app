@@ -16,11 +16,11 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-6 left-0 right-0 z-50 px-4 flex justify-center pointer-events-none">
-      <nav className="bg-[#532120]/85 backdrop-blur-lg border border-white/10 text-[#f8ece3] shadow-2xl rounded-full w-full max-w-[320px] pointer-events-auto">
+      <nav className="bg-white/40 backdrop-blur-xl border border-white/60 text-[#532120] shadow-[0_8px_32px_rgba(83,33,32,0.1)] rounded-full w-full max-w-[320px] pointer-events-auto">
         <div className="flex justify-around items-center h-16 px-2">
           <Link 
             href="/menu" 
-            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/menu' ? 'text-[#ff914a]' : 'text-[#f8ece3] opacity-80 hover:opacity-100'}`}
+            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/menu' ? 'text-[#ff914a] drop-shadow-sm' : 'text-[#532120] opacity-80 hover:opacity-100'}`}
           >
             <Home className="w-5 h-5" />
             <span className="text-[10px] font-bold">Cardápio</span>
@@ -28,7 +28,7 @@ export function BottomNav() {
           
           <Link 
             href="/cart" 
-            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/cart' ? 'text-[#ff914a]' : 'text-[#f8ece3] opacity-80 hover:opacity-100'}`}
+            className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/cart' ? 'text-[#ff914a] drop-shadow-sm' : 'text-[#532120] opacity-80 hover:opacity-100'}`}
           >
             <div className="relative">
               <ShoppingBag className="w-5 h-5" />
@@ -43,7 +43,7 @@ export function BottomNav() {
 
           <Link 
             href="/"
-            className="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors text-[#f8ece3] opacity-80 hover:opacity-100"
+            className="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors text-[#532120] opacity-80 hover:opacity-100"
           >
             <LogOut className="w-5 h-5" />
             <span className="text-[10px] font-bold">Sair</span>
