@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin, Share2, Clock, ArrowRight, Instagram } from "lucide-react";
+import { MapPin, Share2, Clock, ArrowRight } from "lucide-react";
 import { StoreStatus } from "@/components/StoreStatus";
 
 export default function Home() {
@@ -60,7 +60,11 @@ export default function Home() {
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-1.5 text-[13px] sm:text-base text-[#f8ece3]/80 hover:text-[#ff914a] transition-colors mb-5 sm:mb-8"
           >
-            <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
             <span className="font-medium">@gloriosobrownie</span>
           </a>
 
