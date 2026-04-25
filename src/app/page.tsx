@@ -36,43 +36,43 @@ export default function Home() {
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-          className="flex flex-col items-center text-center w-full max-w-md mt-6"
+          className="flex flex-col items-center text-center w-full max-w-md mt-2 sm:mt-6"
         >
           {/* Official Logo */}
-          <div className="w-36 h-36 sm:w-44 sm:h-44 bg-[#f8ece3] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,145,74,0.4)] mb-6 overflow-hidden relative border-4 border-[#ff914a]">
+          <div className="w-32 h-32 sm:w-44 sm:h-44 bg-[#f8ece3] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(255,145,74,0.4)] mb-4 sm:mb-6 overflow-hidden relative border-4 border-[#ff914a]">
             <Image 
               src="/GloriosoBrownie_Logo_fuul.png" 
               alt="Logo Glorioso Brownie" 
               fill
               className="object-cover"
               priority
-              sizes="(max-width: 640px) 144px, 176px"
+              sizes="(max-width: 640px) 128px, 176px"
             />
           </div>
           
-          <h1 className="text-3xl sm:text-4xl font-black mb-2 leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-black mb-1 sm:mb-2 leading-tight">
             O Sabor Que <span className="text-[#ff914a]">Impressiona.</span>
           </h1>
           
-          <p className="text-sm sm:text-base text-[#f8ece3]/80 mb-6 sm:mb-8">
+          <p className="text-sm sm:text-base text-[#f8ece3]/80 mb-5 sm:mb-8">
             Glorioso Brownie • O seu melhor momento.
           </p>
 
           <Link 
             href="/menu"
-            className="w-3/4 bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_20px_rgba(255,145,74,0.3)] hover:scale-105 hover:bg-[#ff9f61] transition-all flex items-center justify-center gap-3 mb-6"
+            className="w-3/4 bg-[#ff914a] text-[#381010] font-black text-base sm:text-lg py-3 sm:py-4 px-6 rounded-full shadow-[0_8px_20px_rgba(255,145,74,0.3)] hover:scale-105 hover:bg-[#ff9f61] transition-all flex items-center justify-center gap-2 sm:gap-3 mb-5 sm:mb-6"
           >
             Peça seu Lanche
             <ArrowRight className="w-5 h-5" />
           </Link>
 
-          <div className="flex flex-col items-center gap-4 w-full">
-            <div className="flex flex-col gap-2 text-xs sm:text-sm text-[#f8ece3]/80">
+          <div className="flex flex-col items-center gap-3 sm:gap-4 w-full">
+            <div className="flex flex-col gap-1.5 sm:gap-2 text-[11px] sm:text-sm text-[#f8ece3]/80">
               <a 
                 href="https://wa.me/5521990062956?text=Olá!" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 hover:text-[#ff914a] transition-colors"
+                className="flex items-center justify-center gap-1.5 hover:text-[#ff914a] transition-colors"
               >
                 <svg className="w-4 h-4 text-[#ff914a]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12.031 0C5.385 0 0 5.383 0 12.029c0 2.122.553 4.195 1.604 6.012L.207 24l6.096-1.597A11.966 11.966 0 0 0 12.031 24c6.643 0 12.028-5.385 12.028-12.029S18.674 0 12.031 0zm3.896 17.135c-.168.473-.974.928-1.343.972-.371.045-1.026.136-3.329-.817-2.782-1.15-4.577-3.985-4.717-4.171-.141-.186-1.127-1.5-1.127-2.864 0-1.363.704-2.035.952-2.309.248-.274.542-.343.725-.343.183 0 .367.004.524.012.164.009.385-.065.604.464.225.545.726 1.776.791 1.905.066.129.11.28.026.448-.084.168-.128.274-.255.424-.128.15-.265.333-.382.443-.129.124-.265.26-.118.514.148.254.656 1.082 1.406 1.752.969.866 1.775 1.135 2.035 1.258.261.124.413.104.568-.07.155-.175.67-0.776.85-1.042.18-.266.36-.222.597-.132.238.09 1.503.71 1.761.839.258.129.431.194.494.301.062.107.062.624-.106 1.097z"/>
@@ -83,7 +83,7 @@ export default function Home() {
                 href="https://maps.app.goo.gl/DM5P4tAFEQ8G99rJ7" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center justify-center gap-2 text-center hover:text-[#ff914a] transition-colors"
+                className="flex items-center justify-center gap-1.5 text-center hover:text-[#ff914a] transition-colors"
               >
                 <MapPin className="w-4 h-4 text-[#ff914a] shrink-0" />
                 <span className="font-medium underline underline-offset-2">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
@@ -92,10 +92,10 @@ export default function Home() {
 
             <button 
               onClick={handleShare}
-              className="bg-[#532120] text-[#ff914a] p-3 rounded-full shadow-md hover:bg-[#954e3a] hover:text-[#f8ece3] transition-colors mt-2"
+              className="bg-[#532120] text-[#ff914a] p-2 sm:p-3 rounded-full shadow-md hover:bg-[#954e3a] hover:text-[#f8ece3] transition-colors mt-1"
               aria-label="Compartilhar"
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-5 h-5 sm:w-5 sm:h-5" />
             </button>
           </div>
         </motion.div>
