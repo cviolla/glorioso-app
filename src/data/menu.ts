@@ -23,6 +23,12 @@ export type MenuCategory = {
   items?: MenuItem[];
 };
 
+const burgerAddons = [
+  { name: 'CARNE', price: 3.00 },
+  { name: 'OVO', price: 2.00 },
+  { name: 'BACON', price: 2.00 },
+];
+
 export const menuData: MenuCategory[] = [
   {
     id: 'batatas',
@@ -131,23 +137,14 @@ export const menuData: MenuCategory[] = [
     id: 'hamburguer',
     name: 'HAMBURGUER',
     items: [
-      { id: 'x-burguer', name: 'X-BURGUER', description: 'pão, carne, queijo, salada, molho especial e batata filetada', price: 7.50 },
-      { id: 'x-egg', name: 'X-EGG', description: 'pão, carne, queijo, presunto, ovo, salada, molho especial e batata filetada', price: 11.00 },
-      { id: 'x-bacon', name: 'X-BACON', description: 'pão, carne, queijo, presunto, bacon, salada, molho especial e batata filetada', price: 11.00 },
-      { id: 'x-tudo', name: 'X-TUDO', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 13.00 },
-      { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00 },
-      { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00 },
-      { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00 },
-      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', price: 15.00 },
-    ]
-  },
-  {
-    id: 'adicionais',
-    name: 'ADICIONAIS',
-    items: [
-      { id: 'add-carne', name: 'CARNE', price: 3.00 },
-      { id: 'add-ovo', name: 'OVO', price: 2.00 },
-      { id: 'add-bacon', name: 'BACON', price: 2.00 },
+      { id: 'x-burguer', name: 'X-BURGUER', description: 'pão, carne, queijo, salada, molho especial e batata filetada', price: 7.50, addons: burgerAddons },
+      { id: 'x-egg', name: 'X-EGG', description: 'pão, carne, queijo, presunto, ovo, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
+      { id: 'x-bacon', name: 'X-BACON', description: 'pão, carne, queijo, presunto, bacon, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
+      { id: 'x-tudo', name: 'X-TUDO', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 13.00, addons: burgerAddons },
+      { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00, addons: burgerAddons },
+      { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+      { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', price: 15.00, addons: burgerAddons },
     ]
   },
   {
