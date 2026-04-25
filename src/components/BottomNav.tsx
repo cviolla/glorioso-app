@@ -18,11 +18,11 @@ export function BottomNav() {
     <nav className="fixed bottom-0 w-full bg-[#532120] text-[#f8ece3] shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-50">
       <div className="flex justify-around items-center h-20 max-w-md mx-auto px-4">
         <Link 
-          href="/" 
-          className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/' ? 'text-[#ff914a]' : 'text-[#f8ece3] opacity-80 hover:opacity-100'}`}
+          href="/menu" 
+          className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/menu' ? 'text-[#ff914a]' : 'text-[#f8ece3] opacity-80 hover:opacity-100'}`}
         >
           <Home className="w-6 h-6" />
-          <span className="text-xs font-semibold">Home</span>
+          <span className="text-xs font-semibold">Cardápio</span>
         </Link>
         
         <Link 
@@ -40,12 +40,14 @@ export function BottomNav() {
           <span className="text-xs font-semibold">Carrinho</span>
         </Link>
 
-        <button className="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors text-[#f8ece3] opacity-80 hover:opacity-100">
+        <Link 
+          href="/"
+          className="flex flex-col items-center gap-1 p-2 rounded-xl transition-colors text-[#f8ece3] opacity-80 hover:opacity-100"
+        >
           <LogOut className="w-6 h-6" />
           <span className="text-xs font-semibold">Sair</span>
-        </button>
+        </Link>
       </div>
     </nav>
   );
 }
-

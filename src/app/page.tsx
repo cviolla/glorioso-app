@@ -1,19 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Share2, Search, Info } from "lucide-react";
+import { Phone, MapPin, Share2, Info, ArrowRight } from "lucide-react";
 import { StoreStatus } from "@/components/StoreStatus";
-import { BottomNav } from "@/components/BottomNav";
-import { Sidebar } from "@/components/Sidebar";
-import { ProductCard } from "@/components/ProductCard";
-import { menuData, MenuItem } from "@/data/menu";
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState<string>(menuData[0].id);
-  const [searchQuery, setSearchQuery] = useState("");
-
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -30,46 +23,23 @@ export default function Home() {
     }
   };
 
-  const currentCategoryData = menuData.find(c => c.id === activeCategory);
-
-  // Flatten all items for search
-  const allItems = menuData.flatMap(category => {
-    let items: MenuItem[] = [];
-    if (category.items) items = [...items, ...category.items];
-    if (category.subcategories) {
-      category.subcategories.forEach(sub => {
-        items = [...items, ...sub.items];
-      });
-    }
-    return items;
-  });
-
-  const filteredItems = searchQuery 
-    ? allItems.filter(item => 
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : [];
-
   return (
-    <div className="min-h-screen bg-[#f8ece3] font-sans pb-24">
-      <Sidebar onSelectCategory={(id) => {
-        setActiveCategory(id);
-        setSearchQuery(""); // Clear search when navigating from sidebar
-      }} />
+    <div className="min-h-screen bg-[#381010] font-sans flex flex-col relative overflow-hidden text-[#f8ece3]">
+      {/* Background abstract elements for modern feel */}
+      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-[#532120] rounded-full mix-blend-screen filter blur-[100px] opacity-50"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-[#954e3a] rounded-full mix-blend-screen filter blur-[100px] opacity-50"></div>
 
-      {/* Header / Hero Section */}
-      <header className="bg-[#532120] text-[#f8ece3] pt-16 pb-12 px-6 rounded-b-[40px] shadow-lg relative overflow-hidden">
-        <StoreStatus className="absolute top-4 right-4 z-40" />
-        
+      <StoreStatus className="absolute top-6 right-6 z-40" />
+
+      <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 pt-20 pb-10">
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, type: "spring" }}
-          className="flex flex-col items-center text-center"
+          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+          className="flex flex-col items-center text-center w-full max-w-md"
         >
           {/* Official Logo */}
-          <div className="w-40 h-40 bg-[#f8ece3] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,145,74,0.3)] mb-4 overflow-hidden relative border-4 border-[#ff914a]">
+          <div className="w-48 h-48 bg-[#f8ece3] rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(255,145,74,0.4)] mb-8 overflow-hidden relative border-4 border-[#ff914a]">
             <Image 
               src="/GloriosoBrownie_Logo_fuul.png" 
               alt="Logo Glorioso Brownie" 
@@ -79,105 +49,56 @@ export default function Home() {
             />
           </div>
           
-          <h1 className="text-2xl font-bold mb-2">O Sabor Que Impressiona!</h1>
+          <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+            O Sabor Que <span className="text-[#ff914a]">Impressiona.</span>
+          </h1>
           
-          <div className="flex flex-col gap-2 text-sm text-[#f8ece3]/80 mb-6">
-            <div className="flex items-center justify-center gap-2">
-              <Phone className="w-4 h-4 text-[#ff914a]" />
-              <span>(21) 99006-2956</span>
-            </div>
-            <div className="flex items-center justify-center gap-1 w-full px-2">
-              <MapPin className="w-4 h-4 text-[#ff914a] shrink-0" />
-              <span className="truncate text-xs sm:text-sm">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
-            </div>
-          </div>
+          <p className="text-lg text-[#f8ece3]/80 mb-10">
+            Glorioso Brownie • O seu melhor momento.
+          </p>
 
-          <div className="flex gap-4">
-            <button 
-              onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-[#ff914a] text-[#381010] font-bold py-3 px-6 rounded-full shadow-lg hover:scale-105 transition-transform"
-            >
-              Peça seu lanche
-            </button>
+          <Link 
+            href="/menu"
+            className="w-full bg-[#ff914a] text-[#381010] font-black text-lg py-5 px-6 rounded-full shadow-[0_10px_25px_rgba(255,145,74,0.3)] hover:scale-105 hover:bg-[#ff9f61] transition-all flex items-center justify-center gap-3 mb-10"
+          >
+            Peça seu Lanche
+            <ArrowRight className="w-6 h-6" />
+          </Link>
+
+          <div className="flex flex-col items-center gap-6 w-full">
+            <div className="flex flex-col gap-3 text-sm text-[#f8ece3]/80">
+              <div className="flex items-center justify-center gap-2">
+                <Phone className="w-5 h-5 text-[#ff914a]" />
+                <span className="font-medium">(21) 99006-2956</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-center">
+                <MapPin className="w-5 h-5 text-[#ff914a] shrink-0" />
+                <span className="font-medium">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
+              </div>
+            </div>
+
             <button 
               onClick={handleShare}
-              className="bg-[#381010] text-[#f8ece3] p-3 rounded-full shadow-lg hover:bg-[#954e3a] transition-colors"
+              className="bg-[#532120] text-[#ff914a] p-4 rounded-full shadow-lg hover:bg-[#954e3a] hover:text-[#f8ece3] transition-colors mt-4"
               aria-label="Compartilhar"
             >
               <Share2 className="w-6 h-6" />
             </button>
           </div>
         </motion.div>
-      </header>
-
-      <main className="max-w-md mx-auto px-4 mt-[-20px] relative z-10">
-        
-        {/* Search Bar */}
-        <div className="relative mb-8 shadow-md rounded-2xl overflow-hidden bg-white border-2 border-transparent focus-within:border-[#ff914a] transition-colors">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/50 w-6 h-6" />
-          <input 
-            type="text"
-            placeholder="Buscar lanches, pizzas, bebidas..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full py-4 pl-14 pr-4 bg-transparent outline-none text-[#381010] placeholder:text-[#532120]/50 font-medium"
-          />
-        </div>
-
-        {/* Dynamic Section (Search vs Category) */}
-        {searchQuery ? (
-          <div id="menu-section" className="pt-2">
-            <h2 className="text-xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
-              Resultados para "{searchQuery}"
-            </h2>
-
-            {filteredItems.length > 0 ? (
-              filteredItems.map(item => (
-                <ProductCard key={item.id} item={item} />
-              ))
-            ) : (
-              <div className="text-center py-10">
-                <p className="text-[#954e3a] font-medium">Nenhum produto encontrado.</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div id="menu-section" className="pt-2">
-            <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
-              {currentCategoryData?.name}
-            </h2>
-
-            {/* Render regular items */}
-            {currentCategoryData?.items && currentCategoryData.items.map(item => (
-              <ProductCard key={item.id} item={item} />
-            ))}
-
-            {/* Render subcategories if any */}
-            {currentCategoryData?.subcategories && currentCategoryData.subcategories.map((sub, idx) => (
-              <div key={idx} className="mb-8">
-                <h3 className="text-lg font-bold text-[#954e3a] mb-4 bg-[#f8ece3] sticky top-20 z-20 py-2 border-l-4 border-[#ff914a] pl-3">
-                  {sub.name}
-                </h3>
-                {sub.items.map(item => (
-                  <ProductCard key={item.id} item={item} />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
       </main>
 
       {/* Footer */}
-      <footer className="max-w-md mx-auto px-4 py-8 text-center text-[#532120] text-xs pb-32">
+      <footer className="w-full px-4 py-8 text-center text-[#f8ece3]/60 text-xs relative z-10">
         <div className="flex items-center justify-center gap-1 mb-2">
           <Info className="w-4 h-4" />
           <span>Funcionamento: Terça a Domingo das 15h às 00h</span>
         </div>
-        <a href="#" className="underline hover:text-[#954e3a]">Termos e Privacidade</a>
-        <p className="mt-4 opacity-60">© 2026 Glorioso Brownie. Todos os direitos reservados.</p>
+        <p className="mt-4">
+          Ao clicar em Peça seu Lanche, você aceita nossos <br/>
+          <a href="#" className="font-bold text-[#ff914a] hover:underline">TERMOS</a> e <a href="#" className="font-bold text-[#ff914a] hover:underline">PRIVACIDADE</a>.
+        </p>
       </footer>
-
-      <BottomNav />
     </div>
   );
 }
