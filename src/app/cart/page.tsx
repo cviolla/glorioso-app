@@ -13,7 +13,13 @@ export default function CartPage() {
     
     let text = "Olá, gostaria de fazer o seguinte pedido:%0A%0A";
     items.forEach(item => {
-      text += `${item.quantity}x ${item.name} ${item.variant ? `(${item.variant})` : ''} - R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}%0A`;
+      const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
+      let itemDesc = `${item.quantity}x ${item.name}`;
+      if (item.variant) itemDesc += ` (${item.variant})`;
+      text += `${itemDesc} - R$ ${(itemTotal * item.quantity).toFixed(2).replace('.', ',')}%0A`;
+      if (item.addons && item.addons.length > 0) {
+        text += `   + Adicionais: ${item.addons.map(a => a.name).join(', ')}%0A`;
+      }
     });
     text += `%0A*Total: R$ ${totalPrice().toFixed(2).replace('.', ',')}*`;
     
@@ -45,25 +51,33 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {items.map((item, idx) => (
-              <div key={`${item.id}-${item.variant || 'base'}-${idx}`} className="bg-white p-4 rounded-2xl shadow-sm border border-[#532120]/10 flex justify-between items-center">
-                <div>
-                  <h3 className="font-bold text-[#532120]">
-                    {item.quantity}x {item.name}
-                  </h3>
-                  {item.variant && <p className="text-sm text-gray-500">{item.variant}</p>}
-                  <p className="text-[#954e3a] font-semibold mt-1">
-                    R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
-                  </p>
+            {items.map((item) => {
+              const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
+              return (
+                <div key={item.cartItemId} className="bg-white p-4 rounded-2xl shadow-sm border border-[#532120]/10 flex justify-between items-center">
+                  <div>
+                    <h3 className="font-bold text-[#532120]">
+                      {item.quantity}x {item.name}
+                    </h3>
+                    {item.variant && <p className="text-sm text-gray-500">{item.variant}</p>}
+                    {item.addons && item.addons.length > 0 && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        + {item.addons.map(a => a.name).join(', ')}
+                      </p>
+                    )}
+                    <p className="text-[#954e3a] font-semibold mt-1">
+                      R$ {(itemTotal * item.quantity).toFixed(2).replace('.', ',')}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => removeItem(item.cartItemId)}
+                    className="text-red-500 p-2 hover:bg-red-50 rounded-full"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => removeItem(item.id, item.variant)}
-                  className="text-red-500 p-2 hover:bg-red-50 rounded-full"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="mt-8 bg-[#532120] text-[#f8ece3] p-6 rounded-2xl shadow-lg">
               <div className="flex justify-between items-center mb-4 text-lg">

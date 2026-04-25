@@ -9,6 +9,7 @@ export type MenuItem = {
   description?: string;
   price?: number;
   variants?: MenuItemVariant[];
+  addons?: MenuItemVariant[];
   imageUrl?: string;
 };
 

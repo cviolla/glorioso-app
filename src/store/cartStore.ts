@@ -1,17 +1,24 @@
 import { create } from 'zustand';
 
+export type CartAddon = {
+  name: string;
+  price: number;
+};
+
 export type CartItem = {
+  cartItemId: string; // Unique ID for the specific cart entry
   id: string;
   name: string;
   price: number;
   quantity: number;
   variant?: string;
+  addons?: CartAddon[];
 };
 
 interface CartState {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: string, variant?: string) => void;
+  addItem: (item: Omit<CartItem, 'quantity' | 'cartItemId'>) => void;
+  removeItem: (cartItemId: string) => void;
   clearCart: () => void;
   totalItems: () => number;
   totalPrice: () => number;
@@ -20,22 +27,33 @@ interface CartState {
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
   addItem: (item) => set((state) => {
-    const existingItem = state.items.find(i => i.id === item.id && i.variant === item.variant);
-    if (existingItem) {
-      return {
-        items: state.items.map(i => 
-          i.id === item.id && i.variant === item.variant 
-            ? { ...i, quantity: i.quantity + 1 } 
-            : i
-        )
-      };
+    // Generate a signature for comparison
+    const addonsSignature = item.addons?.map(a => a.name).sort().join('|') || '';
+    const variantSignature = item.variant || '';
+    
+    // Check if exact same product + variant + addons exists
+    const existingItemIndex = state.items.findIndex(i => 
+      i.id === item.id && 
+      (i.variant || '') === variantSignature &&
+      (i.addons?.map(a => a.name).sort().join('|') || '') === addonsSignature
+    );
+
+    if (existingItemIndex >= 0) {
+      const newItems = [...state.items];
+      newItems[existingItemIndex].quantity += 1;
+      return { items: newItems };
     }
-    return { items: [...state.items, { ...item, quantity: 1 }] };
+    
+    const cartItemId = crypto.randomUUID();
+    return { items: [...state.items, { ...item, quantity: 1, cartItemId }] };
   }),
-  removeItem: (id, variant) => set((state) => ({
-    items: state.items.filter(i => !(i.id === id && i.variant === variant))
+  removeItem: (cartItemId) => set((state) => ({
+    items: state.items.filter(i => i.cartItemId !== cartItemId)
   })),
   clearCart: () => set({ items: [] }),
   totalItems: () => get().items.reduce((acc, item) => acc + item.quantity, 0),
-  totalPrice: () => get().items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+  totalPrice: () => get().items.reduce((acc, item) => {
+    const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
+    return acc + (itemTotal * item.quantity);
+  }, 0),
 }));
