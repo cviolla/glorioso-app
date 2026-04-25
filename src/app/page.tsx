@@ -67,10 +67,15 @@ export default function Home() {
 
           <div className="flex flex-col items-center gap-6 w-full">
             <div className="flex flex-col gap-3 text-sm text-[#f8ece3]/80">
-              <div className="flex items-center justify-center gap-2">
+              <a 
+                href="https://wa.me/5521990062956?text=Olá!" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 hover:text-[#ff914a] transition-colors"
+              >
                 <Phone className="w-5 h-5 text-[#ff914a]" />
-                <span className="font-medium">(21) 99006-2956</span>
-              </div>
+                <span className="font-medium underline underline-offset-2">(21) 99006-2956</span>
+              </a>
               <a 
                 href="https://maps.app.goo.gl/DM5P4tAFEQ8G99rJ7" 
                 target="_blank" 
