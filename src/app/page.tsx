@@ -24,10 +24,12 @@ export default function Home() {
   };
 
   return (
-    <div className="h-[100dvh] bg-[#381010] font-sans flex flex-col relative overflow-hidden text-[#f8ece3]">
-      {/* Background abstract elements for modern feel */}
-      <div className="absolute top-[-10%] left-[-10%] w-72 h-72 bg-[#532120] rounded-full mix-blend-screen filter blur-[80px] opacity-50"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-[#954e3a] rounded-full mix-blend-screen filter blur-[80px] opacity-50"></div>
+    <div 
+      className="flex flex-col min-h-[100dvh] text-[#f8ece3] font-sans selection:bg-[#ff914a] selection:text-[#381010] overflow-hidden relative bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/background_home.jpg')" }}
+    >
+      {/* Subtle overlay for text readability */}
+      <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none"></div>
 
       <StoreStatus className="absolute top-4 right-4 z-40 scale-90 origin-top-right" />
 
