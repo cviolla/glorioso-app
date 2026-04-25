@@ -26,10 +26,10 @@ export const menuData: MenuCategory[] = [
     id: 'batatas',
     name: 'BATATAS',
     items: [
-      { id: 'batata-cheddar-bacon', name: 'BATATA', description: 'CHEDDAR + BACON', price: 20.00 },
-      { id: 'batata-mussa-calabresa', name: 'BATATA', description: 'MUSSARELA + CALABRESA', price: 20.00 },
-      { id: 'batata-costela-cream', name: 'BATATA', description: 'COSTELA + CREAM CHEESE', price: 22.00 },
-      { id: 'batata-pequena', name: 'BATATA PEQUENA', price: 8.00 },
+      { id: 'batata-cheddar-bacon', name: 'CHEDDAR + BACON', price: 20.00 },
+      { id: 'batata-mussa-calabresa', name: 'MUSSARELA + CALABRESA', price: 20.00 },
+      { id: 'batata-costela-cream', name: 'COSTELA + CREAM CHEESE', price: 22.00 },
+      { id: 'batata-pequena', name: 'PEQUENA', price: 8.00 },
     ]
   },
   {
