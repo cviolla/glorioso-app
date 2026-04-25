@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Share2, Clock, ArrowRight } from "lucide-react";
+import { MapPin, Share2, Clock, ArrowRight, Instagram } from "lucide-react";
 import { StoreStatus } from "@/components/StoreStatus";
 
 export default function Home() {
@@ -54,9 +54,15 @@ export default function Home() {
             O Sabor Que <br className="sm:hidden" /><span className="text-[#ff914a]">Impressiona.</span>
           </h1>
           
-          <p className="text-[13px] sm:text-base text-[#f8ece3]/80 mb-5 sm:mb-8">
-            Glorioso Brownie • O seu melhor momento.
-          </p>
+          <a 
+            href="https://www.instagram.com/gloriosobrownie/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 text-[13px] sm:text-base text-[#f8ece3]/80 hover:text-[#ff914a] transition-colors mb-5 sm:mb-8"
+          >
+            <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="font-medium">@gloriosobrownie</span>
+          </a>
 
           <Link 
             href="/menu"
