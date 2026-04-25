@@ -98,6 +98,10 @@ export default function Home() {
                 <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff914a] shrink-0" />
                 <span className="font-medium underline underline-offset-2 w-5/6 mx-auto sm:w-auto">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
               </a>
+              <div className="flex items-center justify-center gap-1.5 text-center text-[#f8ece3]/60 mt-1">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff914a] shrink-0" />
+                <span className="font-medium">Terça a Domingo das 15h às 00h</span>
+              </div>
             </div>
 
             <button 
@@ -113,10 +117,6 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="w-full px-4 py-4 text-center text-[#f8ece3]/60 text-[10px] sm:text-xs relative z-10">
-        <div className="flex items-center justify-center gap-1 mb-1">
-          <Clock className="w-3 h-3" />
-          <span>Terça a Domingo das 15h às 00h</span>
-        </div>
         <p className="opacity-80">
           Ao pedir, você aceita nossos <Link href="/termos" className="font-bold text-[#ff914a] hover:underline">TERMOS</Link> e <Link href="/privacidade" className="font-bold text-[#ff914a] hover:underline">PRIVACIDADE</Link>.
         </p>
