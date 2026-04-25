@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Share2, Info, ArrowRight } from "lucide-react";
+import { Phone, MapPin, Share2, Clock, ArrowRight } from "lucide-react";
 import { StoreStatus } from "@/components/StoreStatus";
 
 export default function Home() {
@@ -102,7 +102,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full px-4 py-4 text-center text-[#f8ece3]/60 text-[10px] sm:text-xs relative z-10">
         <div className="flex items-center justify-center gap-1 mb-1">
-          <Info className="w-3 h-3" />
+          <Clock className="w-3 h-3" />
           <span>Terça a Domingo das 15h às 00h</span>
         </div>
         <p className="opacity-80">
