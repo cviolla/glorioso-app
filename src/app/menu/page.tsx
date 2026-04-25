@@ -104,14 +104,14 @@ export default function MenuPage() {
 
       <main className="max-w-md mx-auto relative z-10">
         {/* Search Bar */}
-        <div className="relative mb-8 shadow-md rounded-2xl overflow-hidden bg-white border-2 border-transparent focus-within:border-[#ff914a] transition-colors">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/50 w-6 h-6" />
+        <div className="relative mb-6 shadow-sm rounded-2xl overflow-hidden bg-white border border-[#f8ece3] focus-within:border-[#ff914a] transition-colors">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5" />
           <input 
             type="text"
             placeholder="Buscar lanches, pizzas, bebidas..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full py-4 pl-14 pr-4 bg-transparent outline-none text-[#381010] placeholder:text-[#532120]/50 font-medium"
+            className="w-full py-3 pl-12 pr-4 bg-transparent outline-none text-[#381010] placeholder:text-[#532120]/40 font-medium text-sm"
           />
         </div>
 

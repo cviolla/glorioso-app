@@ -9,6 +9,7 @@ export type MenuItem = {
   description?: string;
   price?: number;
   variants?: MenuItemVariant[];
+  imageUrl?: string;
 };
 
 export type MenuCategory = {
