@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
@@ -10,7 +10,56 @@ export default function MenuPage() {
   const [activeCategory, setActiveCategory] = useState<string>(menuData[0].id);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const currentCategoryData = menuData.find(c => c.id === activeCategory);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Intersection Observer for scroll spy
+  useEffect(() => {
+    if (searchQuery) return;
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      const visibleEntries = entries.filter(entry => entry.isIntersecting);
+      if (visibleEntries.length > 0) {
+        // Find the topmost visible element
+        const topEntry = visibleEntries.reduce((prev, curr) => {
+          return prev.boundingClientRect.top < curr.boundingClientRect.top ? prev : curr;
+        });
+        
+        const visibleCategoryId = topEntry.target.id.replace('category-', '');
+        setActiveCategory(visibleCategoryId);
+        
+        // Auto-scroll the horizontal nav to keep the active item in view
+        const btn = document.getElementById(`nav-btn-${visibleCategoryId}`);
+        if (btn) {
+          btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }
+    }, {
+      rootMargin: '-100px 0px -70% 0px', // Triggers when element is near the top
+      threshold: 0
+    });
+
+    menuData.forEach(category => {
+      const el = document.getElementById(`category-${category.id}`);
+      if (el) observerRef.current?.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, [searchQuery]);
+
+  const scrollToCategory = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    setSearchQuery("");
+    
+    // Delay slightly to ensure layout is ready if coming from search mode
+    setTimeout(() => {
+      const el = document.getElementById(`category-${categoryId}`);
+      if (el) {
+        const yOffset = -90; // Height of the sticky header + some padding
+        const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 50);
+  };
 
   const allItems = menuData.flatMap(category => {
     let items: MenuItem[] = [];
@@ -39,11 +88,8 @@ export default function MenuPage() {
           {menuData.map(category => (
             <button
               key={category.id}
-              onClick={() => {
-                setActiveCategory(category.id);
-                setSearchQuery("");
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              id={`nav-btn-${category.id}`}
+              onClick={() => scrollToCategory(category.id)}
               className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 ${
                 activeCategory === category.id && !searchQuery
                   ? "bg-[#532120] text-[#ff914a] shadow-md scale-105"
@@ -69,9 +115,9 @@ export default function MenuPage() {
           />
         </div>
 
-        {/* Dynamic Section (Search vs Category) */}
+        {/* Dynamic Section (Search vs Full List) */}
         {searchQuery ? (
-          <div id="menu-section" className="pt-2">
+          <div className="pt-2">
             <h2 className="text-xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
               Resultados para "{searchQuery}"
             </h2>
@@ -87,22 +133,29 @@ export default function MenuPage() {
             )}
           </div>
         ) : (
-          <div id="menu-section" className="pt-2">
-            <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
-              {currentCategoryData?.name}
-            </h2>
+          <div className="pt-2 flex flex-col gap-10">
+            {/* Render all categories sequentially */}
+            {menuData.map(category => (
+              <div key={category.id} id={`category-${category.id}`} className="scroll-mt-24">
+                <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
+                  {category.name}
+                </h2>
 
-            {currentCategoryData?.items && currentCategoryData.items.map(item => (
-              <ProductCard key={item.id} item={item} />
-            ))}
-
-            {currentCategoryData?.subcategories && currentCategoryData.subcategories.map((sub, idx) => (
-              <div key={idx} className="mb-8">
-                <h3 className="text-lg font-bold text-[#954e3a] mb-4 bg-[#f8ece3] sticky top-20 z-20 py-2 border-l-4 border-[#ff914a] pl-3">
-                  {sub.name}
-                </h3>
-                {sub.items.map(item => (
+                {/* Render regular items */}
+                {category.items && category.items.map(item => (
                   <ProductCard key={item.id} item={item} />
+                ))}
+
+                {/* Render subcategories if any */}
+                {category.subcategories && category.subcategories.map((sub, idx) => (
+                  <div key={idx} className="mt-8 mb-4">
+                    <h3 className="text-lg font-bold text-[#954e3a] mb-4 bg-[#f8ece3] sticky top-[72px] z-20 py-2 border-l-4 border-[#ff914a] pl-3">
+                      {sub.name}
+                    </h3>
+                    {sub.items.map(item => (
+                      <ProductCard key={item.id} item={item} />
+                    ))}
+                  </div>
                 ))}
               </div>
             ))}
