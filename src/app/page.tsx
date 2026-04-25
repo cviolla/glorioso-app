@@ -93,9 +93,9 @@ export default function Home() {
                 href="https://maps.app.goo.gl/DM5P4tAFEQ8G99rJ7" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="flex items-center justify-center gap-1.5 text-center hover:text-[#ff914a] transition-colors max-w-[280px]"
+                className="flex items-start sm:items-center justify-center gap-1.5 text-center hover:text-[#ff914a] transition-colors max-w-[260px] sm:max-w-none"
               >
-                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff914a] shrink-0" />
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#ff914a] shrink-0 mt-0.5 sm:mt-0" />
                 <span className="font-medium underline underline-offset-2 leading-snug">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
               </a>
               <div className="flex items-center justify-center gap-1.5 text-center text-[#f8ece3]/60">
