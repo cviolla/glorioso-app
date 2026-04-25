@@ -60,7 +60,7 @@ export default function Home() {
 
           <Link 
             href="/menu"
-            className="w-full bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_20px_rgba(255,145,74,0.3)] hover:scale-105 hover:bg-[#ff9f61] transition-all flex items-center justify-center gap-3 mb-6"
+            className="w-3/4 bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_20px_rgba(255,145,74,0.3)] hover:scale-105 hover:bg-[#ff9f61] transition-all flex items-center justify-center gap-3 mb-6"
           >
             Peça seu Lanche
             <ArrowRight className="w-5 h-5" />
