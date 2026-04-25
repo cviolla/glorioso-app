@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
-import { Sidebar } from "@/components/Sidebar";
 import { ProductCard } from "@/components/ProductCard";
 import { menuData, MenuItem } from "@/data/menu";
 
@@ -32,11 +31,30 @@ export default function MenuPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#f8ece3] font-sans pb-24 pt-20 px-4">
-      <Sidebar onSelectCategory={(id) => {
-        setActiveCategory(id);
-        setSearchQuery("");
-      }} />
+    <div className="min-h-screen bg-[#f8ece3] font-sans pb-24 pt-4 px-4">
+      
+      {/* Sticky Top Category Navigation */}
+      <nav className="sticky top-0 z-40 bg-[#f8ece3] -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
+        <div className="flex gap-3 max-w-md mx-auto">
+          {menuData.map(category => (
+            <button
+              key={category.id}
+              onClick={() => {
+                setActiveCategory(category.id);
+                setSearchQuery("");
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 ${
+                activeCategory === category.id && !searchQuery
+                  ? "bg-[#532120] text-[#ff914a] shadow-md scale-105"
+                  : "bg-white text-[#532120] border border-[#532120]/20 hover:bg-[#532120]/5"
+              }`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+      </nav>
 
       <main className="max-w-md mx-auto relative z-10">
         {/* Search Bar */}
