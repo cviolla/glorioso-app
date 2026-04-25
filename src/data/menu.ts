@@ -144,7 +144,7 @@ export const menuData: MenuCategory[] = [
       { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00, addons: burgerAddons },
       { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
       { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
-      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', price: 15.00, addons: burgerAddons },
+      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
     ]
   },
   {
