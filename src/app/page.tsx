@@ -86,9 +86,9 @@ export default function Home() {
               <Phone className="w-4 h-4 text-[#ff914a]" />
               <span>(21) 99006-2956</span>
             </div>
-            <div className="flex items-center justify-center gap-2 max-w-xs text-center">
-              <MapPin className="w-5 h-5 text-[#ff914a] shrink-0" />
-              <span>Avenida B Nº 195 - rua da Feira, Nova Campinas</span>
+            <div className="flex items-center justify-center gap-1 w-full px-2">
+              <MapPin className="w-4 h-4 text-[#ff914a] shrink-0" />
+              <span className="truncate text-xs sm:text-sm">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
             </div>
           </div>
 
