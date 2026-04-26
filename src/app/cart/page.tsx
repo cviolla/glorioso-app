@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, ChevronRight, X, Motorbike, Store, User, Phone, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
@@ -68,36 +68,59 @@ export default function CartPage() {
     window.open(`https://wa.me/5521990062956?text=${text}`, '_blank');
   };
 
-  const DrawerOverlay = ({ isOpen, onClose, children, title }: { isOpen: boolean, onClose: () => void, children: React.ReactNode, title: string }) => (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end items-center">
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/60"
-          />
-          <motion.div 
-            initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-            transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="relative w-full max-w-3xl bg-[#f8ece3] rounded-t-3xl h-[85%] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.5)] overflow-hidden"
-          >
-            <div className="flex items-center justify-between p-5 border-b border-[#532120]/10 shrink-0 bg-[#f8ece3] z-10">
-              <div className="flex items-center gap-3">
-                <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#532120]/10 text-[#381010]">
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <h2 className="text-lg font-bold text-[#381010]">{title}</h2>
+  const DrawerOverlay = ({ isOpen, onClose, children, title }: { isOpen: boolean, onClose: () => void, children: React.ReactNode, title: string }) => {
+    useEffect(() => {
+      if (isOpen) {
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
+      } else {
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+      }
+      return () => { 
+        document.body.style.overflow = ''; 
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+      };
+    }, [isOpen]);
+
+    return (
+      <AnimatePresence>
+        {isOpen && (
+          <div className="fixed inset-0 z-50 overflow-hidden" style={{ touchAction: 'none' }}>
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="absolute inset-0 bg-black/60"
+            />
+            <motion.div 
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+              className="absolute top-12 inset-x-0 bottom-0 w-full max-w-3xl mx-auto bg-[#f8ece3] rounded-t-3xl flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.5)] overflow-hidden"
+              style={{ touchAction: 'auto' }}
+            >
+              <div className="flex items-center justify-between p-5 border-b border-[#532120]/10 shrink-0 bg-[#f8ece3] relative z-10">
+                <div className="flex items-center gap-3">
+                  <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#532120]/10 text-[#381010]">
+                    <ArrowLeft className="w-5 h-5" />
+                  </button>
+                  <h2 className="text-lg font-bold text-[#381010]">{title}</h2>
+                </div>
               </div>
-            </div>
-            <div className="overflow-y-auto flex-1 p-5 pb-32 relative">
-              {children}
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
+              <div className="overflow-y-auto flex-1 p-5 pb-32 relative">
+                {children}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#1a0808] font-sans pb-32 text-[#f8ece3]">
