@@ -8,6 +8,13 @@ export async function GET() {
     let insertedSubcategories = 0;
     let insertedProducts = 0;
 
+    // LIMPEZA DAS TABELAS (Para evitar duplicatas)
+    // Deletamos na ordem inversa das chaves estrangeiras
+    await supabase.from('product_variants').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabase.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabase.from('subcategories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    await supabase.from('categories').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
     for (let cIndex = 0; cIndex < menuData.length; cIndex++) {
       const category = menuData[cIndex];
       
