@@ -16,11 +16,19 @@ export default function CartPage() {
   const [deliveryType, setDeliveryType] = useState<DeliveryType>(null);
 
   const [userInfo, setUserInfo] = useState({ name: '', phone: '' });
-  const [address, setAddress] = useState({ street: '', number: '', neighborhood: 'Nova Campinas (R$ 5,00)', complement: '', reference: '' });
+  const [address, setAddress] = useState({ street: '', number: '', neighborhood: 'Santa Cruz da Serra (R$ 5,00)', complement: '', reference: '' });
   const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: 'PIX', orderTime: 'Para agora', coupon: '' });
 
   const isCartEmpty = items.length === 0;
-  const deliveryFee = deliveryType === 'delivery' ? 5 : 0;
+  
+  const getDeliveryFee = () => {
+    if (deliveryType !== 'delivery') return 0;
+    if (address.neighborhood.includes('R$ 5,00')) return 5;
+    if (address.neighborhood.includes('R$ 7,00')) return 7;
+    return 0; // A combinar
+  };
+  
+  const deliveryFee = getDeliveryFee();
   const finalTotal = totalPrice() + deliveryFee;
 
   const handleCheckoutSubmit = () => {
@@ -192,8 +200,13 @@ export default function CartPage() {
                   <div>
                     <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
                     <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
+                      <option>Santa Cruz da Serra (R$ 5,00)</option>
+                      <option>Jardim Anhangá (R$ 5,00)</option>
                       <option>Nova Campinas (R$ 5,00)</option>
-                      <option>Centro (R$ 7,00)</option>
+                      <option>Parque Paulista (R$ 5,00)</option>
+                      <option>Jardim Rotsen (R$ 5,00)</option>
+                      <option>Barro Branco (R$ 5,00)</option>
+                      <option>Parque Equitativa (R$ 5,00)</option>
                       <option>Outros (A combinar)</option>
                     </select>
                   </div>
