@@ -1,23 +1,178 @@
 "use client";
 
-import { useState } from 'react';
-import { menuData, MenuItem, MenuCategory } from '@/data/menu';
-import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock, Power, Settings } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { MenuItem, MenuCategory } from '@/data/menu';
+import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock, Power, Settings, Save, Trash2, Loader2, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoreStatusStore } from '@/store/storeStatusStore';
+import { supabase } from '@/lib/supabase';
 
 export default function AdminProductsPage() {
   const [search, setSearch] = useState('');
-  const [categories, setCategories] = useState<MenuCategory[]>(menuData);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(menuData[0].id);
-
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [isNewProduct, setIsNewProduct] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen, getIsOpen } = useStoreStatusStore();
   const currentStatus = getIsOpen();
 
+  const fetchMenu = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
+      const { data: subs } = await supabase.from('subcategories').select('*').order('sort_order');
+      const { data: prods } = await supabase.from('products').select('*').order('sort_order');
+      const { data: vars } = await supabase.from('product_variants').select('*').order('sort_order');
+      
+      if (cats && prods) {
+        const assembled: MenuCategory[] = cats.map(cat => {
+          const catProds = prods.filter(p => p.category_id === cat.id && !p.subcategory_id);
+          const catSubs = subs?.filter(s => s.category_id === cat.id).map(sub => ({
+            name: sub.name,
+            items: prods.filter(p => p.subcategory_id === sub.id).map(p => ({
+              id: p.id,
+              name: p.name,
+              description: p.description,
+              price: p.price,
+              imageUrl: p.image_url,
+              category_id: p.category_id,
+              subcategory_id: p.subcategory_id
+            }))
+          }));
+
+          return {
+            id: cat.id,
+            name: cat.name,
+            items: catProds.map(p => ({
+              id: p.id,
+              name: p.name,
+              description: p.description,
+              price: p.price,
+              imageUrl: p.image_url,
+              category_id: p.category_id
+            })),
+            subcategories: catSubs
+          };
+        });
+        setCategories(assembled);
+        if (assembled.length > 0 && !expandedCategory) {
+          setExpandedCategory(assembled[0].id);
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao carregar cardápio:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [expandedCategory]);
+
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
+
   const handleEditClick = (item: MenuItem) => {
-    setEditingItem(item);
+    setIsNewProduct(false);
+    setEditingItem({ ...item });
+  };
+
+  const handleNewClick = () => {
+    setIsNewProduct(true);
+    setEditingItem({
+      id: '',
+      name: '',
+      description: '',
+      price: 0,
+      imageUrl: '',
+      category_id: categories[0]?.id || ''
+    } as any);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+    
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
+      fetchMenu();
+    } catch (err) {
+      alert("Erro ao excluir produto.");
+    }
+  };
+
+  const handleSaveProduct = async () => {
+    if (!editingItem) return;
+    setSaving(true);
+    try {
+      if (isNewProduct) {
+        const { error } = await supabase
+          .from('products')
+          .insert({
+            name: editingItem.name,
+            description: editingItem.description,
+            price: editingItem.price,
+            image_url: editingItem.imageUrl,
+            category_id: (editingItem as any).category_id
+          });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('products')
+          .update({
+            name: editingItem.name,
+            description: editingItem.description,
+            price: editingItem.price,
+            image_url: editingItem.imageUrl
+          })
+          .eq('id', editingItem.id);
+        if (error) throw error;
+      }
+      
+      await fetchMenu();
+      setEditingItem(null);
+    } catch (err) {
+      console.error("Erro ao salvar produto:", err);
+      alert("Erro ao salvar. Verifique o console.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingItem) return;
+
+    setSaving(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        if (uploadError.message.includes('bucket not found')) {
+          alert("O bucket 'products' não existe no Supabase Storage. Crie-o para habilitar o upload.");
+          return;
+        }
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(filePath);
+
+      setEditingItem({ ...editingItem, imageUrl: publicUrl });
+    } catch (err) {
+      console.error("Erro no upload:", err);
+      alert("Erro no upload de imagem.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -35,7 +190,6 @@ export default function AdminProductsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Automatic Mode Toggle */}
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
             <div className="flex items-center gap-3">
               <Clock className="w-5 h-5 text-gray-400" />
@@ -52,7 +206,6 @@ export default function AdminProductsPage() {
             </button>
           </div>
 
-          {/* Manual Toggle (Only if Auto Mode is OFF) */}
           <div className={`flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 transition-opacity ${isAutoMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             <div className="flex items-center gap-3">
               <Power className={`w-5 h-5 ${isManualOpen ? 'text-[#25D366]' : 'text-red-500'}`} />
@@ -86,7 +239,10 @@ export default function AdminProductsPage() {
           <h2 className="text-2xl font-black text-[#381010]">Gerenciar Produtos</h2>
           <p className="text-sm text-gray-500 mt-1">Altere preços, nomes e descrições do cardápio.</p>
         </div>
-        <button className="bg-[#ff914a] text-white px-5 py-3 rounded-xl font-bold flex items-center gap-2 w-full md:w-auto shadow-sm hover:bg-[#e07d3c] transition-colors">
+        <button 
+          onClick={handleNewClick}
+          className="bg-[#ff914a] text-white px-5 py-3 rounded-xl font-bold flex items-center gap-2 w-full md:w-auto shadow-sm hover:bg-[#e07d3c] transition-colors"
+        >
           <Plus className="w-5 h-5" />
           Novo Produto
         </button>
@@ -105,53 +261,58 @@ export default function AdminProductsPage() {
       </div>
 
       {/* Categories & Products List */}
-      <div className="space-y-4">
-        {categories.map((category) => (
-          <div key={category.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-            <button 
-              className="w-full px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
-              onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
-            >
-              <h3 className="font-bold text-[#381010] text-lg">{category.name}</h3>
-              {expandedCategory === category.id ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
-              )}
-            </button>
-            
-            <AnimatePresence>
-              {expandedCategory === category.id && (
-                <motion.div 
-                  initial={{ height: 0 }} 
-                  animate={{ height: 'auto' }} 
-                  exit={{ height: 0 }} 
-                  className="overflow-hidden"
-                >
-                  <div className="px-5 pb-5 pt-2 flex flex-col gap-3">
-                    {/* Render subcategories if any */}
-                    {category.subcategories?.map(sub => (
-                      <div key={sub.name} className="mt-4 first:mt-0">
-                        <h4 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">{sub.name}</h4>
-                        <div className="space-y-3">
-                          {sub.items.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
-                            <ProductListItem key={item.id} item={item} onEdit={() => handleEditClick(item)} />
-                          ))}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400 gap-3">
+          <Loader2 className="w-8 h-8 animate-spin" />
+          <p className="font-medium">Carregando cardápio...</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {categories.map((category) => (
+            <div key={category.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+              <button 
+                className="w-full px-5 py-4 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors"
+                onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
+              >
+                <h3 className="font-bold text-[#381010] text-lg">{category.name}</h3>
+                {expandedCategory === category.id ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {expandedCategory === category.id && (
+                  <motion.div 
+                    initial={{ height: 0 }} 
+                    animate={{ height: 'auto' }} 
+                    exit={{ height: 0 }} 
+                    className="overflow-hidden"
+                  >
+                    <div className="px-5 pb-5 pt-2 flex flex-col gap-3">
+                      {category.subcategories?.map(sub => (
+                        <div key={sub.name} className="mt-4 first:mt-0">
+                          <h4 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">{sub.name}</h4>
+                          <div className="space-y-3">
+                            {sub.items.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
+                              <ProductListItem key={item.id} item={item} onEdit={() => handleEditClick(item)} onDelete={() => handleDeleteProduct(item.id)} />
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
 
-                    {/* Render direct items if any */}
-                    {category.items?.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
-                      <ProductListItem key={item.id} item={item} onEdit={() => handleEditClick(item)} />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        ))}
-      </div>
+                      {category.items?.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
+                        <ProductListItem key={item.id} item={item} onEdit={() => handleEditClick(item)} onDelete={() => handleDeleteProduct(item.id)} />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Edit Modal Overlay */}
       <AnimatePresence>
@@ -162,7 +323,7 @@ export default function AdminProductsPage() {
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }} 
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setEditingItem(null)}
+              onClick={() => !saving && setEditingItem(null)}
             />
             <motion.div 
               initial={{ y: '100%' }} 
@@ -172,63 +333,106 @@ export default function AdminProductsPage() {
               className="bg-white w-full md:w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
             >
               <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-bold text-xl text-[#381010]">Editar Produto</h3>
-                <button onClick={() => setEditingItem(null)} className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 font-bold hover:bg-gray-200">
+                <h3 className="font-bold text-xl text-[#381010]">{isNewProduct ? 'Novo Produto' : 'Editar Produto'}</h3>
+                <button 
+                  onClick={() => setEditingItem(null)} 
+                  disabled={saving}
+                  className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full text-gray-500 font-bold hover:bg-gray-200"
+                >
                   ✕
                 </button>
               </div>
               
               <div className="p-6 overflow-y-auto">
                 <div className="space-y-5">
-                  {/* Fake Image Uploader */}
-                  <div className="h-32 w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 gap-2 cursor-pointer hover:bg-gray-100 transition-colors">
-                    <ImageIcon className="w-8 h-8" />
-                    <span className="text-sm font-medium">Alterar foto do produto</span>
+                  {/* Image Uploader */}
+                  <div className="relative group">
+                    <div className="h-40 w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 overflow-hidden relative">
+                      {editingItem.imageUrl ? (
+                        <img src={editingItem.imageUrl} alt={editingItem.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <>
+                          <ImageIcon className="w-8 h-8" />
+                          <span className="text-sm font-medium">Sem imagem</span>
+                        </>
+                      )}
+                      <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity cursor-pointer">
+                        <Upload className="w-6 h-6 mb-2" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Alterar Foto</span>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={saving} />
+                      </label>
+                    </div>
                   </div>
+
+                  {isNewProduct && (
+                    <div>
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Categoria</label>
+                      <select 
+                        className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px]"
+                        value={(editingItem as any).category_id}
+                        onChange={(e) => setEditingItem({...editingItem, category_id: e.target.value} as any)}
+                        disabled={saving}
+                      >
+                        {categories.map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   <div>
                     <label className="text-sm font-bold text-[#381010] mb-1 block">Nome do Produto</label>
                     <input 
                       type="text" 
                       className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px]"
-                      defaultValue={editingItem.name} 
+                      value={editingItem.name} 
+                      onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
+                      disabled={saving}
                     />
                   </div>
 
-                  {editingItem.description && (
-                    <div>
-                      <label className="text-sm font-bold text-[#381010] mb-1 block">Descrição</label>
-                      <textarea 
-                        className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] resize-none h-24"
-                        defaultValue={editingItem.description} 
-                      />
-                    </div>
-                  )}
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Descrição</label>
+                    <textarea 
+                      className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] resize-none h-24"
+                      value={editingItem.description || ''} 
+                      onChange={(e) => setEditingItem({...editingItem, description: e.target.value})}
+                      placeholder="Ex: pão, carne, queijo..."
+                      disabled={saving}
+                    />
+                  </div>
 
-                  {editingItem.price !== undefined && (
-                    <div>
-                      <label className="text-sm font-bold text-[#381010] mb-1 block">Preço Base (R$)</label>
-                      <input 
-                        type="number" 
-                        step="0.01"
-                        className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px]"
-                        defaultValue={editingItem.price} 
-                      />
-                    </div>
-                  )}
-
-                  <div className="bg-[#ff914a]/10 text-[#ff914a] p-4 rounded-xl text-sm font-medium">
-                    ⚠️ Esta é apenas a interface visual. As edições ainda não serão salvas permanentemente até conectarmos ao banco de dados.
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Preço Base (R$)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px]"
+                      value={editingItem.price || 0} 
+                      onChange={(e) => setEditingItem({...editingItem, price: parseFloat(e.target.value)})}
+                      disabled={saving}
+                    />
                   </div>
                 </div>
               </div>
 
               <div className="p-4 border-t border-gray-100 bg-white md:rounded-b-3xl">
                 <button 
-                  className="w-full bg-[#ff914a] text-white py-4 rounded-xl font-bold shadow-md shadow-[#ff914a]/20 hover:bg-[#e07d3c] transition-colors"
-                  onClick={() => setEditingItem(null)}
+                  className="w-full bg-[#ff914a] text-white py-4 rounded-xl font-bold shadow-md shadow-[#ff914a]/20 hover:bg-[#e07d3c] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  onClick={handleSaveProduct}
+                  disabled={saving}
                 >
-                  Salvar Alterações
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5" />
+                      {isNewProduct ? 'Criar Produto' : 'Salvar Alterações'}
+                    </>
+                  )}
                 </button>
               </div>
             </motion.div>
@@ -239,13 +443,16 @@ export default function AdminProductsPage() {
   );
 }
 
-// Subcomponent for Product List Item
-function ProductListItem({ item, onEdit }: { item: MenuItem, onEdit: () => void }) {
+function ProductListItem({ item, onEdit, onDelete }: { item: MenuItem, onEdit: () => void, onDelete: () => void }) {
   return (
     <div className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 border border-transparent hover:border-gray-200 rounded-xl transition-all group">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
-          <ImageIcon className="w-5 h-5 text-gray-400" />
+        <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative">
+          {item.imageUrl ? (
+            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+          ) : (
+            <ImageIcon className="w-5 h-5 text-gray-400" />
+          )}
         </div>
         <div>
           <h4 className="font-bold text-[#381010]">{item.name}</h4>
@@ -256,12 +463,20 @@ function ProductListItem({ item, onEdit }: { item: MenuItem, onEdit: () => void 
           ) : null}
         </div>
       </div>
-      <button 
-        onClick={onEdit}
-        className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-200 text-gray-600 hover:text-[#ff914a] hover:border-[#ff914a] transition-colors shadow-sm"
-      >
-        <Edit2 className="w-4 h-4" />
-      </button>
+      <div className="flex items-center gap-2">
+        <button 
+          onClick={onDelete}
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-500 transition-colors shadow-sm"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+        <button 
+          onClick={onEdit}
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-white border border-gray-200 text-gray-600 hover:text-[#ff914a] hover:border-[#ff914a] transition-colors shadow-sm"
+        >
+          <Edit2 className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }

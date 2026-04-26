@@ -1,25 +1,86 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Search } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Search, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
-import { menuData, MenuItem } from "@/data/menu";
+import { MenuItem, MenuCategory } from "@/data/menu";
+import { supabase } from "@/lib/supabase";
 
 export default function MenuPage() {
-  const [activeCategory, setActiveCategory] = useState<string>(menuData[0].id);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  const fetchMenu = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
+      const { data: subs } = await supabase.from('subcategories').select('*').order('sort_order');
+      const { data: prods } = await supabase.from('products').select('*').order('sort_order');
+      const { data: vars } = await supabase.from('product_variants').select('*').order('sort_order');
+      
+      if (cats && prods) {
+        const assembled: MenuCategory[] = cats.map(cat => {
+          const catProds = prods.filter(p => p.category_id === cat.id && !p.subcategory_id);
+          const catSubs = subs?.filter(s => s.category_id === cat.id).map(sub => ({
+            name: sub.name,
+            items: prods.filter(p => p.subcategory_id === sub.id).map(p => ({
+              id: p.id,
+              name: p.name,
+              description: p.description,
+              price: p.price,
+              imageUrl: p.image_url,
+              variants: vars?.filter(v => v.product_id === p.id).map(v => ({
+                name: v.name,
+                price: v.price
+              }))
+            }))
+          }));
+
+          return {
+            id: cat.id,
+            name: cat.name,
+            items: catProds.map(p => ({
+              id: p.id,
+              name: p.name,
+              description: p.description,
+              price: p.price,
+              imageUrl: p.image_url,
+              variants: vars?.filter(v => v.product_id === p.id).map(v => ({
+                name: v.name,
+                price: v.price
+              }))
+            })),
+            subcategories: catSubs
+          };
+        });
+        setCategories(assembled);
+        if (assembled.length > 0) {
+          setActiveCategory(assembled[0].id);
+        }
+      }
+    } catch (err) {
+      console.error("Erro ao carregar cardápio:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMenu();
+  }, [fetchMenu]);
+
   // Intersection Observer for scroll spy
   useEffect(() => {
-    if (searchQuery) return;
+    if (searchQuery || categories.length === 0) return;
 
     observerRef.current = new IntersectionObserver((entries) => {
       const visibleEntries = entries.filter(entry => entry.isIntersecting);
       if (visibleEntries.length > 0) {
-        // Find the topmost visible element
         const topEntry = visibleEntries.reduce((prev, curr) => {
           return prev.boundingClientRect.top < curr.boundingClientRect.top ? prev : curr;
         });
@@ -27,41 +88,39 @@ export default function MenuPage() {
         const visibleCategoryId = topEntry.target.id.replace('category-', '');
         setActiveCategory(visibleCategoryId);
         
-        // Auto-scroll the horizontal nav to keep the active item in view
         const btn = document.getElementById(`nav-btn-${visibleCategoryId}`);
         if (btn) {
           btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
       }
     }, {
-      rootMargin: '-100px 0px -70% 0px', // Triggers when element is near the top
+      rootMargin: '-100px 0px -70% 0px',
       threshold: 0
     });
 
-    menuData.forEach(category => {
+    categories.forEach(category => {
       const el = document.getElementById(`category-${category.id}`);
       if (el) observerRef.current?.observe(el);
     });
 
     return () => observerRef.current?.disconnect();
-  }, [searchQuery]);
+  }, [searchQuery, categories]);
 
   const scrollToCategory = (categoryId: string) => {
     setActiveCategory(categoryId);
     setSearchQuery("");
     
-    // Delay slightly to ensure layout is ready if coming from search mode
     setTimeout(() => {
       const el = document.getElementById(`category-${categoryId}`);
       if (el) {
-        const yOffset = -90; // Height of the sticky header + some padding
+        const yOffset = -90; 
         const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
     }, 50);
   };
 
-  const allItems = menuData.flatMap(category => {
+  const allItems = categories.flatMap(category => {
     let items: MenuItem[] = [];
     if (category.items) items = [...items, ...category.items];
     if (category.subcategories) {
@@ -83,24 +142,26 @@ export default function MenuPage() {
     <div className="min-h-screen bg-[#f8ece3] font-sans pb-24 pt-4 px-4">
       
       {/* Sticky Top Category Navigation */}
-      <nav className="sticky top-0 z-40 bg-[#f8ece3] -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
-        <div className="flex gap-3 max-w-md mx-auto">
-          {menuData.map(category => (
-            <button
-              key={category.id}
-              id={`nav-btn-${category.id}`}
-              onClick={() => scrollToCategory(category.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 ${
-                activeCategory === category.id && !searchQuery
-                  ? "bg-[#532120] text-[#ff914a] shadow-md scale-105"
-                  : "bg-white text-[#532120] border border-[#532120]/20 hover:bg-[#532120]/5"
-              }`}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-      </nav>
+      {!loading && categories.length > 0 && (
+        <nav className="sticky top-0 z-40 bg-[#f8ece3] -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
+          <div className="flex gap-3 max-w-md mx-auto">
+            {categories.map(category => (
+              <button
+                key={category.id}
+                id={`nav-btn-${category.id}`}
+                onClick={() => scrollToCategory(category.id)}
+                className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 ${
+                  activeCategory === category.id && !searchQuery
+                    ? "bg-[#532120] text-[#ff914a] shadow-md scale-105"
+                    : "bg-white text-[#532120] border border-[#532120]/20 hover:bg-[#532120]/5"
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
 
       <main className="max-w-md mx-auto relative z-10">
         {/* Search Bar */}
@@ -116,7 +177,12 @@ export default function MenuPage() {
         </div>
 
         {/* Dynamic Section (Search vs Full List) */}
-        {searchQuery ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-[#532120]/40 gap-3">
+            <Loader2 className="w-10 h-10 animate-spin" />
+            <p className="font-bold">Carregando cardápio...</p>
+          </div>
+        ) : searchQuery ? (
           <div className="pt-2">
             <h2 className="text-xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
               Resultados para "{searchQuery}"
@@ -134,19 +200,16 @@ export default function MenuPage() {
           </div>
         ) : (
           <div className="pt-2 flex flex-col gap-10">
-            {/* Render all categories sequentially */}
-            {menuData.map(category => (
+            {categories.map(category => (
               <div key={category.id} id={`category-${category.id}`} className="scroll-mt-24">
                 <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
                   {category.name}
                 </h2>
 
-                {/* Render regular items */}
                 {category.items && category.items.map(item => (
                   <ProductCard key={item.id} item={item} />
                 ))}
 
-                {/* Render subcategories if any */}
                 {category.subcategories && category.subcategories.map((sub, idx) => (
                   <div key={idx} className="mt-8 mb-4">
                     <h3 className="text-lg font-bold text-[#954e3a] mb-4 bg-[#f8ece3] sticky top-[72px] z-20 py-2 border-l-4 border-[#ff914a] pl-3">
