@@ -137,27 +137,70 @@ export default function CartPage() {
           )}
 
           {step === 'address' && (
-            <motion.div key="address" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="address" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+              {/* User Info Section */}
               <div>
                 <h3 className="font-bold text-[#381010] text-lg mb-4">Minhas informações</h3>
-                <div className="space-y-3 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <User className="w-5 h-5 text-[#ff914a]" />
-                    <input type="text" placeholder="Seu nome completo" className="flex-1 bg-transparent outline-none border-b border-gray-200 pb-1 focus:border-[#ff914a] text-[16px]" value={userInfo.name} onChange={e => setUserInfo({...userInfo, name: e.target.value})} />
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Nome completo</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="w-5 h-5 text-gray-400" />
+                      </div>
+                      <input 
+                        type="text" placeholder="Ex: João da Silva" 
+                        className="w-full border border-gray-300 rounded-xl py-3 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
+                        value={userInfo.name} onChange={e => setUserInfo({...userInfo, name: e.target.value})} 
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-700">
-                    <Phone className="w-5 h-5 text-[#ff914a]" />
-                    <input type="tel" placeholder="Seu WhatsApp (ex: 21 99999-9999)" className="flex-1 bg-transparent outline-none border-b border-gray-200 pb-1 focus:border-[#ff914a] text-[16px]" value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} />
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">WhatsApp</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="w-5 h-5 text-gray-400" />
+                      </div>
+                      <input 
+                        type="tel" placeholder="Ex: (21) 99999-9999" 
+                        className="w-full border border-gray-300 rounded-xl py-3 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
+                        value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} 
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Address Section */}
               <div>
                 <h3 className="font-bold text-[#381010] text-lg mb-4">Endereço de entrega</h3>
                 <div className="space-y-4">
-                  <div><label className="text-sm font-bold text-[#381010] mb-1 block">Rua/Avenida</label><input type="text" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] text-gray-800 text-[16px]" value={address.street} onChange={e => setAddress({...address, street: e.target.value})} /></div>
-                  <div><label className="text-sm font-bold text-[#381010] mb-1 block">Número</label><input type="text" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] text-gray-800 text-[16px]" value={address.number} onChange={e => setAddress({...address, number: e.target.value})} /></div>
-                  <div><label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label><select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] text-gray-800 bg-white text-[16px]" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}><option>Nova Campinas (R$ 5,00)</option><option>Centro (R$ 7,00)</option><option>Outros (A combinar)</option></select></div>
-                  <div><label className="text-sm font-bold text-[#381010] mb-1 block">Complemento</label><input type="text" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] text-gray-800 text-[16px]" value={address.complement} onChange={e => setAddress({...address, complement: e.target.value})} /></div>
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Rua/Avenida</label>
+                    <input type="text" placeholder="Ex: Avenida das Américas" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.street} onChange={e => setAddress({...address, street: e.target.value})} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Número</label>
+                      <input type="text" placeholder="Ex: 1000" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.number} onChange={e => setAddress({...address, number: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Complemento</label>
+                      <input type="text" placeholder="Apto 201" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.complement} onChange={e => setAddress({...address, complement: e.target.value})} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
+                    <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
+                      <option>Nova Campinas (R$ 5,00)</option>
+                      <option>Centro (R$ 7,00)</option>
+                      <option>Outros (A combinar)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Referência <span className="text-gray-400 font-normal">(opcional)</span></label>
+                    <input type="text" placeholder="Próximo a..." className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.reference} onChange={e => setAddress({...address, reference: e.target.value})} />
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -173,7 +216,10 @@ export default function CartPage() {
                 <button onClick={() => setStep('cart')} className="text-sm text-[#0066FF] font-medium hover:underline">Editar</button>
               </div>
               <div className="border border-gray-200 rounded-xl p-4 bg-white shadow-sm flex flex-col gap-2">
-                <p className="font-bold text-[#381010]">Minhas informações</p>
+                <div className="flex items-center justify-between">
+                  <p className="font-bold text-[#381010]">Minhas informações</p>
+                  <button onClick={() => setStep('address')} className="text-sm text-[#0066FF] font-medium hover:underline">Editar</button>
+                </div>
                 <p className="text-sm text-gray-600">{userInfo.name} • {userInfo.phone}</p>
                 {deliveryType === 'delivery' && address.street && (
                   <div className="mt-2 pt-2 border-t border-gray-100 flex gap-2">
@@ -182,12 +228,18 @@ export default function CartPage() {
                   </div>
                 )}
               </div>
-              <div className="space-y-4">
-                <select className="w-full border border-gray-300 rounded-xl p-3 outline-none text-[#381010] font-medium bg-white text-[16px]" value={paymentInfo.orderTime} onChange={e => setPaymentInfo({...paymentInfo, orderTime: e.target.value})}><option>Para agora</option><option>Agendar para mais tarde</option></select>
-                <textarea placeholder="Observação" className="w-full border border-gray-300 rounded-xl p-3 outline-none text-gray-800 h-24 resize-none text-[16px]" value={paymentInfo.observation} onChange={e => setPaymentInfo({...paymentInfo, observation: e.target.value})} />
+              <div className="space-y-4 pt-2">
+                <div>
+                  <label className="text-sm font-bold text-[#381010] mb-1 block">Tipo de pedido</label>
+                  <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={paymentInfo.orderTime} onChange={e => setPaymentInfo({...paymentInfo, orderTime: e.target.value})}><option>Para agora</option><option>Agendar para mais tarde</option></select>
+                </div>
+                <div>
+                  <label className="text-sm font-bold text-[#381010] mb-1 block">Observações do pedido</label>
+                  <textarea placeholder="Ex: Tirar cebola, enviar bastante calda..." className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white h-24 resize-none text-[16px] transition-all" value={paymentInfo.observation} onChange={e => setPaymentInfo({...paymentInfo, observation: e.target.value})} />
+                </div>
                 <div className="border border-gray-300 rounded-xl p-4 bg-white/50">
                   <label className="text-sm font-bold text-[#381010] flex gap-2 items-center mb-2"><CreditCard className="w-4 h-4" /> Forma de pagamento</label>
-                  <select className="w-full border border-gray-300 rounded-xl p-3 outline-none text-[#381010] font-medium bg-white text-[16px]" value={paymentInfo.paymentMethod} onChange={e => setPaymentInfo({...paymentInfo, paymentMethod: e.target.value})}><option>PIX</option><option>Cartão de Crédito</option><option>Dinheiro</option></select>
+                  <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={paymentInfo.paymentMethod} onChange={e => setPaymentInfo({...paymentInfo, paymentMethod: e.target.value})}><option>PIX</option><option>Cartão de Crédito</option><option>Cartão de Débito</option><option>Dinheiro (Levar troco)</option></select>
                 </div>
               </div>
             </motion.div>
