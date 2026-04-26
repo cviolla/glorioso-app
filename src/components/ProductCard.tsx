@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useCartStore } from "@/store/cartStore";
-import { Plus, Minus, X } from "lucide-react";
+import { useStoreStatusStore } from "@/store/storeStatusStore";
+import { Plus, Minus, X, Lock } from "lucide-react";
 import { MenuItem } from "@/data/menu";
 
 export function ProductCard({ item }: { item: MenuItem }) {
@@ -11,6 +12,9 @@ export function ProductCard({ item }: { item: MenuItem }) {
   const items = useCartStore(state => state.items);
   const updateQuantity = useCartStore(state => state.updateQuantity);
   const removeItem = useCartStore(state => state.removeItem);
+  
+  const { getIsOpen } = useStoreStatusStore();
+  const isOpen = getIsOpen();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -31,6 +35,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
 
   const handleAddFast = (e: React.MouseEvent, price: number, variant?: string) => {
     e.stopPropagation();
+    if (!isOpen) return;
     addItem({
       id: item.id,
       name: item.name,
@@ -79,9 +84,14 @@ export function ProductCard({ item }: { item: MenuItem }) {
     return (
       <button 
         onClick={(e) => handleAddFast(e, price, variantName)}
-        className="bg-[#ff914a] text-[#381010] w-7 h-7 rounded-full flex items-center justify-center font-bold hover:scale-105 active:scale-95 transition-transform"
+        disabled={!isOpen}
+        className={`w-7 h-7 rounded-full flex items-center justify-center font-bold transition-all ${
+          isOpen 
+            ? "bg-[#ff914a] text-[#381010] hover:scale-105 active:scale-95" 
+            : "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
+        }`}
       >
-        <Plus className="w-4 h-4" />
+        {isOpen ? <Plus className="w-4 h-4" /> : <Lock className="w-3.5 h-3.5" />}
       </button>
     );
   };
@@ -94,6 +104,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
   };
 
   const handleAddFromModal = () => {
+    if (!isOpen) return;
     let basePrice = item.price || 0;
     if (item.variants) {
       const v = item.variants.find(v => v.name === selectedVariant);
@@ -284,9 +295,14 @@ export function ProductCard({ item }: { item: MenuItem }) {
               {/* Add Button */}
               <button 
                 onClick={handleAddFromModal}
-                className="flex-1 bg-[#ff914a] text-[#381010] font-black py-4 rounded-2xl flex justify-between items-center px-5 shadow-md hover:scale-[1.02] active:scale-95 transition-all"
+                disabled={!isOpen}
+                className={`flex-1 font-black py-4 rounded-2xl flex justify-between items-center px-5 shadow-md transition-all ${
+                  isOpen 
+                    ? "bg-[#ff914a] text-[#381010] hover:scale-[1.02] active:scale-95" 
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
               >
-                <span>Adicionar</span>
+                <span>{isOpen ? "Adicionar" : "Loja Fechada"}</span>
                 <span>R$ {totalModalPrice.toFixed(2).replace('.', ',')}</span>
               </button>
             </div>
