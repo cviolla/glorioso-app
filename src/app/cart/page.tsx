@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { ArrowLeft, Trash2, Plus, Minus, MapPin, CreditCard, ChevronRight, X, Motorbike, Store, User, Phone, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, ChevronRight, X, Motorbike, Store, User, Phone, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
