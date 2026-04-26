@@ -52,7 +52,12 @@ export default function AdminProductsPage() {
               description: p.description,
               price: p.price,
               imageUrl: p.image_url,
-              category_id: p.category_id
+              category_id: p.category_id,
+              variants: vars?.filter(v => v.product_id === p.id).map(v => ({
+                id: v.id,
+                name: v.name,
+                price: v.price
+              }))
             })),
             subcategories: catSubs
           };
@@ -119,8 +124,10 @@ export default function AdminProductsPage() {
     if (!editingItem) return;
     setSaving(true);
     try {
+      let productId = editingItem.id;
+
       if (isNewProduct) {
-        const { error } = await supabase
+        const { data: newProd, error } = await supabase
           .from('products')
           .insert({
             name: editingItem.name,
@@ -128,8 +135,11 @@ export default function AdminProductsPage() {
             price: editingItem.price,
             image_url: editingItem.imageUrl,
             category_id: (editingItem as any).category_id
-          });
+          })
+          .select()
+          .single();
         if (error) throw error;
+        productId = newProd.id;
       } else {
         const { error } = await supabase
           .from('products')
@@ -141,6 +151,23 @@ export default function AdminProductsPage() {
           })
           .eq('id', editingItem.id);
         if (error) throw error;
+      }
+
+      // SALVAR VARIANTES
+      if (editingItem.variants) {
+        // Para simplificar, deletamos as antigas e inserimos as novas
+        // Em um sistema real, faríamos um diff (update/insert/delete)
+        await supabase.from('product_variants').delete().eq('product_id', productId);
+        
+        if (editingItem.variants.length > 0) {
+          const variantsToInsert = editingItem.variants.map((v, idx) => ({
+            product_id: productId,
+            name: v.name,
+            price: v.price,
+            sort_order: idx
+          }));
+          await supabase.from('product_variants').insert(variantsToInsert);
+        }
       }
       
       await fetchMenu();
@@ -425,6 +452,75 @@ export default function AdminProductsPage() {
                       onChange={(e) => setEditingItem({...editingItem, price: parseFloat(e.target.value)})}
                       disabled={saving}
                     />
+                    <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">Use 0 se o produto tiver tamanhos abaixo</p>
+                  </div>
+
+                  {/* Variants Manager */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <label className="text-sm font-bold text-[#381010]">Tamanhos / Variações</label>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const vars = [...(editingItem.variants || [])];
+                          vars.push({ name: '', price: 0 } as any);
+                          setEditingItem({...editingItem, variants: vars});
+                        }}
+                        className="text-xs bg-[#ff914a]/10 text-[#ff914a] px-3 py-1.5 rounded-lg font-bold hover:bg-[#ff914a]/20 transition-colors flex items-center gap-1"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add Tamanho
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {editingItem.variants?.map((v, idx) => (
+                        <div key={idx} className="flex gap-2 items-start bg-gray-50 p-3 rounded-xl border border-gray-100">
+                          <div className="flex-1 space-y-2">
+                            <input 
+                              type="text" 
+                              placeholder="Nome (Ex: 30CM)"
+                              className="w-full text-xs border-none bg-white rounded-lg p-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
+                              value={v.name}
+                              onChange={(e) => {
+                                const vars = [...(editingItem.variants || [])];
+                                vars[idx].name = e.target.value;
+                                setEditingItem({...editingItem, variants: vars});
+                              }}
+                            />
+                            <div className="relative">
+                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">R$</span>
+                              <input 
+                                type="number" 
+                                step="0.01"
+                                placeholder="0,00"
+                                className="w-full text-xs border-none bg-white rounded-lg py-2 pl-7 pr-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
+                                value={v.price}
+                                onChange={(e) => {
+                                  const vars = [...(editingItem.variants || [])];
+                                  vars[idx].price = parseFloat(e.target.value);
+                                  setEditingItem({...editingItem, variants: vars});
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              const vars = editingItem.variants?.filter((_, i) => i !== idx);
+                              setEditingItem({...editingItem, variants: vars});
+                            }}
+                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      
+                      {(!editingItem.variants || editingItem.variants.length === 0) && (
+                        <p className="text-center py-4 text-xs text-gray-400 italic">Nenhum tamanho adicional configurado.</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -469,11 +565,13 @@ function ProductListItem({ item, onEdit, onDelete }: { item: MenuItem, onEdit: (
         </div>
         <div>
           <h4 className="font-bold text-[#381010]">{item.name}</h4>
-          {item.price !== undefined ? (
+          {item.price !== undefined && item.price > 0 ? (
             <p className="text-sm text-gray-500 font-medium">R$ {item.price.toFixed(2).replace('.', ',')}</p>
-          ) : item.variants ? (
-            <p className="text-sm text-gray-500 font-medium">Múltiplos tamanhos</p>
-          ) : null}
+          ) : item.variants && item.variants.length > 0 ? (
+            <p className="text-sm text-[#ff914a] font-bold">Múltiplos tamanhos</p>
+          ) : (
+            <p className="text-sm text-gray-400">Preço não definido</p>
+          )}
         </div>
       </div>
       <div className="flex items-center gap-2">
