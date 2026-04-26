@@ -8,12 +8,26 @@ import { MenuItem } from "@/data/menu";
 
 export function ProductCard({ item }: { item: MenuItem }) {
   const addItem = useCartStore(state => state.addItem);
+  const items = useCartStore(state => state.items);
+  const updateQuantity = useCartStore(state => state.updateQuantity);
+  const removeItem = useCartStore(state => state.removeItem);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   // Modal state
   const [selectedVariant, setSelectedVariant] = useState(item.variants?.[0]?.name || '');
   const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [quantity, setQuantity] = useState(1);
+
+  const totalInCart = items.filter(i => i.id === item.id).reduce((sum, i) => sum + i.quantity, 0);
+
+  const getFastCartItem = (variantName?: string) => {
+    return items.find(i => 
+      i.id === item.id && 
+      (i.variant || '') === (variantName || '') && 
+      (!i.addons || i.addons.length === 0)
+    );
+  };
 
   const handleAddFast = (e: React.MouseEvent, price: number, variant?: string) => {
     e.stopPropagation();
@@ -23,6 +37,53 @@ export function ProductCard({ item }: { item: MenuItem }) {
       price: price,
       variant: variant
     });
+  };
+
+  const handleRemoveFast = (e: React.MouseEvent, cartItemId: string, currentQty: number) => {
+    e.stopPropagation();
+    if (currentQty > 1) {
+      updateQuantity(cartItemId, -1);
+    } else {
+      removeItem(cartItemId);
+    }
+  };
+
+  const handleIncrementFast = (e: React.MouseEvent, cartItemId: string) => {
+    e.stopPropagation();
+    updateQuantity(cartItemId, 1);
+  };
+
+  const renderActionButton = (price: number, variantName?: string) => {
+    const cartItem = getFastCartItem(variantName);
+    
+    if (cartItem && cartItem.quantity > 0) {
+      return (
+        <div className="flex items-center gap-2 bg-[#ff914a] rounded-full px-1.5 py-1 shadow-sm" onClick={e => e.stopPropagation()}>
+          <button 
+            onClick={(e) => handleRemoveFast(e, cartItem.cartItemId, cartItem.quantity)}
+            className="w-6 h-6 flex items-center justify-center text-[#381010] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
+          >
+            <Minus className="w-3.5 h-3.5 font-bold" />
+          </button>
+          <span className="text-[#381010] font-black text-xs w-3 text-center">{cartItem.quantity}</span>
+          <button 
+            onClick={(e) => handleIncrementFast(e, cartItem.cartItemId)}
+            className="w-6 h-6 flex items-center justify-center text-[#381010] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5 font-bold" />
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <button 
+        onClick={(e) => handleAddFast(e, price, variantName)}
+        className="bg-[#ff914a] text-[#381010] w-7 h-7 rounded-full flex items-center justify-center font-bold hover:scale-105 active:scale-95 transition-transform"
+      >
+        <Plus className="w-4 h-4" />
+      </button>
+    );
   };
 
   const handleOpenModal = () => {
@@ -91,6 +152,11 @@ export function ProductCard({ item }: { item: MenuItem }) {
               className="object-cover"
               sizes="80px"
             />
+            {totalInCart > 0 && (
+              <div className="absolute top-1 right-1 bg-[#ff914a] text-[#381010] text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md z-10 border-2 border-white">
+                {totalInCart}
+              </div>
+            )}
           </div>
         </div>
 
@@ -98,12 +164,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
           {item.price !== undefined && (
             <div className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
               <span className="font-bold text-[#954e3a] text-sm">R$ {item.price.toFixed(2).replace('.', ',')}</span>
-              <button 
-                onClick={(e) => handleAddFast(e, item.price!)}
-                className="bg-[#ff914a] text-[#381010] w-7 h-7 rounded-full flex items-center justify-center font-bold hover:scale-105 active:scale-95 transition-transform"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              {renderActionButton(item.price)}
             </div>
           )}
 
@@ -113,12 +174,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
                 <span className="text-[11px] font-bold text-[#532120] leading-tight">{variant.name}</span>
                 <span className="font-bold text-[#954e3a] text-sm leading-tight">R$ {variant.price.toFixed(2).replace('.', ',')}</span>
               </div>
-              <button 
-                onClick={(e) => handleAddFast(e, variant.price, variant.name)}
-                className="bg-[#ff914a] text-[#381010] w-7 h-7 rounded-full flex items-center justify-center font-bold hover:scale-105 active:scale-95 transition-transform"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+              {renderActionButton(variant.price, variant.name)}
             </div>
           ))}
         </div>
