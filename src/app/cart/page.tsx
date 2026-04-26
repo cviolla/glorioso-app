@@ -80,9 +80,9 @@ export default function CartPage() {
           <motion.div 
             initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
             transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-            className="fixed inset-x-0 bottom-0 z-50 bg-[#f8ece3] rounded-t-3xl max-h-[90vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+            className="fixed inset-x-0 bottom-0 z-50 bg-[#f8ece3] rounded-t-3xl h-[85svh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.5)] overflow-hidden"
           >
-            <div className="flex items-center justify-between p-5 border-b border-[#532120]/10">
+            <div className="flex items-center justify-between p-5 border-b border-[#532120]/10 shrink-0">
               <div className="flex items-center gap-3">
                 <button onClick={onClose} className="p-2 -ml-2 rounded-full hover:bg-[#532120]/10 text-[#381010]">
                   <ArrowLeft className="w-5 h-5" />
@@ -90,7 +90,7 @@ export default function CartPage() {
                 <h2 className="text-lg font-bold text-[#381010]">{title}</h2>
               </div>
             </div>
-            <div className="overflow-y-auto p-5 pb-24">
+            <div className="overflow-y-auto flex-1 p-5 pb-32 relative">
               {children}
             </div>
           </motion.div>
@@ -283,7 +283,7 @@ export default function CartPage() {
           </div>
         </div>
 
-        <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-gray-100">
+        <div className="absolute bottom-0 inset-x-0 p-4 bg-[#f8ece3] border-t border-[#532120]/10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
           <button 
             onClick={() => {
               if (userInfo.name && userInfo.phone && address.street && address.number && address.complement) {
@@ -385,12 +385,12 @@ export default function CartPage() {
           </div>
         </div>
 
-        <div className="fixed bottom-0 inset-x-0 p-4 bg-white border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
+        <div className="absolute bottom-0 inset-x-0 p-4 bg-[#f8ece3] border-t border-[#532120]/10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
           <button 
             onClick={handleCheckoutSubmit}
-            className="w-full bg-[#0066FF] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md hover:bg-[#ff9f61] transition-colors flex items-center justify-center gap-2"
           >
-            Confirmar (R$ {finalTotal.toFixed(2).replace('.', ',')})
+            Enviar Pedido via WhatsApp <ArrowRight className="w-5 h-5" />
           </button>
         </div>
       </DrawerOverlay>
