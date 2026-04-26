@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { MenuItem, MenuCategory } from '@/data/menu';
 import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock, Power, Settings, Save, Trash2, Loader2, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,20 +58,33 @@ export default function AdminProductsPage() {
           };
         });
         setCategories(assembled);
-        if (assembled.length > 0 && !expandedCategory) {
-          setExpandedCategory(assembled[0].id);
-        }
       }
     } catch (err) {
       console.error("Erro ao carregar cardápio:", err);
     } finally {
       setLoading(false);
     }
-  }, [expandedCategory]);
+  }, []);
 
   useEffect(() => {
-    fetchMenu();
+    fetchMenu().then(() => {
+      // Abre a primeira categoria apenas no carregamento inicial
+      if (categories.length === 0) {
+        // O fetchMenu acima já vai atualizar o estado, 
+        // mas precisamos de um jeito de pegar o ID da primeira categoria
+      }
+    });
   }, [fetchMenu]);
+
+  const initializedRef = useRef(false);
+
+  // Efeito separado para inicializar a primeira categoria aberta
+  useEffect(() => {
+    if (categories.length > 0 && !initializedRef.current) {
+      setExpandedCategory(categories[0].id);
+      initializedRef.current = true;
+    }
+  }, [categories]);
 
   const handleEditClick = (item: MenuItem) => {
     setIsNewProduct(false);
