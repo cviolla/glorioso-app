@@ -99,7 +99,7 @@ export default function Home() {
                 className="text-center hover:text-[#ff914a] transition-colors max-w-[280px] sm:max-w-none inline-block leading-snug"
               >
                 <MapPin className="w-4 h-4 text-[#ff914a] inline-block mr-1.5 -mt-1" />
-                <span className="font-medium underline underline-offset-2">Avenida B Nº 195 - R. da Feira, Nova Campinas</span>
+                <span className="font-medium underline underline-offset-2">Avenida B Nº 195, Nova Campinas</span>
               </a>
               
               <div className="text-center text-[#f8ece3]/60 inline-block">
