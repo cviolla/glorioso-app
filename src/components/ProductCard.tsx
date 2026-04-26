@@ -172,7 +172,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
         </div>
 
         <div className="mt-3 flex flex-col gap-2">
-          {item.price !== undefined && (
+          {item.price !== undefined && item.price > 0 && (
             <div className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
               <span className="font-bold text-[#954e3a] text-sm">R$ {item.price.toFixed(2).replace('.', ',')}</span>
               {renderActionButton(item.price)}
