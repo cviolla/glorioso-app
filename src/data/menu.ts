@@ -23,13 +23,40 @@ export type MenuCategory = {
   items?: MenuItem[];
 };
 
-const burgerAddons = [
-  { name: 'CARNE', price: 3.00 },
+export const burgerAddons = [
+  { name: 'BACON', price: 3.00 },
+  { name: 'BLEND 180g', price: 9.00 },
   { name: 'OVO', price: 2.00 },
-  { name: 'BACON', price: 2.00 },
+  { name: 'CREME DE CHEDDAR', price: 4.00 },
+  { name: 'ONION RINGS', price: 3.00 },
 ];
 
 export const menuData: MenuCategory[] = [
+  {
+    id: 'artesanais',
+    name: 'ARTESANAIS',
+    items: [
+      { id: 'valente-gloria', name: 'VALENTE DE GLÓRIA', description: 'blend 180g, costela desfiada, cream cheese, queijo, molho especial, pão de brioche', price: 26.00, addons: burgerAddons },
+      { id: 'conquistador', name: 'O CONQUISTADOR', description: 'blend 180g, bacon, ovo, queijo, molho especial, pão brioche', price: 23.00, addons: burgerAddons },
+      { id: 'golpe-gloria', name: 'GOLPE DE GLÓRIA', description: 'blend 180g, onion rings, bacon, queijo, molho especial, pão de brioche', price: 25.00, addons: burgerAddons },
+      { id: 'escolhido', name: 'O ESCOLHIDO', description: 'blend 180g, creme de cheddar especial, fatiado de cheddar, molho especial, pão de brioche', price: 21.00, addons: burgerAddons },
+      { id: 'gloria-suprema', name: 'GLÓRIA SUPREMA', description: 'blend 180g, queijo empanado, bacon, molho especial, pão de brioche', price: 28.00, addons: burgerAddons },
+    ]
+  },
+  {
+    id: 'hamburguer',
+    name: 'HAMBURGUER',
+    items: [
+      { id: 'x-burguer', name: 'X-BURGUER', description: 'pão, carne, queijo, salada, molho especial e batata filetada', price: 7.50, addons: burgerAddons },
+      { id: 'x-egg', name: 'X-EGG', description: 'pão, carne, queijo, presunto, ovo, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
+      { id: 'x-bacon', name: 'X-BACON', description: 'pão, carne, queijo, presunto, bacon, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
+      { id: 'x-tudo', name: 'X-TUDO', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 13.00, addons: burgerAddons },
+      { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00, addons: burgerAddons },
+      { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+      { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+    ]
+  },
   {
     id: 'batatas',
     name: 'BATATAS',
@@ -38,41 +65,6 @@ export const menuData: MenuCategory[] = [
       { id: 'batata-mussa-calabresa', name: 'MUSSARELA + CALABRESA', price: 20.00 },
       { id: 'batata-costela-cream', name: 'COSTELA + CREAM CHEESE', price: 22.00 },
       { id: 'batata-pequena', name: 'PEQUENA', price: 8.00 },
-    ]
-  },
-  {
-    id: 'salgados',
-    name: 'SALGADOS',
-    subcategories: [
-      {
-        name: 'FRITOS',
-        items: [
-          { id: 'coxinha', name: 'COXINHA', price: 1.50 },
-          { id: 'risole-camarao', name: 'RISOLE DE CAMARÃO', price: 2.00 },
-          { id: 'quibe', name: 'QUIBE', price: 1.50 },
-          { id: 'bolinho-aipim', name: 'BOLINHO DE AIPIM', price: 2.50 },
-          { id: 'enroladinho-salsicha', name: 'ENROLADINHO DE SALSICHA', price: 1.50 },
-          { id: 'queijo-presunto', name: 'QUEIJO COM PRESUNTO', price: 1.50 },
-          { id: 'queijo-alho', name: 'QUEIJO COM ALHO', price: 1.50 },
-          { id: 'bolinha-queijo', name: 'BOLINHA DE QUEIJO', price: 1.50 },
-        ]
-      },
-      {
-        name: 'MINI ASSADOS',
-        items: [
-          { id: 'mini-joelho-qp', name: 'JOELHO DE QUEIJO COM PRESUNTO', price: 1.00 },
-          { id: 'mini-joelho-frango', name: 'JOELHO DE FRANGO COM REQUEIJÃO', price: 1.00 },
-          { id: 'empadinha', name: 'EMPADINHA', price: 1.00 },
-        ]
-      },
-      {
-        name: 'ASSADOS GRANDES',
-        items: [
-          { id: 'joelho-qp', name: 'JOELHO DE QUEIJO COM PRESUNTO', price: 5.00 },
-          { id: 'joelho-frango', name: 'JOELHO DE FRANGO COM REQUEIJÃO', price: 5.00 },
-          { id: 'hamburguer-forno', name: 'HAMBURGUER DE FORNO', price: 5.00 },
-        ]
-      }
     ]
   },
   {
@@ -134,17 +126,59 @@ export const menuData: MenuCategory[] = [
     ]
   },
   {
-    id: 'hamburguer',
-    name: 'HAMBURGUER',
+    id: 'salgados',
+    name: 'SALGADOS',
+    subcategories: [
+      {
+        name: 'FRITOS',
+        items: [
+          { id: 'coxinha', name: 'COXINHA', price: 1.50 },
+          { id: 'risole-camarao', name: 'RISOLE DE CAMARÃO', price: 2.00 },
+          { id: 'quibe', name: 'QUIBE', price: 1.50 },
+          { id: 'bolinho-aipim', name: 'BOLINHO DE AIPIM', price: 2.50 },
+          { id: 'enroladinho-salsicha', name: 'ENROLADINHO DE SALSICHA', price: 1.50 },
+          { id: 'queijo-presunto', name: 'QUEIJO COM PRESUNTO', price: 1.50 },
+          { id: 'queijo-alho', name: 'QUEIJO COM ALHO', price: 1.50 },
+          { id: 'bolinha-queijo', name: 'BOLINHA DE QUEIJO', price: 1.50 },
+        ]
+      },
+      {
+        name: 'MINI ASSADOS',
+        items: [
+          { id: 'mini-joelho-qp', name: 'JOELHO DE QUEIJO COM PRESUNTO', price: 1.00 },
+          { id: 'mini-joelho-frango', name: 'JOELHO DE FRANGO COM REQUEIJÃO', price: 1.00 },
+          { id: 'empadinha', name: 'EMPADINHA', price: 1.00 },
+        ]
+      },
+      {
+        name: 'ASSADOS GRANDES',
+        items: [
+          { id: 'joelho-qp', name: 'JOELHO DE QUEIJO COM PRESUNTO', price: 5.00 },
+          { id: 'joelho-frango', name: 'JOELHO DE FRANGO COM REQUEIJÃO', price: 5.00 },
+          { id: 'hamburguer-forno', name: 'HAMBURGUER DE FORNO', price: 5.00 },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'sobremesas',
+    name: 'SOBREMESAS',
     items: [
-      { id: 'x-burguer', name: 'X-BURGUER', description: 'pão, carne, queijo, salada, molho especial e batata filetada', price: 7.50, addons: burgerAddons },
-      { id: 'x-egg', name: 'X-EGG', description: 'pão, carne, queijo, presunto, ovo, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
-      { id: 'x-bacon', name: 'X-BACON', description: 'pão, carne, queijo, presunto, bacon, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
-      { id: 'x-tudo', name: 'X-TUDO', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 13.00, addons: burgerAddons },
-      { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00, addons: burgerAddons },
-      { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
-      { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
-      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+      { id: 'copo-felicidade', name: 'COPO DA FELICIDADE', price: 16.00 },
+      { id: 'bolo-chocolate', name: 'BOLO DE CHOCOLATE', description: 'recheios de ninho e brigadeiro', price: 10.00 },
+      { id: 'bolo-cenoura', name: 'BOLO DE CENOURA', description: 'com cobertura de chocolate', price: 6.00 },
+      { id: 'banoffe', name: 'BANOFFE', price: 6.00 },
+      { id: 'brownie-recheado', name: 'BROWNIE RECHEADO', description: 'ninho, brigadeiro, doce de leite', price: 8.00 },
+    ]
+  },
+  {
+    id: 'potes-felicidade',
+    name: 'POTES DA FELICIDADE',
+    items: [
+      { id: 'pote-choc-maracuja', name: 'CHOCOLATE COM MARACUJÁ', price: 15.00 },
+      { id: 'pote-maracuja-ninho', name: 'MARACUJÁ COM NINHO', price: 15.00 },
+      { id: 'pote-nutella-maracuja', name: 'NUTELLA COM MARACUJÁ', price: 15.00 },
+      { id: 'pote-ninho-nutella', name: 'NINHO COM NUTELLA', price: 15.00 },
     ]
   },
   {

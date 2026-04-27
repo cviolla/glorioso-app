@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
-import { MenuItem, MenuCategory } from "@/data/menu";
+import { MenuItem, MenuCategory, burgerAddons } from "@/data/menu";
 import { supabase } from "@/lib/supabase";
 
 export default function MenuPage() {
@@ -25,6 +25,8 @@ export default function MenuPage() {
       
       if (cats && prods) {
         const assembled: MenuCategory[] = cats.map(cat => {
+          const isBurgerCategory = cat.name === 'HAMBURGUER' || cat.name === 'ARTESANAIS';
+          
           const catProds = prods.filter(p => p.category_id === cat.id && !p.subcategory_id);
           const catSubs = subs?.filter(s => s.category_id === cat.id).map(sub => ({
             name: sub.name,
@@ -34,6 +36,7 @@ export default function MenuPage() {
               description: p.description,
               price: p.price,
               imageUrl: p.image_url,
+              addons: isBurgerCategory ? burgerAddons : undefined,
               variants: vars?.filter(v => v.product_id === p.id).map(v => ({
                 name: v.name,
                 price: v.price
@@ -50,6 +53,7 @@ export default function MenuPage() {
               description: p.description,
               price: p.price,
               imageUrl: p.image_url,
+              addons: isBurgerCategory ? burgerAddons : undefined,
               variants: vars?.filter(v => v.product_id === p.id).map(v => ({
                 name: v.name,
                 price: v.price
