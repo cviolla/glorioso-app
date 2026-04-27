@@ -23,7 +23,7 @@ export type MenuCategory = {
   items?: MenuItem[];
 };
 
-export const burgerAddons = [
+export const artesanalAddons = [
   { name: 'BACON', price: 3.00 },
   { name: 'BLEND 180g', price: 9.00 },
   { name: 'OVO', price: 2.00 },
@@ -31,30 +31,36 @@ export const burgerAddons = [
   { name: 'ONION RINGS', price: 3.00 },
 ];
 
+export const traditionalAddons = [
+  { name: 'CARNE', price: 3.00 },
+  { name: 'OVO', price: 2.00 },
+  { name: 'BACON', price: 2.00 },
+];
+
 export const menuData: MenuCategory[] = [
   {
     id: 'artesanais',
     name: 'ARTESANAIS',
     items: [
-      { id: 'valente-gloria', name: 'VALENTE DE GLÓRIA', description: 'blend 180g, costela desfiada, cream cheese, queijo, molho especial, pão de brioche', price: 26.00, addons: burgerAddons },
-      { id: 'conquistador', name: 'O CONQUISTADOR', description: 'blend 180g, bacon, ovo, queijo, molho especial, pão brioche', price: 23.00, addons: burgerAddons },
-      { id: 'golpe-gloria', name: 'GOLPE DE GLÓRIA', description: 'blend 180g, onion rings, bacon, queijo, molho especial, pão de brioche', price: 25.00, addons: burgerAddons },
-      { id: 'escolhido', name: 'O ESCOLHIDO', description: 'blend 180g, creme de cheddar especial, fatiado de cheddar, molho especial, pão de brioche', price: 21.00, addons: burgerAddons },
-      { id: 'gloria-suprema', name: 'GLÓRIA SUPREMA', description: 'blend 180g, queijo empanado, bacon, molho especial, pão de brioche', price: 28.00, addons: burgerAddons },
+      { id: 'valente-gloria', name: 'VALENTE DE GLÓRIA', description: 'blend 180g, costela desfiada, cream cheese, queijo, molho especial, pão de brioche', price: 26.00, addons: artesanalAddons },
+      { id: 'conquistador', name: 'O CONQUISTADOR', description: 'blend 180g, bacon, ovo, queijo, molho especial, pão brioche', price: 23.00, addons: artesanalAddons },
+      { id: 'golpe-gloria', name: 'GOLPE DE GLÓRIA', description: 'blend 180g, onion rings, bacon, queijo, molho especial, pão de brioche', price: 25.00, addons: artesanalAddons },
+      { id: 'escolhido', name: 'O ESCOLHIDO', description: 'blend 180g, creme de cheddar especial, fatiado de cheddar, molho especial, pão de brioche', price: 21.00, addons: artesanalAddons },
+      { id: 'gloria-suprema', name: 'GLÓRIA SUPREMA', description: 'blend 180g, queijo empanado, bacon, molho especial, pão de brioche', price: 28.00, addons: artesanalAddons },
     ]
   },
   {
     id: 'hamburguer',
     name: 'HAMBURGUER',
     items: [
-      { id: 'x-burguer', name: 'X-BURGUER', description: 'pão, carne, queijo, salada, molho especial e batata filetada', price: 7.50, addons: burgerAddons },
-      { id: 'x-egg', name: 'X-EGG', description: 'pão, carne, queijo, presunto, ovo, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
-      { id: 'x-bacon', name: 'X-BACON', description: 'pão, carne, queijo, presunto, bacon, salada, molho especial e batata filetada', price: 11.00, addons: burgerAddons },
-      { id: 'x-tudo', name: 'X-TUDO', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 13.00, addons: burgerAddons },
-      { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00, addons: burgerAddons },
-      { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
-      { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
-      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: burgerAddons },
+      { id: 'x-burguer', name: 'X-BURGUER', description: 'pão, carne, queijo, salada, molho especial e batata filetada', price: 7.50, addons: traditionalAddons },
+      { id: 'x-egg', name: 'X-EGG', description: 'pão, carne, queijo, presunto, ovo, salada, molho especial e batata filetada', price: 11.00, addons: traditionalAddons },
+      { id: 'x-bacon', name: 'X-BACON', description: 'pão, carne, queijo, presunto, bacon, salada, molho especial e batata filetada', price: 11.00, addons: traditionalAddons },
+      { id: 'x-tudo', name: 'X-TUDO', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 13.00, addons: traditionalAddons },
+      { id: 'cheddar-bacon', name: 'CHEDDAR BACON', description: 'pão, carne, queijo cheddar, salada, molho especial e batata filetada', price: 10.00, addons: traditionalAddons },
+      { id: 'x-tudo-duplo', name: 'X-TUDO DUPLO', description: 'pão, 2 carnes, 2 queijos, 2 presuntos, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: traditionalAddons },
+      { id: 'duplo-cheddar-bacon', name: 'DUPLO CHEDDAR BACON', description: 'pão, 2 carnes, 2 queijos cheddar, salada, molho especial e batata filetada', price: 15.00, addons: traditionalAddons },
+      { id: 'x-tudo-picanha', name: 'X-TUDO PICANHA', description: 'pão, carne, queijo, presunto, ovo, bacon, salada, molho especial e batata filetada', price: 15.00, addons: traditionalAddons },
     ]
   },
   {

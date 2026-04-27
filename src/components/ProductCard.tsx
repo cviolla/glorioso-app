@@ -206,7 +206,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="overflow-y-auto no-scrollbar flex-1 pb-24">
+            <div className="overflow-y-auto no-scrollbar flex-1 pb-32">
               {/* Header Image */}
               <div className="w-full h-48 sm:h-64 relative bg-[#f8ece3]">
                 <Image 
@@ -228,21 +228,31 @@ export function ProductCard({ item }: { item: MenuItem }) {
                   <div className="mt-6">
                     <h4 className="font-bold text-[#381010] mb-3 bg-[#f8ece3] px-3 py-1 rounded-lg inline-block">Opções</h4>
                     <div className="flex flex-col gap-2">
-                      {item.variants.map((v, idx) => (
-                        <label key={idx} className="flex justify-between items-center p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-[#f8ece3]/50 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <input 
-                              type="radio" 
-                              name={`variant-${item.id}`}
-                              checked={selectedVariant === v.name}
-                              onChange={() => setSelectedVariant(v.name)}
-                              className="w-5 h-5 accent-[#954e3a]"
-                            />
-                            <span className="font-semibold text-[#532120]">{v.name}</span>
-                          </div>
-                          <span className="font-bold text-[#954e3a]">R$ {v.price.toFixed(2).replace('.', ',')}</span>
-                        </label>
-                      ))}
+                      {item.variants.map((v, idx) => {
+                        const isSelected = selectedVariant === v.name;
+                        return (
+                          <label 
+                            key={idx} 
+                            className={`flex justify-between items-center p-4 border rounded-2xl cursor-pointer transition-all duration-200 ${
+                              isSelected 
+                                ? 'border-[#ff914a] bg-[#f8ece3] ring-1 ring-[#ff914a]/20 shadow-sm' 
+                                : 'border-gray-100 bg-white hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <input 
+                                type="radio" 
+                                name={`variant-${item.id}`}
+                                checked={isSelected}
+                                onChange={() => setSelectedVariant(v.name)}
+                                className="w-5 h-5 accent-[#954e3a]"
+                              />
+                              <span className={`font-bold ${isSelected ? 'text-[#381010]' : 'text-gray-600'}`}>{v.name}</span>
+                            </div>
+                            <span className="font-black text-[#954e3a]">R$ {v.price.toFixed(2).replace('.', ',')}</span>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -252,20 +262,30 @@ export function ProductCard({ item }: { item: MenuItem }) {
                   <div className="mt-6">
                     <h4 className="font-bold text-[#381010] mb-3 bg-[#f8ece3] px-3 py-1 rounded-lg inline-block">Adicionais</h4>
                     <div className="flex flex-col gap-2">
-                      {item.addons.map((a, idx) => (
-                        <label key={idx} className="flex justify-between items-center p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-[#f8ece3]/50 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <input 
-                              type="checkbox"
-                              checked={selectedAddons.includes(a.name)}
-                              onChange={() => toggleAddon(a.name)}
-                              className="w-5 h-5 accent-[#954e3a] rounded"
-                            />
-                            <span className="font-semibold text-[#532120]">{a.name}</span>
-                          </div>
-                          <span className="font-bold text-[#954e3a]">+ R$ {a.price.toFixed(2).replace('.', ',')}</span>
-                        </label>
-                      ))}
+                      {item.addons.map((a, idx) => {
+                        const isSelected = selectedAddons.includes(a.name);
+                        return (
+                          <label 
+                            key={idx} 
+                            className={`flex justify-between items-center p-4 border rounded-2xl cursor-pointer transition-all duration-200 ${
+                              isSelected 
+                                ? 'border-[#ff914a] bg-[#f8ece3] ring-1 ring-[#ff914a]/20 shadow-sm' 
+                                : 'border-gray-100 bg-white hover:bg-gray-50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <input 
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => toggleAddon(a.name)}
+                                className="w-5 h-5 accent-[#954e3a] rounded"
+                              />
+                              <span className={`font-bold ${isSelected ? 'text-[#381010]' : 'text-gray-600'}`}>{a.name}</span>
+                            </div>
+                            <span className="font-black text-[#954e3a]">+ R$ {a.price.toFixed(2).replace('.', ',')}</span>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

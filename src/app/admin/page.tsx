@@ -6,6 +6,7 @@ import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoreStatusStore } from '@/store/storeStatusStore';
 import { supabase } from '@/lib/supabase';
+import { CustomModal } from '@/components/CustomModal';
 
 export default function AdminProductsPage() {
   const [search, setSearch] = useState('');
@@ -14,6 +15,18 @@ export default function AdminProductsPage() {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: "info" | "success" | "warning" | "danger";
+    onConfirm?: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info"
+  });
   const [saving, setSaving] = useState(false);
 
   const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen, getIsOpen } = useStoreStatusStore();
@@ -109,15 +122,32 @@ export default function AdminProductsPage() {
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este produto?")) return;
-    
-    try {
-      const { error } = await supabase.from('products').delete().eq('id', id);
-      if (error) throw error;
-      fetchMenu();
-    } catch (err) {
-      alert("Erro ao excluir produto.");
-    }
+    setModalConfig({
+      isOpen: true,
+      title: "Excluir Produto",
+      message: "Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.",
+      type: "danger",
+      onConfirm: async () => {
+        try {
+          const { error } = await supabase.from('products').delete().eq('id', id);
+          if (error) throw error;
+          fetchMenu();
+          setModalConfig({
+            isOpen: true,
+            title: "Sucesso",
+            message: "Produto excluído com sucesso!",
+            type: "success"
+          });
+        } catch (err) {
+          setModalConfig({
+            isOpen: true,
+            title: "Erro",
+            message: "Houve um erro ao excluir o produto.",
+            type: "danger"
+          });
+        }
+      }
+    });
   };
 
   const handleSaveProduct = async () => {
@@ -548,6 +578,15 @@ export default function AdminProductsPage() {
           </div>
         )}
       </AnimatePresence>
+
+      <CustomModal 
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 }

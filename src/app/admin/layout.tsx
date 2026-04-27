@@ -19,18 +19,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <h1 className="font-black text-[#381010] text-2xl tracking-tight">Glorioso <br/><span className="text-[#ff914a]">Admin</span></h1>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <Link href="/admin" className="flex items-center gap-3 px-4 py-3 bg-[#ff914a]/10 text-[#ff914a] font-bold rounded-xl">
+          <Link href="/admin" className="flex items-center gap-3 px-4 py-3 text-gray-500 font-medium hover:bg-gray-50 hover:text-[#ff914a] rounded-xl transition-all">
             <Package className="w-5 h-5" />
             Produtos
           </Link>
-          <button className="flex items-center gap-3 px-4 py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-xl w-full text-left opacity-50 cursor-not-allowed">
+          <Link href="/admin/orders" className="flex items-center gap-3 px-4 py-3 text-gray-500 font-medium hover:bg-gray-50 hover:text-[#ff914a] rounded-xl transition-all">
             <LayoutDashboard className="w-5 h-5" />
             Pedidos
-          </button>
-          <button className="flex items-center gap-3 px-4 py-3 text-gray-500 font-medium hover:bg-gray-50 rounded-xl w-full text-left opacity-50 cursor-not-allowed">
+          </Link>
+          <Link href="/admin/settings" className="flex items-center gap-3 px-4 py-3 text-gray-500 font-medium hover:bg-gray-50 hover:text-[#ff914a] rounded-xl transition-all">
             <Settings className="w-5 h-5" />
             Configurações
-          </button>
+          </Link>
         </nav>
       </aside>
 
@@ -41,18 +41,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around p-3 pb-safe z-20 md:hidden">
-        <Link href="/admin" className="flex flex-col items-center gap-1 text-[#ff914a]">
+        <Link href="/admin" className="flex flex-col items-center gap-1 text-gray-400 hover:text-[#ff914a]">
           <Package className="w-6 h-6" />
           <span className="text-[10px] font-bold">Produtos</span>
         </Link>
-        <button className="flex flex-col items-center gap-1 text-gray-400 opacity-50">
+        <Link href="/admin/orders" className="flex flex-col items-center gap-1 text-gray-400 hover:text-[#ff914a]">
           <LayoutDashboard className="w-6 h-6" />
           <span className="text-[10px] font-medium">Pedidos</span>
-        </button>
-        <button className="flex flex-col items-center gap-1 text-gray-400 opacity-50">
+        </Link>
+        <Link href="/admin/settings" className="flex flex-col items-center gap-1 text-gray-400 hover:text-[#ff914a]">
           <Settings className="w-6 h-6" />
           <span className="text-[10px] font-medium">Ajustes</span>
-        </button>
+        </Link>
       </nav>
     </div>
   );

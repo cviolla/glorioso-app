@@ -1,71 +1,271 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, Motorbike, Store, User, Phone } from "lucide-react";
+import { useSettingsStore } from "@/store/settingsStore";
+import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, Motorbike, Store, User, Phone, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { supabase } from "@/lib/supabase";
+import { CustomModal } from "@/components/CustomModal";
 
 type CheckoutStep = 'cart' | 'address' | 'summary';
 type DeliveryType = 'delivery' | 'pickup' | null;
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalPrice, totalItems } = useCartStore();
+  const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCartStore();
+  const { whatsappNumber, deliveryFee5, deliveryFee7 } = useSettingsStore();
+  const [isHydrated, setIsHydrated] = useState(false);
+  
   const [step, setStep] = useState<CheckoutStep>('cart');
   const [deliveryType, setDeliveryType] = useState<DeliveryType>(null);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: "info" | "success" | "warning" | "danger";
+    onConfirm?: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "info"
+  });
   const [userInfo, setUserInfo] = useState({ name: '', phone: '' });
-  const [address, setAddress] = useState({ street: '', number: '', neighborhood: 'Santa Cruz da Serra (R$ 5,00)', complement: '', reference: '' });
+  const [address, setAddress] = useState({ street: '', number: '', neighborhood: 'Santa Cruz da Serra', complement: '', reference: '' });
   const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: 'PIX', orderTime: 'Para agora', coupon: '' });
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const formatPhone = (value: string) => {
+    // Remove tudo que não é dígito
+    const digits = value.replace(/\D/g, '');
+    
+    // Se começar com 5521, remove para tratar apenas o número
+    let number = digits;
+    if (digits.startsWith('5521')) {
+      number = digits.slice(4);
+    } else if (digits.startsWith('21')) {
+      number = digits.slice(2);
+    }
+
+    // Limita a 9 dígitos (padrão celular BR)
+    number = number.slice(0, 9);
+
+    // Aplica a máscara: +55 (21) 9XXXX-XXXX
+    if (number.length <= 5) {
+      return `+55 (21) ${number}`;
+    }
+    return `+55 (21) ${number.slice(0, 5)}-${number.slice(5)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    setUserInfo({ ...userInfo, phone: formatted });
+  };
+
+  useEffect(() => {
+    if (isHydrated && !userInfo.phone) {
+      setUserInfo(prev => ({ ...prev, phone: '+55 (21) ' }));
+    }
+  }, [isHydrated]);
+
+  useEffect(() => {
+    const fetchCustomerData = async () => {
+      const cleanPhone = userInfo.phone.replace(/\D/g, '');
+      // Verifica se tem os 4 do prefixo (5521) + 8 ou 9 do número
+      if (cleanPhone.length >= 12) {
+        const { data, error } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('phone', userInfo.phone)
+          .single();
+        
+        if (data && !error) {
+          if (!userInfo.name) setUserInfo(prev => ({ ...prev, name: data.name }));
+          setAddress({
+            street: data.street || '',
+            number: data.number || '',
+            neighborhood: data.neighborhood || 'Santa Cruz da Serra',
+            complement: data.complement || '',
+            reference: data.reference || ''
+          });
+        }
+      }
+    };
+
+    fetchCustomerData();
+  }, [userInfo.phone]);
 
   const isCartEmpty = items.length === 0;
   
   const getDeliveryFee = () => {
     if (deliveryType !== 'delivery') return 0;
-    if (address.neighborhood.includes('R$ 5,00')) return 5;
-    if (address.neighborhood.includes('R$ 7,00')) return 7;
-    return 0; // A combinar
+    
+    const neighborhood = address.neighborhood;
+    
+    // Preços específicos solicitados
+    if (neighborhood === 'Nova Campinas') return 4.00;
+    
+    if ([
+      'Jardim Anhangá', 
+      'Parque Paulista', 
+      'Barro Branco', 
+      'Parque Equitativa'
+    ].includes(neighborhood)) return 5.00;
+    
+    if ([
+      'Santa Cruz da Serra', 
+      'Santa Cruz', 
+      'Jardim Rotsen'
+    ].includes(neighborhood)) return 6.00;
+
+    // Chácaras Rio-Petrópolis (mantendo o padrão anterior de 5,00 se não especificado)
+    if (neighborhood === 'Chácaras Rio-Petrópolis') return 5.00;
+
+    return deliveryFee7; // Valor para "Outros" ou locais não mapeados
   };
   
   const deliveryFee = getDeliveryFee();
   const finalTotal = totalPrice() + deliveryFee;
 
-  const handleCheckoutSubmit = () => {
-    if (items.length === 0) return;
-    
-    let text = `Olá, gostaria de fazer um pedido para *${deliveryType === 'pickup' ? 'Retirada' : 'Delivery'}*:%0A%0A`;
-    
-    items.forEach(item => {
-      const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
-      let itemDesc = `*${item.quantity}x ${item.name}*`;
-      if (item.variant) itemDesc += ` (${item.variant})`;
-      text += `${itemDesc} - R$ ${(itemTotal * item.quantity).toFixed(2).replace('.', ',')}%0A`;
-      if (item.addons && item.addons.length > 0) {
-        text += `   + Adicionais: ${item.addons.map(a => a.name).join(', ')}%0A`;
-      }
-    });
-    
-    text += `%0A*Subtotal:* R$ ${totalPrice().toFixed(2).replace('.', ',')}`;
-    if (deliveryType === 'delivery') {
-      text += `%0A*Taxa de entrega:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}`;
-    }
-    text += `%0A*Total: R$ ${finalTotal.toFixed(2).replace('.', ',')}*%0A`;
-    text += `%0A👤 *Cliente:* ${userInfo.name || 'Não informado'} | ${userInfo.phone || 'Não informado'}`;
-    
-    if (deliveryType === 'delivery') {
-      text += `%0A📍 *Endereço:* ${address.street}, ${address.number} - ${address.neighborhood}`;
-      if (address.complement) text += ` (${address.complement})`;
-      if (address.reference) text += `%0ARef: ${address.reference}`;
-    }
+  if (!isHydrated) return null;
 
-    text += `%0A💳 *Pagamento:* ${paymentInfo.paymentMethod}`;
-    text += `%0A🕒 *Tempo:* ${paymentInfo.orderTime}`;
-    if (paymentInfo.observation) {
-      text += `%0A📝 *Observação:* ${paymentInfo.observation}`;
-    }
+  const handleCheckoutSubmit = async () => {
+    if (items.length === 0 || isSubmitting) return;
     
-    window.open(`https://wa.me/5521990062956?text=${text}`, '_blank');
+    setIsSubmitting(true);
+    
+    try {
+      // 1. Salvar/Atualizar Cliente para agilizar pedidos futuros
+      await supabase.from('customers').upsert({
+        phone: userInfo.phone,
+        name: userInfo.name,
+        street: address.street,
+        number: address.number,
+        neighborhood: address.neighborhood,
+        complement: address.complement,
+        reference: address.reference,
+        last_order_at: new Date().toISOString()
+      }, { onConflict: 'phone' });
+
+      // 2. Salvar Pedido no Supabase
+      const { data: savedOrder, error } = await supabase.from('orders').insert({
+        customer_name: userInfo.name,
+        customer_phone: userInfo.phone,
+        delivery_type: deliveryType,
+        address_street: address.street,
+        address_number: address.number,
+        address_neighborhood: address.neighborhood,
+        address_complement: address.complement,
+        address_reference: address.reference,
+        payment_method: paymentInfo.paymentMethod,
+        order_time: paymentInfo.orderTime,
+        observation: paymentInfo.observation,
+        total_price: finalTotal,
+        items: items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          variant: item.variant,
+          addons: item.addons
+        })),
+        status: 'pending'
+      }).select().single();
+
+      if (error) throw error;
+
+      // 3. Montar texto do WhatsApp conforme novo template
+      const orderId = savedOrder.id.slice(-6).toUpperCase();
+      const now = new Date();
+      const formattedDateTime = now.toLocaleString('pt-BR', { 
+        day: '2-digit', month: '2-digit', year: 'numeric', 
+        hour: '2-digit', minute: '2-digit' 
+      }).replace(',', '');
+
+      let text = `Venho do app *Glorioso Brownie*\n`;
+      text += `BR-${orderId}\n`;
+      text += `${formattedDateTime}\n\n`;
+      
+      text += `*Tipo de serviço:* ${deliveryType === 'pickup' ? 'Retirada' : 'Delivery'}\n\n`;
+      
+      text += `*Nome:* ${userInfo.name}\n`;
+      text += `*Telefone:* ${userInfo.phone}\n`;
+      if (deliveryType === 'delivery') {
+        text += `*Endereço:* ${address.neighborhood}, ${address.street} #${address.number}`;
+        if (address.complement) text += ` - ${address.complement}`;
+        if (address.reference) text += ` | Ref: ${address.reference}`;
+        text += `\n`;
+      }
+      
+      text += `\n*Produtos*\n`;
+      items.forEach(item => {
+        const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
+        let itemDesc = `X${item.quantity} ${item.name}`;
+        if (item.variant) itemDesc += ` (${item.variant})`;
+        text += `${itemDesc}  R$ ${(itemTotal * item.quantity).toFixed(2).replace('.', ',')}\n`;
+        if (item.addons && item.addons.length > 0) {
+          text += `   _Adicionais: ${item.addons.map(a => a.name).join(', ')}_\n`;
+        }
+      });
+      
+      text += `\n*Subtotal:* R$ ${totalPrice().toFixed(2).replace('.', ',')}\n`;
+      if (deliveryType === 'delivery') {
+        text += `*Delivery:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}\n`;
+      }
+      text += `*Total:* R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
+      
+      text += `\n*Pagamento*\n`;
+      text += `Estado do pagamento: Não pago\n`;
+      text += `Total a pagar: R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
+      text += `${paymentInfo.paymentMethod} ${finalTotal.toFixed(2).replace('.', ',')}\n`;
+      
+      if (paymentInfo.observation) {
+        text += `\n*Comentários adicionais:*\n${paymentInfo.observation}\n`;
+      }
+      
+      text += `\nPor favor, envie-nos esta mensagem agora. Assim que recebermos estaremos atendendo você.`;
+      
+      // 4. Abrir WhatsApp e limpar carrinho
+      const cleanNumber = whatsappNumber.replace(/\D/g, '');
+      const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, '_blank');
+      clearCart();
+      
+    } catch (err: any) {
+      console.error("Erro ao salvar pedido:", err);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro no Pedido",
+        message: "Houve um erro ao processar seu pedido no banco de dados. Por favor, tente novamente ou entre em contato.",
+        type: "danger"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isStepValid = () => {
+    const cleanPhone = userInfo.phone.replace(/\D/g, '');
+    const isBasicInfoValid = userInfo.name.trim().length > 2 && cleanPhone.length >= 12;
+    
+    if (step === 'address') {
+      if (deliveryType === 'pickup') return isBasicInfoValid;
+      
+      return (
+        isBasicInfoValid &&
+        address.street.trim().length > 3 &&
+        address.number.trim().length >= 1 &&
+        address.neighborhood.trim() !== '' &&
+        address.complement.trim().length >= 2 &&
+        address.reference.trim().length >= 2
+      );
+    }
+    return true;
   };
 
   const handleBack = () => {
@@ -158,7 +358,7 @@ export default function CartPage() {
                       </div>
                       <input 
                         type="text" placeholder="Ex: João da Silva" 
-                        className="w-full border border-gray-300 rounded-xl py-3 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
+                        className={`w-full border rounded-xl py-3 pl-10 pr-3 outline-none focus:ring-1 text-[#381010] bg-white text-[16px] transition-all ${userInfo.name.length > 0 && userInfo.name.length <= 2 ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#ff914a] focus:ring-[#ff914a]'}`} 
                         value={userInfo.name} onChange={e => setUserInfo({...userInfo, name: e.target.value})} 
                       />
                     </div>
@@ -170,9 +370,9 @@ export default function CartPage() {
                         <Phone className="w-5 h-5 text-gray-400" />
                       </div>
                       <input 
-                        type="tel" placeholder="Ex: (21) 99999-9999" 
-                        className="w-full border border-gray-300 rounded-xl py-3 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
-                        value={userInfo.phone} onChange={e => setUserInfo({...userInfo, phone: e.target.value})} 
+                        type="tel" placeholder="99999-9999" 
+                        className={`w-full border rounded-xl py-3 pl-10 pr-3 outline-none focus:ring-1 text-[#381010] bg-white text-[16px] transition-all ${userInfo.phone.length > 13 && userInfo.phone.replace(/\D/g, '').length < 12 ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:border-[#ff914a] focus:ring-[#ff914a]'}`} 
+                        value={userInfo.phone} onChange={handlePhoneChange} 
                       />
                     </div>
                   </div>
@@ -180,42 +380,45 @@ export default function CartPage() {
               </div>
 
               {/* Address Section */}
-              <div>
-                <h3 className="font-bold text-[#381010] text-lg mb-4">Endereço de entrega</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-bold text-[#381010] mb-1 block">Rua/Avenida</label>
-                    <input type="text" placeholder="Ex: Avenida das Américas" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.street} onChange={e => setAddress({...address, street: e.target.value})} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+              {deliveryType === 'delivery' && (
+                <div>
+                  <h3 className="font-bold text-[#381010] text-lg mb-4">Endereço de entrega</h3>
+                  <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-bold text-[#381010] mb-1 block">Número</label>
-                      <input type="text" placeholder="Ex: 1000" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.number} onChange={e => setAddress({...address, number: e.target.value})} />
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Rua/Avenida</label>
+                      <input type="text" placeholder="Ex: Avenida das Américas" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.street} onChange={e => setAddress({...address, street: e.target.value})} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-bold text-[#381010] mb-1 block">Número</label>
+                        <input type="text" placeholder="Ex: 1000" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.number} onChange={e => setAddress({...address, number: e.target.value})} />
+                      </div>
+                      <div>
+                        <label className="text-sm font-bold text-[#381010] mb-1 block">Complemento</label>
+                        <input type="text" placeholder="Apto 201 ou Casa" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.complement} onChange={e => setAddress({...address, complement: e.target.value})} />
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm font-bold text-[#381010] mb-1 block">Complemento</label>
-                      <input type="text" placeholder="Apto 201" className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.complement} onChange={e => setAddress({...address, complement: e.target.value})} />
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
+                      <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
+                        <option>Santa Cruz da Serra</option>
+                        <option>Jardim Anhangá</option>
+                        <option>Nova Campinas</option>
+                        <option>Parque Paulista</option>
+                        <option>Jardim Rotsen</option>
+                        <option>Barro Branco</option>
+                        <option>Parque Equitativa</option>
+                        <option>Chácaras Rio-Petrópolis</option>
+                        <option>Outros</option>
+                      </select>
                     </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
-                    <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
-                      <option>Santa Cruz da Serra (R$ 5,00)</option>
-                      <option>Jardim Anhangá (R$ 5,00)</option>
-                      <option>Nova Campinas (R$ 5,00)</option>
-                      <option>Parque Paulista (R$ 5,00)</option>
-                      <option>Jardim Rotsen (R$ 5,00)</option>
-                      <option>Barro Branco (R$ 5,00)</option>
-                      <option>Parque Equitativa (R$ 5,00)</option>
-                      <option>Outros (A combinar)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-bold text-[#381010] mb-1 block">Referência <span className="text-gray-400 font-normal">(opcional)</span></label>
-                    <input type="text" placeholder="Próximo a..." className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.reference} onChange={e => setAddress({...address, reference: e.target.value})} />
+                    <div>
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Referência</label>
+                      <input type="text" placeholder="Próximo a..." className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.reference} onChange={e => setAddress({...address, reference: e.target.value})} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           )}
 
@@ -267,20 +470,49 @@ export default function CartPage() {
               <>
                 <p className="text-center text-sm font-medium mb-4 text-white/80">Selecione o tipo de serviço:</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => { setDeliveryType('pickup'); setStep('summary'); }} className="bg-[#ff914a] text-[#381010] flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold hover:bg-[#ff9f61]"><Store className="w-5 h-5" /> Retirada</button>
+                  <button onClick={() => { setDeliveryType('pickup'); setStep('address'); }} className="bg-[#ff914a] text-[#381010] flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold hover:bg-[#ff9f61]"><Store className="w-5 h-5" /> Retirada</button>
                   <button onClick={() => { setDeliveryType('delivery'); setStep('address'); }} className="bg-[#ff914a] text-[#381010] flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold hover:bg-[#ff9f61]"><Motorbike className="w-5 h-5" /> Delivery</button>
                 </div>
               </>
             )}
             {step === 'address' && (
-              <button onClick={() => setStep('summary')} className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md" disabled={!userInfo.name || !userInfo.phone || !address.street || !address.number || !address.complement}>Continuar</button>
+              <button 
+                onClick={() => setStep('summary')} 
+                className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md disabled:opacity-50 disabled:grayscale transition-all" 
+                disabled={!isStepValid()}
+              >
+                {isStepValid() ? 'Continuar para Pagamento' : 'Preencha todos os campos'}
+              </button>
             )}
             {step === 'summary' && (
-              <button onClick={handleCheckoutSubmit} className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md flex items-center justify-center gap-2">Enviar via WhatsApp <ArrowRight className="w-5 h-5" /></button>
+              <button 
+                onClick={handleCheckoutSubmit} 
+                disabled={isSubmitting}
+                className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    Enviar via WhatsApp <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
+              </button>
             )}
           </div>
         </div>
       )}
+      <CustomModal 
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 }

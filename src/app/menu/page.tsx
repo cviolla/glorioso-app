@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { ProductCard } from "@/components/ProductCard";
-import { MenuItem, MenuCategory, burgerAddons } from "@/data/menu";
+import { MenuItem, MenuCategory, artesanalAddons, traditionalAddons } from "@/data/menu";
 import { supabase } from "@/lib/supabase";
 
 export default function MenuPage() {
@@ -27,6 +27,8 @@ export default function MenuPage() {
         const assembled: MenuCategory[] = cats.map(cat => {
           const isBurgerCategory = cat.name === 'HAMBURGUER' || cat.name === 'ARTESANAIS';
           
+          const addonsToUse = cat.name === 'ARTESANAIS' ? artesanalAddons : (cat.name === 'HAMBURGUER' ? traditionalAddons : undefined);
+          
           const catProds = prods.filter(p => p.category_id === cat.id && !p.subcategory_id);
           const catSubs = subs?.filter(s => s.category_id === cat.id).map(sub => ({
             name: sub.name,
@@ -36,7 +38,7 @@ export default function MenuPage() {
               description: p.description,
               price: p.price,
               imageUrl: p.image_url,
-              addons: isBurgerCategory ? burgerAddons : undefined,
+              addons: addonsToUse,
               variants: vars?.filter(v => v.product_id === p.id).map(v => ({
                 name: v.name,
                 price: v.price
@@ -53,7 +55,7 @@ export default function MenuPage() {
               description: p.description,
               price: p.price,
               imageUrl: p.image_url,
-              addons: isBurgerCategory ? burgerAddons : undefined,
+              addons: addonsToUse,
               variants: vars?.filter(v => v.product_id === p.id).map(v => ({
                 name: v.name,
                 price: v.price
@@ -143,11 +145,21 @@ export default function MenuPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#f8ece3] font-sans pb-24 pt-4 px-4">
+    <div className="min-h-screen font-sans pb-24 pt-4 px-4 relative">
+      {/* Background Image Pattern */}
+      <div 
+        className="fixed inset-0 z-0 opacity-40 pointer-events-none"
+        style={{ 
+          backgroundImage: "url('/GB2.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '350px',
+          backgroundAttachment: 'fixed'
+        }}
+      />
       
       {/* Sticky Top Category Navigation */}
       {!loading && categories.length > 0 && (
-        <nav className="sticky top-0 z-40 bg-[#f8ece3] -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
+        <nav className="sticky top-0 z-40 bg-[#f8ece3]/80 backdrop-blur-md -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
           <div className="flex gap-3 max-w-md mx-auto">
             {categories.map(category => (
               <button
@@ -167,9 +179,9 @@ export default function MenuPage() {
         </nav>
       )}
 
-      <main className="max-w-md mx-auto relative z-10">
+      <main className="max-w-md mx-auto relative">
         {/* Search Bar */}
-        <div className="relative mb-6 shadow-sm rounded-2xl overflow-hidden bg-white border border-[#f8ece3] focus-within:border-[#ff914a] transition-colors">
+        <div className="relative mb-6 shadow-sm rounded-2xl overflow-hidden bg-white/90 backdrop-blur-sm border border-[#f8ece3] focus-within:border-[#ff914a] transition-colors">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5" />
           <input 
             type="text"
