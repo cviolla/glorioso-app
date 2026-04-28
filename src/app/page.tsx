@@ -64,14 +64,13 @@ export default function Home() {
           className="flex flex-col items-center text-center w-full max-w-md mt-4 sm:mt-0"
         >
           {/* Official Logo */}
-          <div className="w-36 h-36 sm:w-44 sm:h-44 bg-[#f8ece3] rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(255,145,74,0.4)] mb-6 sm:mb-8 overflow-hidden relative border-[3px] border-[#ff914a]">
+          <div className="relative w-48 h-48 sm:w-56 sm:h-56 mb-6 sm:mb-8 drop-shadow-xl">
             <Image 
               src="/GloriosoBrownie_Logo_fuul.png" 
               alt="Logo Glorioso Brownie" 
               fill
-              className="object-cover"
+              className="object-contain"
               priority
-              sizes="(max-width: 640px) 144px, 176px"
             />
           </div>
           

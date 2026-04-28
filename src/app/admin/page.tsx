@@ -262,61 +262,6 @@ export default function AdminProductsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Store Status Control */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-[#ff914a]/10 rounded-xl flex items-center justify-center">
-            <Settings className="w-6 h-6 text-[#ff914a]" />
-          </div>
-          <div>
-            <h3 className="font-bold text-[#381010] text-lg">Configurações da Loja</h3>
-            <p className="text-sm text-gray-500">Controle o funcionamento do cardápio.</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-gray-400" />
-              <div>
-                <span className="block font-bold text-[#381010] text-sm">Horário Automático</span>
-                <span className="text-xs text-gray-500 uppercase font-bold tracking-tight">15:00 - 00:00 (Ter-Dom)</span>
-              </div>
-            </div>
-            <button 
-              onClick={toggleAutoMode}
-              className={`w-12 h-6 rounded-full relative transition-colors ${isAutoMode ? 'bg-[#25D366]' : 'bg-gray-300'}`}
-            >
-              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isAutoMode ? 'left-7' : 'left-1'}`} />
-            </button>
-          </div>
-
-          <div className={`flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 transition-opacity ${isAutoMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-            <div className="flex items-center gap-3">
-              <Power className={`w-5 h-5 ${isManualOpen ? 'text-[#25D366]' : 'text-red-500'}`} />
-              <div>
-                <span className="block font-bold text-[#381010] text-sm">Status Manual</span>
-                <span className={`text-xs uppercase font-bold tracking-tight ${isManualOpen ? 'text-[#25D366]' : 'text-red-500'}`}>
-                  {isManualOpen ? 'Forçar Loja Aberta' : 'Forçar Loja Fechada'}
-                </span>
-              </div>
-            </div>
-            <button 
-              onClick={() => setManualOpen(!isManualOpen)}
-              className={`w-12 h-6 rounded-full relative transition-colors ${isManualOpen ? 'bg-[#25D366]' : 'bg-red-500'}`}
-            >
-              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isManualOpen ? 'left-7' : 'left-1'}`} />
-            </button>
-          </div>
-        </div>
-
-        <div className={`mt-4 p-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-inner ${
-          currentStatus ? 'bg-[#25D366]/10 text-[#25D366]' : 'bg-gray-100 text-gray-500'
-        }`}>
-          <div className={`w-2 h-2 rounded-full ${currentStatus ? 'bg-[#25D366] animate-pulse' : 'bg-gray-400'}`} />
-          STATUS ATUAL: {currentStatus ? 'LOJA ABERTA' : 'LOJA FECHADA'}
-        </div>
-      </div>
 
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
