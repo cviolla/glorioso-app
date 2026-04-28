@@ -223,23 +223,33 @@ export function ProductCard({ item }: { item: MenuItem }) {
           {item.price !== undefined && item.price > 0 && (
             <div className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
               <span className="font-bold text-[#954e3a] text-sm">
-                R$ {item.price.toFixed(2).replace('.', ',')}
+                R$ {((getFastCartItem()?.quantity || 1) * item.price).toFixed(2).replace('.', ',')}
               </span>
               {renderActionButton(item.price)}
             </div>
           )}
 
-          {item.variants?.map((variant, idx) => (
-            <div key={idx} className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
-              <div className="flex flex-col">
-                <span className="text-[11px] font-bold text-[#532120] leading-tight">{variant.name}</span>
-                <span className="font-bold text-[#954e3a] text-sm leading-tight">
-                  R$ {variant.price.toFixed(2).replace('.', ',')}
-                </span>
+          {item.variants?.map((variant, idx) => {
+            const cartItem = getFastCartItem(variant.name);
+            const displayPrice = (cartItem?.quantity || 1) * variant.price;
+            
+            return (
+              <div key={idx} className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-[#532120] leading-tight">{variant.name}</span>
+                  <motion.span 
+                    key={displayPrice}
+                    initial={{ opacity: 0.5 }}
+                    animate={{ opacity: 1 }}
+                    className="font-black text-[#954e3a] text-sm leading-tight"
+                  >
+                    R$ {displayPrice.toFixed(2).replace('.', ',')}
+                  </motion.span>
+                </div>
+                {renderActionButton(variant.price, variant.name)}
               </div>
-              {renderActionButton(variant.price, variant.name)}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </motion.div>
 
