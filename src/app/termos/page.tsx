@@ -29,7 +29,7 @@ export default function TermosPage() {
         <section>
           <h2 className="text-white font-semibold mb-2">2. Uso de Licença</h2>
           <p className="mb-2">
-            É concedida permissão para baixar temporariamente uma cópia dos materiais (informações ou software) no site Glorioso Brownie, apenas para visualização transitória pessoal e não comercial. Esta é a concessão de uma licença, não uma transferência de título e, sob esta licença, você não pode: modificar ou copiar os materiais; usar os materiais para qualquer finalidade comercial ou para exibição pública (comercial ou não comercial); tentar descompilar ou fazer engenharia reversa de qualquer software contido no site Glorioso Brownie; remover quaisquer direitos autorais ou outras notações de propriedade dos materiais; ou transferir os materiais para outra pessoa ou 'espelhe' os materiais em qualquer outro servidor.
+            É concedida permissão para baixar temporariamente uma cópia dos materiais (informações ou software) no site Glorioso Brownie, apenas para visualização transitória pessoal e não comercial. Esta é a concessão de uma licença, não uma transferência de título e, sob esta licença, você não pode: modificar ou copiar os materiais; usar os materiais para qualquer finalidade comercial ou para exibição pública (comercial ou não comercial); tentar descompilar ou fazer engenharia reversa de qualquer software contido no site Glorioso Brownie; remover quaisquer direitos autorais ou outras notações de propriedade dos materiais; ou transferir os materiais para outra pessoa ou &apos;espelhe&apos; os materiais em qualquer outro servidor.
           </p>
           <p>
             Esta licença será automaticamente rescindida se você violar alguma dessas restrições e poderá ser rescindida por Glorioso Brownie a qualquer momento. Ao encerrar a visualização desses materiais ou após o término desta licença, você deve apagar todos os materiais baixados em sua posse, seja em formato eletrónico ou impresso.
@@ -39,7 +39,7 @@ export default function TermosPage() {
         <section>
           <h2 className="text-white font-semibold mb-2">3. Isenção de responsabilidade</h2>
           <p>
-            Os materiais no site da Glorioso Brownie são fornecidos 'como estão'. Glorioso Brownie não oferece garantias, expressas ou implícitas, e, por este meio, isenta e nega todas as outras garantias, incluindo, sem limitação, garantias implícitas ou condições de comercialização, adequação a um fim específico ou não violação de propriedade intelectual ou outra violação de direitos. Além disso, o Glorioso Brownie não garante ou faz qualquer representação relativa à precisão, aos resultados prováveis ou à confiabilidade do uso dos materiais em seu site ou de outra forma relacionado a esses materiais ou em sites vinculados a este site.
+            Os materiais no site da Glorioso Brownie são fornecidos &apos;como estão&apos;. Glorioso Brownie não oferece garantias, expressas ou implícitas, e, por este meio, isenta e nega todas as outras garantias, incluindo, sem limitação, garantias implícitas ou condições de comercialização, adequação a um fim específico ou não violação de propriedade intelectual ou outra violação de direitos. Além disso, o Glorioso Brownie não garante ou faz qualquer representação relativa à precisão, aos resultados prováveis ou à confiabilidade do uso dos materiais em seu site ou de outra forma relacionado a esses materiais ou em sites vinculados a este site.
           </p>
         </section>
 
