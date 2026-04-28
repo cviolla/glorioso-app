@@ -236,24 +236,14 @@ export default function AdminOrdersPage() {
       o.status === 'delivered'
     );
 
-    const totals: Record<string, number> = {
-      'PIX': 0,
-      'Cartão de Crédito': 0,
-      'Cartão de Débito': 0,
-      'Dinheiro': 0,
-    };
-
+    const totals: Record<string, number> = {};
     let total = 0;
+
     todayOrders.forEach(o => {
-      const method = o.payment_method;
-      if (totals[method] !== undefined) {
-        totals[method] += o.total_price;
-      } else {
-        // Fallback para métodos não listados ou variações de nome
-        const normalized = Object.keys(totals).find(k => method.toUpperCase().includes(k.toUpperCase()));
-        if (normalized) totals[normalized] += o.total_price;
-      }
-      total += o.total_price;
+      const method = o.payment_method || 'Outros';
+      const value = Number(o.total_price) || 0;
+      totals[method] = (totals[method] || 0) + value;
+      total += value;
     });
 
     return { totals, total, count: todayOrders.length };
@@ -749,7 +739,7 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Printable Cash Report */}
-      <div className="hidden printing-cash-report:block font-mono text-black p-0 w-full text-sm bg-white">
+      <div id="print-cash-report" className="hidden printing-cash-report:block font-mono text-black p-0 w-full text-sm bg-white">
         <div className="max-w-[72mm] mx-auto">
           <div className="text-center border-b-2 border-double border-black pb-4 mb-4">
             <h1 className="text-xl font-black uppercase">GLORIOSO BROWNIE</h1>
@@ -801,8 +791,8 @@ export default function AdminOrdersPage() {
           body {
             visibility: hidden;
           }
-          /* Mostra apenas o ticket */
-          #print-receipt {
+          /* Mostra apenas o ticket ou o relatório de caixa */
+          #print-receipt, #print-cash-report {
             visibility: visible !important;
             position: absolute !important;
             left: 0 !important;
@@ -811,7 +801,7 @@ export default function AdminOrdersPage() {
             display: block !important;
             background: white !important;
           }
-          #print-receipt * {
+          #print-receipt *, #print-cash-report * {
             visibility: visible !important;
           }
           .print\:hidden {
