@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   title: "Glorioso Brownie",
   description: "Peça seu lanche online - Glorioso Brownie",
   icons: {
-    icon: "/GloriosoBrownie_Logo_fuul.png",
-    apple: "/GloriosoBrownie_Logo_fuul.png",
+    icon: "/GB2.png",
+    apple: "/GB2.png",
   }
 };
 

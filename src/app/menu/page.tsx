@@ -151,7 +151,7 @@ export default function MenuPage() {
       <div 
         className="fixed inset-0 z-0 opacity-25 pointer-events-none"
         style={{ 
-          backgroundImage: "url('/GloriosoBrownie_Logo_fuul.png')",
+          backgroundImage: "url('/GB2.png')",
           backgroundRepeat: 'repeat',
           backgroundSize: '320px',
           backgroundAttachment: 'fixed'
@@ -250,9 +250,9 @@ export default function MenuPage() {
                 <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
                   {category.name}
                   <img 
-                    src="/GloriosoBrownie_Logo_fuul.png" 
-                    alt="Glorioso Brownie" 
-                    className="h-4 sm:h-5 object-contain" 
+                    src="/GB2.png" 
+                    alt="Logo Glorioso Brownie" 
+                    className="h-4 sm:h-5 object-contain"
                   />
                 </h2>
 
