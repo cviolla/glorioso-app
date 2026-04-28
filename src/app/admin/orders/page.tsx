@@ -795,20 +795,24 @@ export default function AdminOrdersPage() {
             margin: 0 !important;
             padding: 0 !important;
             height: auto !important;
-            overflow: visible !important;
             background: white !important;
           }
-          /* Esconde tudo exceto o ticket */
-          body > *:not(#print-receipt) {
-            display: none !important;
+          /* Esconde tudo */
+          body {
+            visibility: hidden;
           }
+          /* Mostra apenas o ticket */
           #print-receipt {
-            display: block !important;
+            visibility: visible !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
             width: 100% !important;
-            max-width: 80mm !important;
-            margin: 0 auto !important;
-            padding: 20px !important;
-            position: static !important;
+            display: block !important;
+            background: white !important;
+          }
+          #print-receipt * {
+            visibility: visible !important;
           }
           .print\:hidden {
             display: none !important;
