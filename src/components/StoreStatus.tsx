@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 
 export function StoreStatus({ className = "" }: { className?: string }) {
   const router = useRouter();
-  const { getIsOpen, fetchStatus, isAutoMode, isManualOpen } = useStoreStatusStore();
+  const { getIsOpen, fetchStatus, isManualOpen } = useStoreStatusStore();
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0); // Força re-render a cada minuto
 
@@ -28,11 +28,10 @@ export function StoreStatus({ className = "" }: { className?: string }) {
         },
         (payload) => {
           // Atualiza o store global com os novos dados do payload diretamente
-          const { is_auto_mode, is_manual_open } = payload.new;
+          const { is_manual_open } = payload.new;
           
           // Acessamos o store diretamente para atualizar o estado sem re-fetch
           useStoreStatusStore.setState({ 
-            isAutoMode: is_auto_mode, 
             isManualOpen: is_manual_open 
           });
 

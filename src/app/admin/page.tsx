@@ -29,7 +29,7 @@ export default function AdminProductsPage() {
   });
   const [saving, setSaving] = useState(false);
 
-  const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen, getIsOpen } = useStoreStatusStore();
+  const { isManualOpen, setManualOpen, getIsOpen } = useStoreStatusStore();
   const currentStatus = getIsOpen();
 
   const fetchMenu = useCallback(async () => {

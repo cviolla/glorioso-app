@@ -5,7 +5,6 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { 
   Phone, 
   CreditCard, 
-  Truck, 
   Save, 
   RefreshCw,
   ToggleLeft,
@@ -17,7 +16,7 @@ import { motion } from "framer-motion";
 import { CustomModal } from "@/components/CustomModal";
 
 export default function AdminSettingsPage() {
-  const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen, fetchStatus } = useStoreStatusStore();
+  const { isManualOpen, setManualOpen, fetchStatus } = useStoreStatusStore();
   const { 
     whatsappNumber, 
     deliveryFees,
