@@ -1,3 +1,4 @@
+// Version: 1.0.1 - UI-UX Pro Max
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
