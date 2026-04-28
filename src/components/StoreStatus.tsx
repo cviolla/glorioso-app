@@ -9,8 +9,8 @@ import { supabase } from "@/lib/supabase";
 export function StoreStatus({ className = "" }: { className?: string }) {
   const router = useRouter();
   const { getIsOpen, fetchStatus, isAutoMode, isManualOpen } = useStoreStatusStore();
-  const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [tick, setTick] = useState(0); // Força re-render a cada minuto
 
   useEffect(() => {
     fetchStatus().then(() => setLoading(false));
@@ -29,6 +29,7 @@ export function StoreStatus({ className = "" }: { className?: string }) {
         () => {
           fetchStatus().then(() => {
             router.refresh();
+            setTick(t => t + 1); // Força re-render local
           });
         }
       )
@@ -37,19 +38,16 @@ export function StoreStatus({ className = "" }: { className?: string }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchStatus]);
+  }, [fetchStatus, router]);
 
   useEffect(() => {
-    const updateStatus = () => {
-      setIsOpen(getIsOpen());
-    };
-
-    updateStatus();
-    const interval = setInterval(updateStatus, 60000); // Check every minute
+    const interval = setInterval(() => setTick(t => t + 1), 60000);
     return () => clearInterval(interval);
-  }, [getIsOpen, isAutoMode, isManualOpen]);
+  }, []);
 
   if (loading) return null;
+
+  const isOpen = getIsOpen();
 
   return (
     <div className={`flex justify-center ${className}`}>

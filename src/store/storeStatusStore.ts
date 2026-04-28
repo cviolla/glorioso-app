@@ -68,25 +68,38 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
 
   getIsOpen: () => {
     const { isAutoMode, isManualOpen } = get();
+    
+    // Se não estiver no modo automático, retorna o status manual imediatamente
     if (!isAutoMode) return isManualOpen;
 
-    // Auto mode logic (Brasília Time)
+    // Lógica de Modo Automático (Horário de Brasília)
     try {
-      const date = new Date();
-      const options = { timeZone: "America/Sao_Paulo", hour12: false };
-      const brTimeStr = date.toLocaleString("en-US", options);
-      const brDate = new Date(brTimeStr);
-      
-      const day = brDate.getDay(); // 0 = Sunday, 1 = Monday, ...
-      const hour = brDate.getHours();
+      // Usar Intl.DateTimeFormat para obter a hora atual em SP de forma robusta
+      const formatter = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        weekday: 'long',
+        hour12: false
+      });
 
-      // Closed on Mondays
-      if (day === 1) return false;
+      const parts = formatter.formatToParts(new Date());
+      const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+      const weekdayPart = parts.find(p => p.type === 'weekday')?.value || '';
       
-      // Open from 15:00 to 23:59
+      // Mapeamento de dias para evitar problemas de localização
+      // No pt-BR, segunda-feira contém "segunda"
+      const isMonday = weekdayPart.toLowerCase().includes('segunda');
+
+      // Fechado às segundas
+      if (isMonday) return false;
+      
+      // Aberto das 15:00 às 23:59 (00:00)
       return hour >= 15 && hour < 24;
-    } catch {
-      // Fallback if timezone logic fails
+    } catch (err) {
+      console.error('Fallback de data acionado:', err);
+      // Fallback básico usando hora local se o Intl falhar
       const hour = new Date().getHours();
       return hour >= 15 && hour < 24;
     }
