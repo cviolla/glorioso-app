@@ -791,24 +791,22 @@ export default function AdminOrdersPage() {
             margin: 0;
             size: auto;
           }
-          body {
+          html, body {
             margin: 0;
             padding: 0;
             height: auto !important;
-            overflow: hidden !important;
-            -webkit-print-color-adjust: exact;
+            overflow: visible !important;
           }
           .print\:hidden {
             display: none !important;
           }
-          .printing-cash-report .print\:hidden {
-            display: none !important;
-          }
-          .printing-cash-report .printing-cash-report\:block {
-            display: block !important;
-          }
           .printing-cash-report .print\:block {
             display: none !important;
+          }
+          /* Garante que o ticket não seja cortado */
+          .print\:block {
+            width: 100% !important;
+            max-width: 100% !important;
           }
         }
       `}</style>

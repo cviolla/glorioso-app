@@ -96,7 +96,7 @@ export default function RootLayout({
         <CopyProtection />
         {children}
         
-        <footer className="w-full py-2 text-center relative z-10 border-t border-[var(--color-brand-dark)]/5 mt-4 bg-white/30 backdrop-blur-sm">
+        <footer className="w-full py-2 text-center relative z-10 border-t border-[var(--color-brand-dark)]/5 mt-4 bg-white/30 backdrop-blur-sm print:hidden">
           <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
             Created by <a href="https://instagram.com/cviolla" target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-accent)] hover:underline">@cviolla</a>
           </p>
