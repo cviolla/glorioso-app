@@ -21,7 +21,8 @@ import {
   Trash2,
   TrendingUp,
   DollarSign,
-  Receipt
+  Receipt,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
