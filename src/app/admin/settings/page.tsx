@@ -84,8 +84,8 @@ export default function AdminSettingsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
               <div>
-                <p className="font-bold text-[#381010]">Modo Automático</p>
-                <p className="text-xs text-gray-500">Abre/fecha conforme o horário configurado.</p>
+                <p className="text-sm font-bold text-[#381010]">Modo Automático</p>
+                <p className="text-sm text-gray-500">Abre/fecha conforme o horário configurado.</p>
               </div>
               <button 
                 onClick={toggleAutoMode}
@@ -98,8 +98,8 @@ export default function AdminSettingsPage() {
             {!isAutoMode && (
               <div className="flex items-center justify-between p-4 bg-amber-50 border border-amber-100 rounded-2xl">
                 <div>
-                  <p className="font-bold text-amber-900">Controle Manual</p>
-                  <p className="text-xs text-amber-700">A loja está atualmente {isManualOpen ? 'ABERTA' : 'FECHADA'}.</p>
+                  <p className="text-sm font-bold text-amber-900">Controle Manual</p>
+                  <p className="text-sm text-amber-700">A loja está atualmente {isManualOpen ? 'ABERTA' : 'FECHADA'}.</p>
                 </div>
                 <button 
                   onClick={() => setManualOpen(!isManualOpen)}
@@ -112,7 +112,7 @@ export default function AdminSettingsPage() {
 
             <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3">
               <Clock className="w-5 h-5 text-blue-600 shrink-0" />
-              <div className="text-xs text-blue-700 leading-relaxed">
+              <div className="text-sm text-blue-700 leading-relaxed">
                 <p className="font-bold mb-1">Horário Padrão:</p>
                 <p>Terça a Domingo: 15:00 às 23:59</p>
                 <p>Segunda-feira: Fechado</p>
