@@ -3,11 +3,15 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { Package, LayoutDashboard, Settings, LogOut } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createBrowserClient } from '@supabase/ssr';
 import { useRouter } from 'next/navigation';
 
 export function AdminSidebar({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
