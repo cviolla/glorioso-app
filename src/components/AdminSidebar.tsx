@@ -25,7 +25,7 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
       <header className="bg-white border-b border-gray-200 px-4 py-4 flex items-center justify-between sticky top-0 z-20 md:hidden print:hidden">
         <h1 className="font-black text-[#381010] text-xl tracking-tight">GLORIOSO <span className="text-[#ff914a]">ADMIN</span></h1>
         <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 overflow-hidden">
-          <img src="/GB2.png" alt="Admin" className="w-full h-full object-cover" />
+          <img src="/GloriosoBrownie_Logo_fuul.png" alt="Admin" className="w-full h-full object-cover" />
         </div>
       </header>
 

@@ -49,7 +49,7 @@ export default function Home() {
   return (
     <div 
       className="flex flex-col min-h-[100dvh] text-[#f8ece3] font-sans selection:bg-[#ff914a] selection:text-[#381010] overflow-hidden relative bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/background_home.jpg')" }}
+      style={{ backgroundImage: "url('/GB2.png')" }}
     >
       {/* Subtle overlay for text readability */}
       <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none"></div>
@@ -66,7 +66,7 @@ export default function Home() {
           {/* Official Logo */}
           <div className="w-36 h-36 sm:w-44 sm:h-44 bg-[#f8ece3] rounded-full flex items-center justify-center shadow-[0_0_25px_rgba(255,145,74,0.4)] mb-6 sm:mb-8 overflow-hidden relative border-[3px] border-[#ff914a]">
             <Image 
-              src="/GB2.png" 
+              src="/GloriosoBrownie_Logo_fuul.png" 
               alt="Logo Glorioso Brownie" 
               fill
               className="object-cover"

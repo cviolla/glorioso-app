@@ -54,9 +54,9 @@ export default function AdminLoginPage() {
         <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden">
           <div className="bg-[#381010] p-10 text-center relative">
             <div className="w-36 h-36 bg-[#5c2e21] rounded-full mx-auto mb-6 p-4 shadow-2xl flex items-center justify-center overflow-hidden border-4 border-[#381010]">
-              <img src="/GB2.png" alt="Logo" className="w-full h-full object-contain scale-110" />
+              <img src="/GloriosoBrownie_Logo_fuul.png" alt="Logo" className="w-full h-full object-contain scale-110" />
             </div>
-            <h1 className="text-white font-black text-3xl tracking-tight">Admin <span className="text-[#ff914a]">Access</span></h1>
+            <h1 className="text-white font-black text-3xl tracking-tight">Glorioso <span className="text-[#ff914a]">Admin.</span></h1>
             <p className="text-white/40 text-xs font-bold uppercase tracking-widest mt-2">Glorioso Brownie</p>
           </div>
 

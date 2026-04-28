@@ -162,7 +162,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
           
           <div className="w-20 h-20 shrink-0 bg-[#f8ece3] rounded-xl overflow-hidden relative border border-[#ff914a]/30 shadow-inner">
             <Image 
-              src={item.imageUrl || "/GB2.png"} 
+              src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
               alt={item.name}
               fill
               className="object-cover"
@@ -223,7 +223,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               {/* Header Image */}
               <div className="w-full h-48 sm:h-64 relative bg-[#f8ece3]">
                 <Image 
-                  src={item.imageUrl || "/GB2.png"} 
+                  src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
                   alt={item.name}
                   fill
                   className="object-cover"

@@ -250,7 +250,7 @@ export default function MenuPage() {
                 <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
                   {category.name}
                   <img 
-                    src="/GB2.png" 
+                    src="/glorioso brownie.png" 
                     alt="Logo Glorioso Brownie" 
                     className="h-4 sm:h-5 object-contain"
                   />
