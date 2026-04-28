@@ -102,77 +102,41 @@ export default function AdminSettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Status da Loja */}
         <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
-          <div className="mb-2">
-            <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Status da Loja</h2>
+          <div className="flex items-center gap-4 mb-2">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${isManualOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+              <RefreshCw className={`w-6 h-6 ${isManualOpen ? 'animate-spin-slow' : ''}`} />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Status da Loja</h2>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Controle Direto</p>
+            </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-5 bg-gray-50/50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
+          <div className="space-y-6">
+            <div className={`p-8 rounded-[2.5rem] border-2 transition-all flex flex-col items-center text-center gap-6 ${isManualOpen ? 'bg-emerald-50/50 border-emerald-100' : 'bg-rose-50/50 border-rose-100'}`}>
               <div>
-                <p className="text-sm font-black text-[var(--color-brand-dark)] uppercase tracking-tight">Modo Automático</p>
-                <p className="text-xs text-gray-500 font-medium mt-1">Abre/fecha conforme o horário configurado.</p>
-              </div>
-              <button 
-                onClick={toggleAutoMode}
-                className={`transition-all hover:scale-110 active:scale-95 ${isAutoMode ? 'text-[var(--color-brand-accent)]' : 'text-gray-200'}`}
-              >
-                {isAutoMode ? <ToggleRight className="w-12 h-12" /> : <ToggleLeft className="w-12 h-12" />}
-              </button>
-            </div>
-
-            {!isAutoMode && (
-              <motion.div 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-between p-5 bg-rose-50 border-2 border-rose-100 rounded-2xl"
-              >
-                <div>
-                  <p className="text-sm font-black text-rose-900 uppercase tracking-tight">Controle Manual</p>
-                  <p className="text-xs text-rose-700 font-bold mt-1">Status: {isManualOpen ? 'ABERTA AGORA' : 'FECHADA AGORA'}.</p>
-                </div>
-                <button 
-                  onClick={() => setManualOpen(!isManualOpen)}
-                  className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm ${isManualOpen ? 'bg-white text-rose-600 hover:bg-rose-100' : 'bg-white text-emerald-600 hover:bg-emerald-50'}`}
-                >
-                  {isManualOpen ? 'Fechar Loja' : 'Abrir Loja'}
-                </button>
-              </motion.div>
-            )}
-
-            <div className="p-6 bg-[#f8ece3]/40 border border-[#381010]/5 rounded-[2.5rem] space-y-4">
-              <div className="mb-2">
-                <h3 className="text-sm font-black text-[#381010] uppercase tracking-tight">Horário Padrão</h3>
-                <p className="text-[10px] text-[#ff914a] font-bold uppercase tracking-widest">Configuração Semanal</p>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-2.5">
-                <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-white shadow-sm transition-all hover:shadow-md group">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#ff914a] shadow-[0_0_8px_rgba(255,145,74,0.5)] group-hover:scale-125 transition-transform" />
-                    <span className="text-xs font-black text-[#381010]/80 uppercase tracking-tight">Terça a Domingo</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black text-[#ff914a]/60 uppercase tracking-widest">Das</span>
-                    <span className="text-xs font-black text-[#ff914a] bg-[#ff914a]/5 px-3 py-1.5 rounded-xl border border-[#ff914a]/10">15:00 — 23:59</span>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 bg-[#f8ece3]/20 rounded-2xl border border-dashed border-[#381010]/10 opacity-60">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-gray-300" />
-                    <span className="text-xs font-black text-gray-400 uppercase tracking-tight">Segunda-feira</span>
-                  </div>
-                  <div className="px-4 py-1.5 bg-gray-100/50 rounded-xl">
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Loja Fechada</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <p className="text-[9px] text-[#381010]/30 font-bold uppercase tracking-tighter text-center">
-                  * Alterações no horário fixo requerem atualização de sistema
+                <p className={`text-sm font-black uppercase tracking-widest mb-1 ${isManualOpen ? 'text-emerald-900' : 'text-rose-900'}`}>
+                  Sua loja está atualmente:
                 </p>
+                <h3 className={`text-4xl font-black ${isManualOpen ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {isManualOpen ? 'ABERTA' : 'FECHADA'}
+                </h3>
               </div>
+
+              <button 
+                onClick={() => setManualOpen(!isManualOpen)}
+                className={`w-full py-6 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${
+                  isManualOpen 
+                    ? 'bg-rose-500 text-white shadow-rose-500/20 hover:bg-rose-600' 
+                    : 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-600'
+                }`}
+              >
+                {isManualOpen ? 'Fechar Loja Agora' : 'Abrir Loja Agora'}
+              </button>
+
+              <p className="text-[10px] text-gray-400 font-medium max-w-[200px]">
+                * Esta alteração é imediata e afetará o que os clientes veem no site.
+              </p>
             </div>
           </div>
         </section>
