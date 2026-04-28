@@ -145,8 +145,17 @@ export default function MenuPage() {
       )
     : [];
 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const handleSearchClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 400);
+  };
+
   return (
-    <div className="min-h-screen font-sans pb-24 pt-4 px-4 relative">
+    <div className="min-h-screen font-sans pb-32 pt-4 px-4 relative">
       {/* Background Image Pattern */}
       <div 
         className="fixed inset-0 z-0 opacity-25 pointer-events-none"
@@ -159,7 +168,7 @@ export default function MenuPage() {
       />
       
       {/* Sticky Top Category Navigation */}
-      {!loading && categories.length > 0 && (
+      {!loading && categories.length > 0 && !searchQuery && (
         <nav className="sticky top-0 z-40 bg-[#f8ece3]/80 backdrop-blur-md -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
           <div className="flex gap-3 max-w-md mx-auto">
             {categories.map(category => (
@@ -168,7 +177,7 @@ export default function MenuPage() {
                 id={`nav-btn-${category.id}`}
                 onClick={() => scrollToCategory(category.id)}
                 className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 ${
-                  activeCategory === category.id && !searchQuery
+                  activeCategory === category.id
                     ? "bg-[#532120] text-[#ff914a] shadow-md scale-105"
                     : "bg-white text-[#532120] border border-[#532120]/20 hover:bg-[#532120]/5"
                 }`}
@@ -210,15 +219,24 @@ export default function MenuPage() {
         </div>
 
         {/* Search Bar */}
-        <div className="relative mb-6 shadow-sm rounded-2xl overflow-hidden bg-white/90 backdrop-blur-sm border border-[#f8ece3] focus-within:border-[#ff914a] transition-colors">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5" />
+        <div className="relative mb-6 shadow-lg rounded-2xl overflow-hidden bg-white/90 backdrop-blur-md border-2 border-[#f8ece3] focus-within:border-[#ff914a] transition-all group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5 group-focus-within:text-[#ff914a] transition-colors" />
           <input 
+            ref={searchInputRef}
             type="text"
-            placeholder="Buscar lanches, pizzas, bebidas..."
+            placeholder="O que você deseja hoje?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full py-3 pl-12 pr-4 bg-transparent outline-none text-[#381010] placeholder:text-[#532120]/40 font-medium text-sm"
+            className="w-full py-4 pl-12 pr-12 bg-transparent outline-none text-[#381010] placeholder:text-[#532120]/30 font-bold text-sm"
           />
+          {searchQuery && (
+            <button 
+              onClick={() => setSearchQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-all"
+            >
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          )}
         </div>
 
         {/* Dynamic Section (Search vs Full List) */}
@@ -228,18 +246,29 @@ export default function MenuPage() {
             <p className="font-bold">Carregando cardápio...</p>
           </div>
         ) : searchQuery ? (
-          <div className="pt-2">
+          <div className="pt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
               Resultados para "{searchQuery}"
             </h2>
 
             {filteredItems.length > 0 ? (
-              filteredItems.map(item => (
-                <ProductCard key={item.id} item={item} />
-              ))
+              <div className="flex flex-col gap-1">
+                {filteredItems.map(item => (
+                  <ProductCard key={item.id} item={item} />
+                ))}
+              </div>
             ) : (
-              <div className="text-center py-10">
-                <p className="text-[#954e3a] font-medium">Nenhum produto encontrado.</p>
+              <div className="text-center py-20 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-300" />
+                </div>
+                <p className="text-[#954e3a] font-black uppercase tracking-widest text-xs">Nenhum produto encontrado</p>
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  className="mt-4 text-[var(--color-brand-accent)] font-bold text-sm hover:underline"
+                >
+                  Limpar busca
+                </button>
               </div>
             )}
           </div>
@@ -276,7 +305,7 @@ export default function MenuPage() {
         )}
       </main>
 
-      <BottomNav />
+      <BottomNav onSearchClick={handleSearchClick} />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useEffect, useState } from "react";
 
-export function BottomNav() {
+export function BottomNav({ onSearchClick }: { onSearchClick?: () => void }) {
   const pathname = usePathname();
   const totalItems = useCartStore(state => state.totalItems());
   const [mounted, setMounted] = useState(false);
@@ -28,11 +28,7 @@ export function BottomNav() {
           </Link>
 
           <button 
-            onClick={() => {
-              // Trigger search overlay or navigate to search
-              // For now, let's assume we navigate to /menu?search=true or similar
-              // or just provide the visual button as requested
-            }}
+            onClick={onSearchClick}
             className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors text-[#532120] opacity-80 hover:opacity-100`}
           >
             <Search className="w-5 h-5" />
