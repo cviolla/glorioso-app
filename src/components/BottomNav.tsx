@@ -1,7 +1,7 @@
 "use client";
 
 import { Home, ShoppingBag, LogOut, Search } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";

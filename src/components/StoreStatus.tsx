@@ -3,22 +3,47 @@
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
 import { useStoreStatusStore } from "@/store/storeStatusStore";
+import { supabase } from "@/lib/supabase";
 
 export function StoreStatus({ className = "" }: { className?: string }) {
-  const { getIsOpen } = useStoreStatusStore();
+  const { getIsOpen, fetchStatus, isAutoMode, isManualOpen } = useStoreStatusStore();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    fetchStatus().then(() => setLoading(false));
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel('store_config_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'store_config',
+          filter: 'id=eq.1',
+        },
+        () => {
+          fetchStatus();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchStatus]);
+
+  useEffect(() => {
     const updateStatus = () => {
       setIsOpen(getIsOpen());
-      setLoading(false);
     };
 
     updateStatus();
     const interval = setInterval(updateStatus, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [getIsOpen]);
+  }, [getIsOpen, isAutoMode, isManualOpen]);
 
   if (loading) return null;
 

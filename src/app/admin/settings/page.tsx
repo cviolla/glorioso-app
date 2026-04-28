@@ -12,20 +12,26 @@ import {
   ToggleRight,
   AlertTriangle
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CustomModal } from "@/components/CustomModal";
 
 export default function AdminSettingsPage() {
-  const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen } = useStoreStatusStore();
+  const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen, fetchStatus } = useStoreStatusStore();
   const { 
     whatsappNumber, 
     deliveryFees,
     paymentMethods,
+    fetchSettings,
     setWhatsappNumber,
-    setDeliveryFee,
-    setPaymentMethods
+    setPaymentMethods,
+    updateAllFees
   } = useSettingsStore();
+  
+  useEffect(() => {
+    fetchStatus();
+    fetchSettings();
+  }, [fetchStatus, fetchSettings]);
 
   const [localWhatsapp, setLocalWhatsapp] = useState(whatsappNumber);
   const [localFees, setLocalFees] = useState(deliveryFees);
@@ -43,6 +49,13 @@ export default function AdminSettingsPage() {
     type: "success"
   });
 
+  // Sincroniza estado local quando os dados chegam do Supabase
+  useEffect(() => {
+    if (whatsappNumber) setLocalWhatsapp(whatsappNumber);
+    if (deliveryFees && Object.keys(deliveryFees).length > 0) setLocalFees(deliveryFees);
+    if (paymentMethods) setLocalMethods(paymentMethods);
+  }, [whatsappNumber, deliveryFees, paymentMethods]);
+
   const toggleMethod = (method: string) => {
     setLocalMethods(prev => 
       prev.includes(method) 
@@ -51,25 +64,30 @@ export default function AdminSettingsPage() {
     );
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    setTimeout(() => {
-      setWhatsappNumber(localWhatsapp);
-      setPaymentMethods(localMethods);
-      // Salva cada taxa individualmente no store
-      Object.entries(localFees).forEach(([neighborhood, fee]) => {
-        setDeliveryFee(neighborhood, fee);
-      });
-      setIsSaving(false);
+    try {
+      await setWhatsappNumber(localWhatsapp);
+      await setPaymentMethods(localMethods);
+      await updateAllFees(localFees);
       
-      // Abre o modal customizado em vez do alert nativo
+      setIsSaving(false);
       setModalConfig({
         isOpen: true,
         title: "Sucesso!",
-        message: "Configurações salvas com sucesso no sistema.",
+        message: "Configurações salvas com sucesso no banco de dados.",
         type: "success"
       });
-    }, 800);
+    } catch (err) {
+      console.error(err);
+      setIsSaving(false);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro",
+        message: "Erro ao salvar no banco de dados.",
+        type: "danger"
+      });
+    }
   };
 
   const allPossibleMethods = ['PIX', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro'];

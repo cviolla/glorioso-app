@@ -16,7 +16,7 @@ type DeliveryType = 'delivery' | 'pickup' | null;
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCartStore();
-  const { whatsappNumber, deliveryFees, paymentMethods } = useSettingsStore();
+  const { whatsappNumber, deliveryFees, paymentMethods, fetchSettings } = useSettingsStore();
   const [isHydrated, setIsHydrated] = useState(false);
   
   const [step, setStep] = useState<CheckoutStep>('cart');
@@ -39,8 +39,9 @@ export default function CartPage() {
   const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: 'PIX', orderTime: 'Para agora', coupon: '' });
 
   useEffect(() => {
+    fetchSettings();
     setIsHydrated(true);
-  }, []);
+  }, [fetchSettings]);
 
   // Force scroll to top on step change
   useEffect(() => {

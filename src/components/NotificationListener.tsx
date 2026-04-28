@@ -2,11 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
-import { Bell, ShoppingBag, X } from "lucide-react";
+import { ShoppingBag, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface OrderNotification {
+  id: string;
+  customer_name: string;
+  total_price: number;
+}
+
 export function NotificationListener() {
-  const [newOrder, setNewOrder] = useState<any>(null);
+  const [newOrder, setNewOrder] = useState<OrderNotification | null>(null);
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -25,7 +31,7 @@ export function NotificationListener() {
         { event: "INSERT", schema: "public", table: "orders" },
         (payload) => {
           console.log("Novo pedido recebido!", payload.new);
-          setNewOrder(payload.new);
+          setNewOrder(payload.new as OrderNotification);
           playNotificationSound();
           
           // Auto close after 10 seconds

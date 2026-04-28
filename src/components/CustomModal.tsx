@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, CheckCircle2, X, AlertTriangle } from "lucide-react";
+import { X } from "lucide-react";
 
 interface CustomModalProps {
   isOpen: boolean;
