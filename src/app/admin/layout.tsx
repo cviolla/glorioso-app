@@ -12,6 +12,14 @@ export const metadata = {
     title: 'Admin | Glorioso Brownie',
     description: 'Acesso restrito ao painel de gestão do Glorioso Brownie.',
     type: 'website',
+    images: [
+      {
+        url: '/admin-icon.png',
+        width: 512,
+        height: 512,
+        alt: 'Admin Icon Glorioso Brownie',
+      },
+    ],
   },
   robots: {
     index: false,
