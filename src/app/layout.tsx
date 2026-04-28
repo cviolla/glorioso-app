@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { CopyProtection } from "@/components/CopyProtection";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Glorioso Brownie | Cardápio Online',
-    description: 'Brownies artesanais feitos com amor. Peça agora e experimente o sabor glorioso!',
+    description: 'Peça agora e experimente o sabor glorioso!',
     url: 'https://gloriosobrownie.com.br',
     siteName: 'Glorioso Brownie',
     images: [
@@ -85,6 +86,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--color-brand-light)] text-[var(--color-brand-dark)] pb-20`}>
+        <CopyProtection />
         {children}
       </body>
     </html>

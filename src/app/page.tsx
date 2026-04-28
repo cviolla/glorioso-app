@@ -74,8 +74,8 @@ export default function Home() {
             />
           </div>
           
-          <h1 className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight">
-            O Sabor Que <span className="text-[#ff914a]">Impressiona.</span>
+          <h1 className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight uppercase tracking-tighter">
+            O Sabor <span className="text-[#ff914a]">GLORIOSO.</span>
           </h1>
           
           <a 
