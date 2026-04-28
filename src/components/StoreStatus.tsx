@@ -26,11 +26,18 @@ export function StoreStatus({ className = "" }: { className?: string }) {
           table: 'store_config',
           filter: 'id=eq.1',
         },
-        () => {
-          fetchStatus().then(() => {
-            router.refresh();
-            setTick(t => t + 1); // Força re-render local
+        (payload) => {
+          // Atualiza o store global com os novos dados do payload diretamente
+          const { is_auto_mode, is_manual_open } = payload.new;
+          
+          // Acessamos o store diretamente para atualizar o estado sem re-fetch
+          useStoreStatusStore.setState({ 
+            isAutoMode: is_auto_mode, 
+            isManualOpen: is_manual_open 
           });
+
+          router.refresh();
+          setTick(t => t + 1);
         }
       )
       .subscribe();
