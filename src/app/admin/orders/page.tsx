@@ -685,15 +685,15 @@ export default function AdminOrdersPage() {
       </AnimatePresence>
 
       {/* Printable Receipt Component - Otimizado para Impressoras Térmicas */}
-      <div className="hidden print:block font-mono text-black p-0 w-full text-[12px] leading-tight bg-white">
-        <div className="max-w-[72mm] mx-auto">
-          <div className="text-center border-b border-dashed border-black pb-4 mb-4">
+      <div id="print-receipt" className="hidden print:block font-mono text-black p-0 w-full text-[12px] leading-tight bg-white">
+        <div className="max-w-[72mm] mx-auto p-4">
+          <div className="text-center border-b border-dashed border-black pb-4 mb-4 print-section">
             <h1 className="text-lg font-black uppercase">GLORIOSO BROWNIE</h1>
             <p className="text-[10px]">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
             <p className="text-[10px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
           </div>
 
-          <div className="mb-4 space-y-1">
+          <div className="mb-4 space-y-1 print-section">
             <p><strong>CLIENTE:</strong> {selectedOrder?.customer_name}</p>
             <p><strong>TEL:</strong> {selectedOrder?.customer_phone}</p>
             <div className="border-y border-dashed border-black/20 py-1 my-1">
@@ -710,7 +710,7 @@ export default function AdminOrdersPage() {
             )}
           </div>
 
-          <div className="border-b border-dashed border-black pb-2 mb-2">
+          <div className="border-b border-dashed border-black pb-2 mb-2 print-section">
             <p className="font-bold text-center border-b border-black mb-2 py-1">RESUMO DO PEDIDO</p>
             {selectedOrder?.items.map((item, idx) => (
               <div key={idx} className="mb-2">
@@ -726,7 +726,7 @@ export default function AdminOrdersPage() {
             ))}
           </div>
 
-          <div className="space-y-1 border-b border-dashed border-black pb-2 mb-2">
+          <div className="space-y-1 border-b border-dashed border-black pb-2 mb-2 print-section">
             <div className="flex justify-between text-sm">
               <span>Subtotal:</span>
               <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
@@ -737,7 +737,7 @@ export default function AdminOrdersPage() {
             </div>
           </div>
 
-          <div className="mb-4">
+          <div className="mb-4 print-section">
             <p><strong>PAGAMENTO:</strong> {selectedOrder?.payment_method}</p>
             {selectedOrder?.observation && (
               <div className="mt-2 p-1 border border-black border-dotted">
@@ -792,21 +792,31 @@ export default function AdminOrdersPage() {
             size: auto;
           }
           html, body {
-            margin: 0;
-            padding: 0;
+            margin: 0 !important;
+            padding: 0 !important;
             height: auto !important;
             overflow: visible !important;
+            background: white !important;
+          }
+          /* Esconde tudo exceto o ticket */
+          body > *:not(#print-receipt) {
+            display: none !important;
+          }
+          #print-receipt {
+            display: block !important;
+            width: 100% !important;
+            max-width: 80mm !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+            position: static !important;
           }
           .print\:hidden {
             display: none !important;
           }
-          .printing-cash-report .print\:block {
-            display: none !important;
-          }
-          /* Garante que o ticket não seja cortado */
-          .print\:block {
-            width: 100% !important;
-            max-width: 100% !important;
+          /* Evita quebras no meio de blocos importantes */
+          .print-section {
+            page-break-inside: avoid;
+            break-inside: avoid;
           }
         }
       `}</style>

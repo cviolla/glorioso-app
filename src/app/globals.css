@@ -54,3 +54,14 @@ img {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+@media print {
+  footer, .print\:hidden {
+    display: none !important;
+  }
+  body, html {
+    background: white !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+}
