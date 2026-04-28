@@ -3,8 +3,6 @@
 import { useStoreStatusStore } from "@/store/storeStatusStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { 
-  Store, 
-  Clock, 
   Phone, 
   CreditCard, 
   Truck, 
@@ -32,6 +30,7 @@ export default function AdminSettingsPage() {
   const [localWhatsapp, setLocalWhatsapp] = useState(whatsappNumber);
   const [localFees, setLocalFees] = useState(deliveryFees);
   const [isSaving, setIsSaving] = useState(false);
+  const [localMethods, setLocalMethods] = useState(paymentMethods);
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -44,10 +43,19 @@ export default function AdminSettingsPage() {
     type: "success"
   });
 
+  const toggleMethod = (method: string) => {
+    setLocalMethods(prev => 
+      prev.includes(method) 
+        ? prev.filter(m => m !== method) 
+        : [...prev, method]
+    );
+  };
+
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => {
       setWhatsappNumber(localWhatsapp);
+      setPaymentMethods(localMethods);
       // Salva cada taxa individualmente no store
       Object.entries(localFees).forEach(([neighborhood, fee]) => {
         setDeliveryFee(neighborhood, fee);
@@ -64,6 +72,8 @@ export default function AdminSettingsPage() {
     }, 800);
   };
 
+  const allPossibleMethods = ['PIX', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro'];
+
   return (
     <div className="space-y-8 pb-20 md:pb-0">
       <div>
@@ -74,10 +84,7 @@ export default function AdminSettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Status da Loja */}
         <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100">
-              <Store className="w-6 h-6" />
-            </div>
+          <div className="mb-2">
             <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Status da Loja</h2>
           </div>
 
@@ -114,12 +121,39 @@ export default function AdminSettingsPage() {
               </motion.div>
             )}
 
-            <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3">
-              <Clock className="w-5 h-5 text-blue-600 shrink-0" />
-              <div className="text-sm text-blue-700 leading-relaxed">
-                <p className="font-bold mb-1">Horário Padrão:</p>
-                <p>Terça a Domingo: 15:00 às 23:59</p>
-                <p>Segunda-feira: Fechado</p>
+            <div className="p-6 bg-[#f8ece3]/40 border border-[#381010]/5 rounded-[2.5rem] space-y-4">
+              <div className="mb-2">
+                <h3 className="text-sm font-black text-[#381010] uppercase tracking-tight">Horário Padrão</h3>
+                <p className="text-[10px] text-[#ff914a] font-bold uppercase tracking-widest">Configuração Semanal</p>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2.5">
+                <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-white shadow-sm transition-all hover:shadow-md group">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#ff914a] shadow-[0_0_8px_rgba(255,145,74,0.5)] group-hover:scale-125 transition-transform" />
+                    <span className="text-xs font-black text-[#381010]/80 uppercase tracking-tight">Terça a Domingo</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black text-[#ff914a]/60 uppercase tracking-widest">Das</span>
+                    <span className="text-xs font-black text-[#ff914a] bg-[#ff914a]/5 px-3 py-1.5 rounded-xl border border-[#ff914a]/10">15:00 — 23:59</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 bg-[#f8ece3]/20 rounded-2xl border border-dashed border-[#381010]/10 opacity-60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-gray-300" />
+                    <span className="text-xs font-black text-gray-400 uppercase tracking-tight">Segunda-feira</span>
+                  </div>
+                  <div className="px-4 py-1.5 bg-gray-100/50 rounded-xl">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Loja Fechada</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <p className="text-[9px] text-[#381010]/30 font-bold uppercase tracking-tighter text-center">
+                  * Alterações no horário fixo requerem atualização de sistema
+                </p>
               </div>
             </div>
           </div>
@@ -179,17 +213,24 @@ export default function AdminSettingsPage() {
             <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Pagamento</h2>
           </div>
 
-          <div className="space-y-2">
-            {paymentMethods.map((method) => (
-              <div key={method} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                <span className="text-sm font-medium text-[#381010]">{method}</span>
-                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-bold uppercase">Ativo</span>
-              </div>
-            ))}
+          <div className="space-y-3">
+            {allPossibleMethods.map((method) => {
+              const isActive = localMethods.includes(method);
+              return (
+                <div 
+                  key={method} 
+                  onClick={() => toggleMethod(method)}
+                  className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive ? 'bg-indigo-50 border-indigo-100 shadow-sm' : 'bg-gray-50 border-transparent hover:border-gray-200 opacity-60'}`}
+                >
+                  <span className={`text-sm font-black uppercase tracking-tight ${isActive ? 'text-indigo-900' : 'text-gray-400'}`}>{method}</span>
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'}`}>
+                    {isActive ? 'Ativo' : 'Inativo'}
+                    {isActive ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-          <p className="text-xs text-gray-400 italic flex items-center gap-1">
-            <AlertTriangle className="w-3 h-3" /> Edição de métodos de pagamento disponível na próxima atualização.
-          </p>
         </section>
 
         {/* Botão Salvar */}

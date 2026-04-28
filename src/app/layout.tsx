@@ -59,12 +59,18 @@ export const metadata: Metadata = {
     icon: "/GloriosoBrownie_Logo_fuul.png",
     apple: "/GloriosoBrownie_Logo_fuul.png",
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Glorioso Brownie',
+  },
   themeColor: '#381010',
   viewport: {
     width: 'device-width',
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
+    viewportFit: 'cover',
   },
   robots: {
     index: true,
@@ -86,11 +92,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--color-brand-light)] text-[var(--color-brand-dark)] pb-32`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--color-brand-light)] text-[var(--color-brand-dark)] pb-6`}>
         <CopyProtection />
         {children}
         
-        <footer className="w-full py-12 text-center relative z-10 border-t border-[var(--color-brand-dark)]/5 mt-12 bg-white/30 backdrop-blur-sm">
+        <footer className="w-full py-2 text-center relative z-10 border-t border-[var(--color-brand-dark)]/5 mt-4 bg-white/30 backdrop-blur-sm">
           <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
             Created by <a href="https://instagram.com/cviolla" target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-accent)] hover:underline">@cviolla</a>
           </p>

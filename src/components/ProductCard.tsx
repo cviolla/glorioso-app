@@ -83,7 +83,15 @@ export function ProductCard({ item }: { item: MenuItem }) {
           >
             <Minus className="w-3.5 h-3.5 font-bold" />
           </button>
-          <span className="text-[var(--color-brand-dark)] font-black text-xs w-3 text-center">{cartItem.quantity}</span>
+          <motion.span 
+            key={cartItem.quantity}
+            initial={{ scale: 1.5 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 15 }}
+            className="text-[var(--color-brand-dark)] font-black text-xs w-3 text-center"
+          >
+            {cartItem.quantity}
+          </motion.span>
           <button 
             onClick={(e) => handleIncrementFast(e, cartItem.cartItemId)}
             className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
@@ -184,7 +192,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               className="w-full h-full relative"
             >
               <Image 
-                src={item.imageUrl || "/logo glorioso brownie.png"} 
+                src={item.imageUrl || "/glorioso brownie.png"} 
                 alt={item.name}
                 fill
                 className="object-contain opacity-80"
@@ -196,7 +204,11 @@ export function ProductCard({ item }: { item: MenuItem }) {
                 <motion.div 
                   key="badge"
                   initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  animate={{ 
+                    scale: isZooming ? [1, 1.2, 1] : 1,
+                    opacity: 1 
+                  }}
+                  transition={{ duration: 0.2 }}
                   exit={{ scale: 0.5, opacity: 0 }}
                   className="absolute top-1 right-1 bg-[#ff914a] text-[#381010] text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md z-10 border-2 border-white"
                 >
@@ -210,7 +222,9 @@ export function ProductCard({ item }: { item: MenuItem }) {
         <div className="mt-3 flex flex-col gap-2">
           {item.price !== undefined && item.price > 0 && (
             <div className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
-              <span className="font-bold text-[#954e3a] text-sm">R$ {item.price.toFixed(2).replace('.', ',')}</span>
+              <span className="font-bold text-[#954e3a] text-sm">
+                R$ {item.price.toFixed(2).replace('.', ',')}
+              </span>
               {renderActionButton(item.price)}
             </div>
           )}
@@ -219,7 +233,9 @@ export function ProductCard({ item }: { item: MenuItem }) {
             <div key={idx} className="flex justify-between items-center bg-[#f8ece3] px-3 py-2 rounded-xl">
               <div className="flex flex-col">
                 <span className="text-[11px] font-bold text-[#532120] leading-tight">{variant.name}</span>
-                <span className="font-bold text-[#954e3a] text-sm leading-tight">R$ {variant.price.toFixed(2).replace('.', ',')}</span>
+                <span className="font-bold text-[#954e3a] text-sm leading-tight">
+                  R$ {variant.price.toFixed(2).replace('.', ',')}
+                </span>
               </div>
               {renderActionButton(variant.price, variant.name)}
             </div>
@@ -246,7 +262,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               {/* Header Image */}
               <div className="w-full h-48 sm:h-64 relative bg-[#f8ece3]">
                 <Image 
-                  src={item.imageUrl || "/logo glorioso brownie.png"} 
+                  src={item.imageUrl || "/glorioso brownie.png"} 
                   alt={item.name}
                   fill
                   className="object-cover"
@@ -339,7 +355,15 @@ export function ProductCard({ item }: { item: MenuItem }) {
                 >
                   <Minus className="w-4 h-4 font-bold" />
                 </button>
-                <span className="w-4 text-center font-bold text-[#381010]">{quantity}</span>
+                <motion.span 
+                  key={quantity}
+                  initial={{ scale: 1.4 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                  className="w-4 text-center font-bold text-[#381010]"
+                >
+                  {quantity}
+                </motion.span>
                 <button 
                   onClick={() => setQuantity(q => q + 1)}
                   className="w-8 h-8 flex items-center justify-center text-[#532120] bg-white rounded-xl shadow-sm"
@@ -359,7 +383,13 @@ export function ProductCard({ item }: { item: MenuItem }) {
                 }`}
               >
                 <span>{isOpen ? "Adicionar" : "Loja Fechada"}</span>
-                <span>R$ {totalModalPrice.toFixed(2).replace('.', ',')}</span>
+                <motion.span
+                  key={totalModalPrice}
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: 1 }}
+                >
+                  R$ {totalModalPrice.toFixed(2).replace('.', ',')}
+                </motion.span>
               </button>
             </div>
           </div>

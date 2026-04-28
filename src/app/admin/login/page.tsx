@@ -53,8 +53,8 @@ export default function AdminLoginPage() {
       >
         <div className="bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(56,16,16,0.1)] overflow-hidden border border-white">
           <div className="p-12 text-center">
-            <div className="w-32 h-32 mx-auto mb-8 flex items-center justify-center">
-              <img src="/logo glorioso brownie.png" alt="Logo" className="w-full h-full object-contain" />
+            <div className="w-[70px] h-[70px] mx-auto mb-8 flex items-center justify-center">
+              <img src="/glorioso brownie.png" alt="Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-[var(--color-brand-dark)] font-black text-3xl tracking-tight">Painel <span className="text-[var(--color-brand-accent)]">Admin</span></h1>
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mt-3">Acesso Administrativo</p>

@@ -155,7 +155,7 @@ export default function MenuPage() {
   };
 
   return (
-    <div className="min-h-screen font-sans pb-32 pt-4 px-4 relative">
+    <div className="min-h-screen font-sans pb-6 pt-4 px-4 relative">
       {/* Background Image Pattern */}
       <div 
         className="fixed inset-0 z-0 opacity-25 pointer-events-none"
@@ -169,7 +169,7 @@ export default function MenuPage() {
       
       {/* Sticky Top Category Navigation */}
       {!loading && categories.length > 0 && !searchQuery && (
-        <nav className="sticky top-0 z-40 bg-[#f8ece3]/80 backdrop-blur-md -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar border-b border-[#381010]/10 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
+        <nav className="sticky top-0 z-40 -mx-4 px-4 py-4 mb-6 overflow-x-auto whitespace-nowrap no-scrollbar backdrop-blur-md bg-[#f8ece3]/10">
           <div className="flex gap-3 max-w-md mx-auto">
             {categories.map(category => (
               <button
@@ -279,9 +279,9 @@ export default function MenuPage() {
                 <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
                   {category.name}
                   <img 
-                    src="/logo glorioso brownie.png" 
+                    src="/glorioso brownie.png" 
                     alt="Logo Glorioso Brownie" 
-                    className="h-6 sm:h-8 object-contain"
+                    className="h-[13px] sm:h-[18px] object-contain"
                   />
                 </h2>
 

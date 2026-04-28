@@ -28,8 +28,7 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
       {/* Mobile Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-20 md:hidden print:hidden">
         <div className="flex items-center gap-2">
-          <img src="/logo glorioso brownie.png" alt="Admin" className="w-10 h-10 object-contain" />
-          <h1 className="font-black text-[var(--color-brand-dark)] text-lg tracking-tight">ADMIN</h1>
+          <h1 className="font-black text-[var(--color-brand-dark)] text-lg tracking-tight">Glorioso <span className="text-[var(--color-brand-accent)]">Admin</span></h1>
         </div>
         <button 
           onClick={handleLogout}
@@ -43,7 +42,6 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r border-gray-100 min-h-screen sticky top-0 print:hidden">
         <div className="p-8 flex flex-col items-center border-b border-gray-50">
-          <img src="/logo glorioso brownie.png" alt="Admin" className="w-24 h-24 object-contain mb-4" />
           <h1 className="font-black text-[var(--color-brand-dark)] text-xl tracking-tighter">Glorioso <span className="text-[var(--color-brand-accent)]">Admin</span></h1>
         </div>
         

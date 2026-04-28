@@ -35,6 +35,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'glorioso-settings-storage',
+      version: 1,
     }
   )
 );

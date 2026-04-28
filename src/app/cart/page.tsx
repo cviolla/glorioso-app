@@ -15,7 +15,7 @@ type DeliveryType = 'delivery' | 'pickup' | null;
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCartStore();
-  const { whatsappNumber, deliveryFees } = useSettingsStore();
+  const { whatsappNumber, deliveryFees, paymentMethods } = useSettingsStore();
   const [isHydrated, setIsHydrated] = useState(false);
   
   const [step, setStep] = useState<CheckoutStep>('cart');
@@ -40,6 +40,11 @@ export default function CartPage() {
   useEffect(() => {
     setIsHydrated(true);
   }, []);
+
+  // Force scroll to top on step change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
 
   const formatPhone = (value: string) => {
     // Remove tudo que não é dígito
@@ -73,6 +78,14 @@ export default function CartPage() {
       setUserInfo(prev => ({ ...prev, phone: '+55 (21) ' }));
     }
   }, [isHydrated]);
+
+  useEffect(() => {
+    if (isHydrated && paymentMethods.length > 0) {
+      if (!paymentMethods.includes(paymentInfo.paymentMethod)) {
+        setPaymentInfo(prev => ({ ...prev, paymentMethod: paymentMethods[0] }));
+      }
+    }
+  }, [isHydrated, paymentMethods]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -120,6 +133,18 @@ export default function CartPage() {
 
   const handleCheckoutSubmit = async () => {
     if (items.length === 0 || isSubmitting) return;
+
+    // Segurança: Verificar se a loja está aberta antes de processar
+    const { getIsOpen } = useStoreStatusStore.getState();
+    if (!getIsOpen()) {
+      setModalConfig({
+        isOpen: true,
+        title: "Loja Fechada",
+        message: "Desculpe, a loja fechou enquanto você montava seu pedido. Não podemos processar novos pedidos agora.",
+        type: "warning"
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -236,7 +261,8 @@ export default function CartPage() {
 
   const isStepValid = () => {
     const cleanPhone = userInfo.phone.replace(/\D/g, '');
-    const isBasicInfoValid = userInfo.name.trim().length > 2 && cleanPhone.length >= 12;
+    // Nome > 2 chars e Telefone válido (55 + 21 + 9 dígitos = 13)
+    const isBasicInfoValid = userInfo.name.trim().length > 2 && cleanPhone.length >= 13;
     
     if (step === 'address') {
       if (deliveryType === 'pickup') return isBasicInfoValid;
@@ -245,11 +271,14 @@ export default function CartPage() {
         isBasicInfoValid &&
         address.street.trim().length > 3 &&
         address.number.trim().length >= 1 &&
-        address.neighborhood.trim() !== '' &&
-        address.complement.trim().length >= 2 &&
-        address.reference.trim().length >= 2
+        address.neighborhood.trim() !== ''
       );
     }
+
+    if (step === 'summary') {
+      return isBasicInfoValid && paymentInfo.paymentMethod !== '';
+    }
+
     return true;
   };
 
@@ -262,7 +291,7 @@ export default function CartPage() {
   };
 
   return (
-    <div className={`min-h-screen font-sans pb-32 ${step === 'cart' ? 'bg-[#1a0808] text-[#f8ece3]' : 'bg-[#f8ece3] text-[#381010]'}`}>
+    <div className={`min-h-screen font-sans pb-6 ${step === 'cart' ? 'bg-[#1a0808] text-[#f8ece3]' : 'bg-[#f8ece3] text-[#381010]'}`}>
       <header className={`p-5 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${step === 'cart' ? 'border-white/5 bg-[#1a0808]/95' : 'border-[#532120]/10 bg-[#f8ece3]/95'}`}>
         <div className="flex items-center gap-3">
           {step === 'cart' ? (
@@ -305,7 +334,7 @@ export default function CartPage() {
                     return (
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-16 h-16 shrink-0 overflow-hidden relative">
-                           <Image src="/GloriosoBrownie_Logo_fuul.png" alt="Logo" fill className="object-contain opacity-50" />
+                           <Image src="/glorioso brownie.png" alt="Logo" fill className="object-contain opacity-50" />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-[15px] leading-tight mb-1">{item.name}</h3>
@@ -386,15 +415,9 @@ export default function CartPage() {
                     <div>
                       <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
                       <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
-                        <option>Santa Cruz da Serra</option>
-                        <option>Jardim Anhangá</option>
-                        <option>Nova Campinas</option>
-                        <option>Parque Paulista</option>
-                        <option>Jardim Rotsen</option>
-                        <option>Barro Branco</option>
-                        <option>Parque Equitativa</option>
-                        <option>Chácaras Rio-Petrópolis</option>
-                        <option>Outros</option>
+                        {Object.keys(deliveryFees).sort().map(neighborhood => (
+                          <option key={neighborhood}>{neighborhood}</option>
+                        ))}
                       </select>
                     </div>
                     <div>
@@ -460,7 +483,15 @@ export default function CartPage() {
                 </div>
                 <div className="border border-gray-300 rounded-xl p-4 bg-white/50">
                   <label className="text-sm font-bold text-[#381010] flex gap-2 items-center mb-2"><CreditCard className="w-4 h-4" /> Forma de pagamento</label>
-                  <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={paymentInfo.paymentMethod} onChange={e => setPaymentInfo({...paymentInfo, paymentMethod: e.target.value})}><option>PIX</option><option>Cartão de Crédito</option><option>Cartão de Débito</option><option>Dinheiro (Levar troco)</option></select>
+                  <select 
+                    className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
+                    value={paymentInfo.paymentMethod} 
+                    onChange={e => setPaymentInfo({...paymentInfo, paymentMethod: e.target.value})}
+                  >
+                    {paymentMethods.map(method => (
+                      <option key={method} value={method}>{method}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </motion.div>

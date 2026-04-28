@@ -44,6 +44,7 @@ export const useStoreStatusStore = create<StoreStatusState>()(
     }),
     {
       name: 'store-status-storage',
+      version: 1,
     }
   )
 );

@@ -26,105 +26,75 @@ export function CustomModal({
 }: CustomModalProps) {
   const themes = {
     info: {
-      icon: AlertCircle,
-      color: "text-[var(--color-brand-accent)]",
-      bg: "bg-[var(--color-brand-light)]/50",
-      border: "border-[var(--color-brand-accent)]/10",
-      button: "bg-[var(--color-brand-dark)] hover:bg-[var(--color-brand-primary)]",
+      button: "bg-[#ff914a] text-[#381010] hover:bg-[#ff7a21]",
     },
     success: {
-      icon: CheckCircle2,
-      color: "text-emerald-500",
-      bg: "bg-emerald-50",
-      border: "border-emerald-100",
-      button: "bg-[var(--color-brand-dark)] hover:bg-[var(--color-brand-primary)]",
+      button: "bg-emerald-500 text-white hover:bg-emerald-600",
     },
     warning: {
-      icon: AlertTriangle,
-      color: "text-amber-500",
-      bg: "bg-amber-50",
-      border: "border-amber-100",
-      button: "bg-[var(--color-brand-accent)] hover:bg-[var(--color-brand-accent)]/80",
+      button: "bg-amber-500 text-white hover:bg-amber-600",
     },
     danger: {
-      icon: AlertTriangle,
-      color: "text-rose-500",
-      bg: "bg-rose-50",
-      border: "border-rose-100",
-      button: "bg-rose-500 hover:bg-rose-600",
+      button: "bg-rose-500 text-white hover:bg-rose-600",
     },
   };
 
   const theme = themes[type];
-  const Icon = theme.icon;
-
-  // Se não houver função de confirmação, o texto de cancelar vira "Fechar"
   const finalCancelText = !onConfirm ? "Fechar" : cancelText;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#381010]/40 backdrop-blur-md">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-[#381010]/40 backdrop-blur-md z-[100]"
-          />
-          <div className="fixed inset-0 flex items-center justify-center p-4 z-[101] pointer-events-none">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(56,16,16,0.1)] w-full max-w-sm overflow-hidden pointer-events-auto border border-white/20"
-            >
-              <div className={`p-8 ${theme.bg} border-b ${theme.border} flex flex-col items-center text-center relative`}>
-                <button 
-                  onClick={onClose}
-                  className="absolute right-6 top-6 p-2 text-gray-300 hover:text-[var(--color-brand-dark)] transition-colors rounded-full hover:bg-white/50"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                
-                <div className={`mb-4 p-4 rounded-3xl bg-white shadow-xl shadow-[var(--color-brand-dark)]/5 ${theme.color}`}>
-                  <Icon className="w-10 h-10" />
-                </div>
-                
-                <h3 className="font-black text-[var(--color-brand-dark)] text-2xl tracking-tight">{title}</h3>
-              </div>
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(56,16,16,0.15)] w-full max-w-sm overflow-hidden border border-white/20"
+          >
+            {/* Header - Admin Style */}
+            <div className="bg-[#381010] p-8 text-white text-center relative">
+              <button 
+                onClick={onClose}
+                className="absolute right-6 top-6 p-2 text-white/30 hover:text-white transition-colors rounded-full hover:bg-white/10"
+              >
+                <X className="w-5 h-5" />
+              </button>
               
-              <div className="p-8 text-center">
-                <p className="text-gray-500 font-semibold leading-relaxed text-sm">{message}</p>
-              </div>
+              
+              <h3 className="font-black text-2xl tracking-tight leading-tight">{title}</h3>
+            </div>
+            
+            <div className="p-8 text-center">
+              <p className="text-gray-500 font-bold leading-relaxed text-sm">{message}</p>
+            </div>
 
-              <div className="p-8 pt-0 flex gap-3">
+            <div className="p-8 pt-0 flex gap-3">
+              <button
+                onClick={onClose}
+                className={`flex-1 px-4 py-4 rounded-2xl font-black transition-all text-xs uppercase tracking-widest ${
+                  !onConfirm 
+                    ? "bg-[#381010] text-white hover:bg-[#532120] shadow-lg shadow-[#381010]/10 active:scale-95" 
+                    : "bg-gray-50 text-gray-400 hover:text-[#381010] hover:bg-gray-100 active:scale-95"
+                }`}
+              >
+                {finalCancelText}
+              </button>
+              
+              {onConfirm && (
                 <button
-                  onClick={onClose}
-                  className={`flex-1 px-4 py-4 rounded-2xl font-black transition-all text-xs uppercase tracking-widest ${
-                    !onConfirm 
-                      ? "bg-[var(--color-brand-dark)] text-white hover:bg-[var(--color-brand-primary)] shadow-lg shadow-[var(--color-brand-dark)]/20 active:scale-95" 
-                      : "bg-gray-100 text-gray-400 hover:bg-gray-200 active:scale-95"
-                  }`}
+                  onClick={() => {
+                    onConfirm();
+                    onClose();
+                  }}
+                  className={`flex-1 px-4 py-4 rounded-2xl font-black transition-all text-xs uppercase tracking-widest shadow-lg active:scale-95 ${theme.button}`}
                 >
-                  {finalCancelText}
+                  {confirmText}
                 </button>
-                
-                {onConfirm && (
-                  <button
-                    onClick={() => {
-                      onConfirm();
-                      onClose();
-                    }}
-                    className={`flex-1 px-4 py-4 rounded-2xl font-black text-white transition-all text-xs uppercase tracking-widest shadow-lg active:scale-95 ${theme.button}`}
-                  >
-                    {confirmText}
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </div>
-        </>
+              )}
+            </div>
+          </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );
