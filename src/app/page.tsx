@@ -49,10 +49,10 @@ export default function Home() {
   return (
     <div 
       className="flex flex-col min-h-[100dvh] text-[#f8ece3] font-sans selection:bg-[#ff914a] selection:text-[#381010] overflow-hidden relative bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/GB1.png')" }}
+      style={{ backgroundImage: "url('/GB1.png?v=2')" }}
     >
-      {/* Subtle overlay for text readability */}
-      <div className="absolute inset-0 bg-black/20 z-0 pointer-events-none"></div>
+      {/* Overlay removido para máxima fidelidade da imagem de fundo */}
+      <div className="absolute inset-0 bg-transparent z-0 pointer-events-none"></div>
 
       <StoreStatus className="absolute top-4 right-4 z-40 scale-90 origin-top-right" />
 

@@ -151,7 +151,7 @@ export default function MenuPage() {
       <div 
         className="fixed inset-0 z-0 opacity-25 pointer-events-none"
         style={{ 
-          backgroundImage: "url('/GB1.png')",
+          backgroundImage: "url('/GB1.png?v=2')",
           backgroundRepeat: 'repeat',
           backgroundSize: '320px',
           backgroundAttachment: 'fixed'
