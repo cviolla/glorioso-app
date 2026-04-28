@@ -289,39 +289,39 @@ export default function AdminOrdersPage() {
       <div className="space-y-6 print:hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-[#381010]">Gestão de Pedidos</h1>
+          <h1 className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Gestão de Pedidos</h1>
           <p className="text-gray-500 text-sm">Acompanhe e gerencie as solicitações em tempo real.</p>
         </div>
         <div className="flex gap-2">
           <button 
             onClick={() => setIsCashModalOpen(true)}
-            className="flex items-center gap-2 bg-[#ff914a] text-[#381010] px-4 py-2 rounded-xl font-bold hover:bg-[#ff7a21] transition-all shadow-md active:scale-95"
+            className="flex items-center gap-2 bg-[var(--color-brand-accent)] text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-brand-accent)]/20"
           >
             <Receipt className="w-5 h-5" /> Fechar Caixa
           </button>
           <button 
             onClick={fetchOrders}
-            className="bg-white border border-gray-200 p-2 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+            className="bg-white border-2 border-gray-100 p-3 rounded-2xl hover:bg-gray-50 transition-colors shadow-sm text-gray-400 hover:text-[var(--color-brand-accent)]"
           >
-            <Loader2 className={`w-5 h-5 text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+            <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* Sales Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-[#381010] rounded-3xl p-6 shadow-xl relative overflow-hidden group">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-[#ff914a]/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-[#ff914a]/20 transition-all duration-700"></div>
+        <div className="md:col-span-2 bg-[var(--color-brand-dark)] rounded-[2rem] p-8 shadow-xl relative overflow-hidden group">
+          <div className="absolute right-0 top-0 w-48 h-48 bg-[var(--color-brand-accent)]/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-[var(--color-brand-accent)]/20 transition-all duration-700"></div>
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div>
-              <p className="text-[#ff914a] text-xs font-black uppercase tracking-widest mb-1 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" /> Faturamento {salesPeriod === 'all' ? 'Total' : `(Últimos ${salesPeriod} dias)`}
+              <p className="text-[var(--color-brand-accent)] text-[10px] font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" /> FATURAMENTO {salesPeriod === 'all' ? 'TOTAL' : `ÚLTIMOS ${salesPeriod} DIAS`}
               </p>
-              <h2 className="text-3xl sm:text-4xl font-black text-white">
+              <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
                 R$ {calculateSales(salesPeriod).toFixed(2).replace('.', ',')}
               </h2>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 bg-white/5 p-1 rounded-2xl backdrop-blur-sm border border-white/5">
               {[
                 { id: '1', label: 'Hoje' },
                 { id: '3', label: '3d' },
@@ -332,7 +332,7 @@ export default function AdminOrdersPage() {
                 <button
                   key={p.id}
                   onClick={() => setSalesPeriod(p.id as any)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${salesPeriod === p.id ? 'bg-[#ff914a] text-[#381010]' : 'bg-white/10 text-white/60 hover:bg-white/20'}`}
+                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${salesPeriod === p.id ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
                 >
                   {p.label}
                 </button>
@@ -352,26 +352,26 @@ export default function AdminOrdersPage() {
                       initial={{ height: 0 }}
                       animate={{ height: `${height}%` }}
                       transition={{ duration: 1, delay: idx * 0.1, ease: "easeOut" }}
-                      className={`w-full max-w-[30px] rounded-t-lg bg-gradient-to-t from-[#ff914a] to-[#ffb385] relative`}
+                      className={`w-full max-w-[24px] rounded-t-xl bg-gradient-to-t from-[var(--color-brand-accent)] to-[var(--color-brand-accent)]/60 relative`}
                     >
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-opacity bg-white text-[#381010] text-[10px] font-bold px-1.5 py-0.5 rounded shadow-lg pointer-events-none whitespace-nowrap">
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-all bg-white text-[var(--color-brand-dark)] text-[10px] font-black px-2 py-1 rounded-lg shadow-xl pointer-events-none whitespace-nowrap border border-gray-100">
                         R$ {day.value.toFixed(0)}
                       </div>
                     </motion.div>
                   </div>
-                  <span className="text-[10px] text-white/40 font-bold uppercase">{day.label.split(' ')[0]}</span>
+                  <span className="text-[10px] text-white/30 font-black uppercase tracking-widest">{day.label.split(' ')[0]}</span>
                 </div>
               );
             })}
           </div>
         </div>
-        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center border border-green-100">
-            <DollarSign className="w-6 h-6 text-green-600" />
+        <div className="bg-white rounded-[2rem] p-8 border border-white shadow-sm flex flex-col justify-center gap-4 hover:shadow-md transition-all">
+          <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center border border-green-100">
+            <DollarSign className="w-7 h-7 text-green-600" />
           </div>
           <div>
-            <p className="text-gray-400 text-xs font-bold uppercase">Ticket Médio</p>
-            <p className="text-xl font-black text-[#381010]">
+            <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Ticket Médio</p>
+            <p className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">
               R$ {(calculateSales('all') / (orders.filter(o => o.status === 'delivered').length || 1)).toFixed(2).replace('.', ',')}
             </p>
           </div>
@@ -380,29 +380,29 @@ export default function AdminOrdersPage() {
 
       {/* Filters and Search */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-2 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div className="md:col-span-2 relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
           <input 
             type="text" 
             placeholder="Buscar por cliente ou ID..." 
-            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#ff914a] focus:border-transparent outline-none transition-all shadow-sm"
+            className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-medium"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="relative">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <div className="relative group">
+          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
           <select 
-            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl appearance-none outline-none focus:ring-2 focus:ring-[#ff914a] shadow-sm"
+            className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-black appearance-none"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as any)}
           >
-            <option value="all">Todos os Status</option>
-            <option value="pending">Pendentes</option>
-            <option value="preparing">Em Preparo</option>
-            <option value="shipped">Em Entrega</option>
-            <option value="delivered">Entregues</option>
-            <option value="cancelled">Cancelados</option>
+            <option value="all">TODOS STATUS</option>
+            <option value="pending">PENDENTES</option>
+            <option value="preparing">EM PREPARO</option>
+            <option value="shipped">EM ENTREGA</option>
+            <option value="delivered">ENTREGUES</option>
+            <option value="cancelled">CANCELADOS</option>
           </select>
         </div>
       </div>
@@ -428,27 +428,27 @@ export default function AdminOrdersPage() {
                   layoutId={order.id}
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`group p-5 rounded-2xl border transition-all cursor-pointer hover:shadow-md ${selectedOrder?.id === order.id ? 'bg-white border-[#ff914a] ring-2 ring-[#ff914a]/10' : 'bg-white border-gray-100'}`}
+                  className={`group p-5 rounded-3xl border-2 transition-all cursor-pointer hover:shadow-lg ${selectedOrder?.id === order.id ? 'bg-white border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10' : 'bg-white border-white hover:border-gray-100 shadow-sm'}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${statusConfig[order.status].color}`}>
-                        <StatusIcon className="w-6 h-6" />
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${statusConfig[order.status].color}`}>
+                        <StatusIcon className="w-7 h-7" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-bold text-[#381010]">{order.customer_name}</span>
-                          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-mono">#{order.id.slice(-4).toUpperCase()}</span>
+                          <span className="font-black text-[var(--color-brand-dark)] text-lg tracking-tight">{order.customer_name}</span>
+                          <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-black tracking-widest">#{order.id.slice(-4).toUpperCase()}</span>
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {formatDate(order.created_at)}</span>
-                          <span className="flex items-center gap-1"><ShoppingBag className="w-3 h-3" /> {order.items.length} itens</span>
+                        <div className="flex items-center gap-4 text-xs text-gray-400 font-bold">
+                          <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(order.created_at)}</span>
+                          <span className="flex items-center gap-1.5"><ShoppingBag className="w-3.5 h-3.5" /> {order.items.length} itens</span>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-black text-[#381010] mb-1">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                      <span className={`text-xs font-bold px-2 py-1 rounded-lg uppercase tracking-wider ${statusConfig[order.status].color} border`}>
+                      <p className="font-black text-[var(--color-brand-dark)] text-xl tracking-tight mb-1">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                      <span className={`text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-[0.1em] ${statusConfig[order.status].color} border shadow-sm`}>
                         {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
                       </span>
                     </div>
@@ -481,23 +481,23 @@ export default function AdminOrdersPage() {
                       </button>
                       <button 
                         onClick={handlePrint}
-                        className="text-[#ff914a] hover:text-[#ff7a21] transition-colors flex items-center gap-1 font-bold text-sm"
+                        className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest"
                       >
                         <Printer className="w-5 h-5" /> Imprimir
                       </button>
                       <button 
                         onClick={() => deleteOrder(selectedOrder.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors flex items-center gap-1 font-bold text-sm ml-2"
+                        className="text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest ml-4"
                         title="Apagar Pedido"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-5 h-5" /> Apagar
                       </button>
                     </div>
-                    <span className="font-mono text-xs text-gray-400">ID: {selectedOrder.id.slice(-6).toUpperCase()}</span>
+                    <span className="font-black text-[10px] text-gray-300 tracking-widest uppercase">ID: {selectedOrder.id.slice(-6).toUpperCase()}</span>
                   </div>
-                  <h2 className="text-xl font-black text-[#381010]">{selectedOrder.customer_name}</h2>
+                  <h2 className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tight">{selectedOrder.customer_name}</h2>
                   <div className="flex items-center gap-2 mt-2">
-                    <a href={`tel:${selectedOrder.customer_phone}`} className="flex items-center gap-1 text-sm font-bold text-[#ff914a] hover:underline">
+                    <a href={`tel:${selectedOrder.customer_phone}`} className="flex items-center gap-2 text-sm font-black text-[var(--color-brand-accent)] hover:underline">
                       <Phone className="w-4 h-4" /> {selectedOrder.customer_phone}
                     </a>
                   </div>
@@ -579,17 +579,17 @@ export default function AdminOrdersPage() {
                   </div>
 
                   {selectedOrder.observation && (
-                    <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-                      <p className="text-xs font-bold text-amber-800 mb-1">Observação:</p>
-                      <p className="text-sm text-amber-900">{selectedOrder.observation}</p>
+                    <div className="p-5 bg-[var(--color-brand-light)] border-2 border-[var(--color-brand-accent)]/10 rounded-2xl">
+                      <p className="text-[10px] font-black text-[var(--color-brand-dark)] mb-2 uppercase tracking-widest">Observação:</p>
+                      <p className="text-sm text-[var(--color-brand-dark)]/80 font-medium italic">"{selectedOrder.observation}"</p>
                     </div>
                   )}
                 </div>
 
-                <div className="p-6 bg-gray-50 border-t border-gray-100">
+                <div className="p-8 bg-gray-50/50 border-t border-gray-100">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500 font-bold">Total do Pedido</span>
-                    <span className="text-2xl font-black text-[#381010]">R$ {selectedOrder.total_price.toFixed(2).replace('.', ',')}</span>
+                    <span className="text-gray-400 font-black text-xs uppercase tracking-[0.2em]">Total do Pedido</span>
+                    <span className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tighter">R$ {selectedOrder.total_price.toFixed(2).replace('.', ',')}</span>
                   </div>
                 </div>
               </motion.div>

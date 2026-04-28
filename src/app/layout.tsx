@@ -85,9 +85,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--color-brand-light)] text-[var(--color-brand-dark)] pb-20`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-[var(--color-brand-light)] text-[var(--color-brand-dark)] pb-32`}>
         <CopyProtection />
         {children}
+        
+        <footer className="w-full py-12 text-center relative z-10 border-t border-[var(--color-brand-dark)]/5 mt-12 bg-white/30 backdrop-blur-sm">
+          <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
+            Created by <a href="https://instagram.com/cviolla" target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-accent)] hover:underline">@cviolla</a>
+          </p>
+          <p className="text-gray-300 text-[9px] font-bold uppercase tracking-widest">Copyright©2026-2027</p>
+        </footer>
       </body>
     </html>
   );

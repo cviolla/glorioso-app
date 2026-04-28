@@ -67,47 +67,51 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-8 pb-20 md:pb-0">
       <div>
-        <h1 className="text-2xl font-black text-[#381010]">Configurações</h1>
+        <h1 className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Configurações</h1>
         <p className="text-gray-500 text-sm">Gerencie o funcionamento da sua loja e canais de contato.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Status da Loja */}
-        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-              <Store className="w-5 h-5" />
+        <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100">
+              <Store className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-bold text-[#381010]">Status da Loja</h2>
+            <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Status da Loja</h2>
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+            <div className="flex items-center justify-between p-5 bg-gray-50/50 rounded-2xl border border-transparent hover:border-gray-100 transition-all">
               <div>
-                <p className="text-sm font-bold text-[#381010]">Modo Automático</p>
-                <p className="text-sm text-gray-500">Abre/fecha conforme o horário configurado.</p>
+                <p className="text-sm font-black text-[var(--color-brand-dark)] uppercase tracking-tight">Modo Automático</p>
+                <p className="text-xs text-gray-500 font-medium mt-1">Abre/fecha conforme o horário configurado.</p>
               </div>
               <button 
                 onClick={toggleAutoMode}
-                className={`transition-colors ${isAutoMode ? 'text-[#ff914a]' : 'text-gray-300'}`}
+                className={`transition-all hover:scale-110 active:scale-95 ${isAutoMode ? 'text-[var(--color-brand-accent)]' : 'text-gray-200'}`}
               >
-                {isAutoMode ? <ToggleRight className="w-10 h-10" /> : <ToggleLeft className="w-10 h-10" />}
+                {isAutoMode ? <ToggleRight className="w-12 h-12" /> : <ToggleLeft className="w-12 h-12" />}
               </button>
             </div>
 
             {!isAutoMode && (
-              <div className="flex items-center justify-between p-4 bg-amber-50 border border-amber-100 rounded-2xl">
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between p-5 bg-rose-50 border-2 border-rose-100 rounded-2xl"
+              >
                 <div>
-                  <p className="text-sm font-bold text-amber-900">Controle Manual</p>
-                  <p className="text-sm text-amber-700">A loja está atualmente {isManualOpen ? 'ABERTA' : 'FECHADA'}.</p>
+                  <p className="text-sm font-black text-rose-900 uppercase tracking-tight">Controle Manual</p>
+                  <p className="text-xs text-rose-700 font-bold mt-1">Status: {isManualOpen ? 'ABERTA AGORA' : 'FECHADA AGORA'}.</p>
                 </div>
                 <button 
                   onClick={() => setManualOpen(!isManualOpen)}
-                  className={`px-4 py-2 rounded-xl font-bold text-sm transition-all ${isManualOpen ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-green-100 text-green-600 hover:bg-green-200'}`}
+                  className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-sm ${isManualOpen ? 'bg-white text-rose-600 hover:bg-rose-100' : 'bg-white text-emerald-600 hover:bg-emerald-50'}`}
                 >
                   {isManualOpen ? 'Fechar Loja' : 'Abrir Loja'}
                 </button>
-              </div>
+              </motion.div>
             )}
 
             <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex gap-3">
@@ -122,24 +126,24 @@ export default function AdminSettingsPage() {
         </section>
 
         {/* Contato e Delivery */}
-        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600">
-              <Phone className="w-5 h-5" />
+        <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100">
+              <Phone className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-bold text-[#381010]">Contato e Taxas</h2>
+            <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Contato e Taxas</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block">WhatsApp de Recebimento</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">WhatsApp de Recebimento</label>
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
                 <input 
                   type="text" 
                   value={localWhatsapp}
                   onChange={(e) => setLocalWhatsapp(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-[#ff914a] outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 outline-none transition-all font-bold text-[var(--color-brand-dark)]"
                   placeholder="Ex: 5521999999999"
                 />
               </div>
@@ -148,16 +152,16 @@ export default function AdminSettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(localFees).map(([neighborhood, fee]) => (
                 <div key={neighborhood}>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block truncate">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block truncate">
                     {neighborhood}
                   </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">R$</span>
+                  <div className="relative group">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 font-black group-focus-within:text-[var(--color-brand-accent)] transition-colors">R$</span>
                     <input 
                       type="number" 
                       value={fee}
                       onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parseFloat(e.target.value) || 0 })}
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-[#ff914a] outline-none transition-all text-sm font-bold text-[#381010]"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 outline-none transition-all font-black text-[var(--color-brand-dark)]"
                     />
                   </div>
                 </div>
@@ -167,12 +171,12 @@ export default function AdminSettingsPage() {
         </section>
 
         {/* Métodos de Pagamento */}
-        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-              <CreditCard className="w-5 h-5" />
+        <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
+          <div className="flex items-center gap-4 mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
+              <CreditCard className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-bold text-[#381010]">Pagamento</h2>
+            <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Pagamento</h2>
           </div>
 
           <div className="space-y-2">
@@ -193,9 +197,9 @@ export default function AdminSettingsPage() {
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-[#ff914a] text-[#381010] font-black px-12 py-4 rounded-2xl shadow-lg shadow-[#ff914a]/20 flex items-center gap-2 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100"
+            className="bg-[var(--color-brand-accent)] text-white font-black px-16 py-5 rounded-2xl shadow-xl shadow-[var(--color-brand-accent)]/20 flex items-center gap-3 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100 uppercase tracking-widest text-sm"
           >
-            {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+            {isSaving ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
             Salvar Alterações
           </button>
         </div>
