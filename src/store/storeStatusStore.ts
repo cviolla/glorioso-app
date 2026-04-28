@@ -94,32 +94,24 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
 
     // Lógica de Modo Automático (Horário de Brasília)
     try {
-      // Usar Intl.DateTimeFormat para obter a hora atual em SP de forma robusta
-      const formatter = new Intl.DateTimeFormat('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric',
-        weekday: 'long',
-        hour12: false
-      });
-
-      const parts = formatter.formatToParts(new Date());
-      const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-      const weekdayPart = parts.find(p => p.type === 'weekday')?.value || '';
+      // Obtém a data/hora atual no fuso de São Paulo
+      const now = new Date();
+      const spTimeStr = now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" });
+      const spDate = new Date(spTimeStr);
       
-      // Mapeamento de dias para evitar problemas de localização
-      // No pt-BR, segunda-feira contém "segunda"
-      const isMonday = weekdayPart.toLowerCase().includes('segunda');
+      const day = spDate.getDay(); // 0 (Dom) a 6 (Sáb)
+      const hour = spDate.getHours();
 
-      // Fechado às segundas
-      if (isMonday) return false;
+      // Mapeamento: 0=Dom, 1=Seg, 2=Ter, 3=Qua, 4=Qui, 5=Sex, 6=Sáb
+      // Fechado às segundas (1)
+      if (day === 1) return false;
       
-      // Aberto das 15:00 às 23:59 (00:00)
+      // Aberto de Terça a Domingo das 15:00 às 23:59 (hora 23 incluída)
+      // Como o dia vira às 00:00, usamos hour < 24 ou simplesmente >= 15
       return hour >= 15 && hour < 24;
     } catch (err) {
-      console.error('Fallback de data acionado:', err);
-      // Fallback básico usando hora local se o Intl falhar
+      console.error('Erro na lógica de horário SP:', err);
+      // Fallback básico usando hora local se o fuso falhar
       const hour = new Date().getHours();
       return hour >= 15 && hour < 24;
     }
