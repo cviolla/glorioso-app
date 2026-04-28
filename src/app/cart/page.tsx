@@ -15,7 +15,7 @@ type DeliveryType = 'delivery' | 'pickup' | null;
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCartStore();
-  const { whatsappNumber, deliveryFee5, deliveryFee7 } = useSettingsStore();
+  const { whatsappNumber, deliveryFees } = useSettingsStore();
   const [isHydrated, setIsHydrated] = useState(false);
   
   const [step, setStep] = useState<CheckoutStep>('cart');
@@ -108,26 +108,9 @@ export default function CartPage() {
     
     const neighborhood = address.neighborhood;
     
-    // Preços específicos solicitados
-    if (neighborhood === 'Nova Campinas') return 4.00;
-    
-    if ([
-      'Jardim Anhangá', 
-      'Parque Paulista', 
-      'Barro Branco', 
-      'Parque Equitativa'
-    ].includes(neighborhood)) return 5.00;
-    
-    if ([
-      'Santa Cruz da Serra', 
-      'Santa Cruz', 
-      'Jardim Rotsen'
-    ].includes(neighborhood)) return 6.00;
-
-    // Chácaras Rio-Petrópolis (mantendo o padrão anterior de 5,00 se não especificado)
-    if (neighborhood === 'Chácaras Rio-Petrópolis') return 5.00;
-
-    return deliveryFee7; // Valor para "Outros" ou locais não mapeados
+    // Busca a taxa configurada no painel administrativo
+    // Se não encontrar o bairro específico, usa a taxa de 'Outros'
+    return deliveryFees[neighborhood] || deliveryFees['Outros'] || 7.00;
   };
   
   const deliveryFee = getDeliveryFee();

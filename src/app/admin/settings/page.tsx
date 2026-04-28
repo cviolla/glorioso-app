@@ -21,24 +21,25 @@ export default function AdminSettingsPage() {
   const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen } = useStoreStatusStore();
   const { 
     whatsappNumber, 
-    deliveryFee5, 
-    deliveryFee7, 
+    deliveryFees,
     paymentMethods,
     setWhatsappNumber,
-    setDeliveryFees,
+    setDeliveryFee,
     setPaymentMethods
   } = useSettingsStore();
 
   const [localWhatsapp, setLocalWhatsapp] = useState(whatsappNumber);
-  const [localF5, setLocalF5] = useState(deliveryFee5.toString());
-  const [localF7, setLocalF7] = useState(deliveryFee7.toString());
+  const [localFees, setLocalFees] = useState(deliveryFees);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = () => {
     setIsSaving(true);
     setTimeout(() => {
       setWhatsappNumber(localWhatsapp);
-      setDeliveryFees(parseFloat(localF5), parseFloat(localF7));
+      // Salva cada taxa individualmente no store
+      Object.entries(localFees).forEach(([neighborhood, fee]) => {
+        setDeliveryFee(neighborhood, fee);
+      });
       setIsSaving(false);
       alert("Configurações salvas com sucesso!");
     }, 800);
@@ -125,31 +126,23 @@ export default function AdminSettingsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block">Taxa Santa Cruz</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">R$</span>
-                  <input 
-                    type="number" 
-                    value={localF5}
-                    onChange={(e) => setLocalF5(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-[#ff914a] outline-none transition-all"
-                  />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(localFees).map(([neighborhood, fee]) => (
+                <div key={neighborhood}>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block truncate">
+                    {neighborhood}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">R$</span>
+                    <input 
+                      type="number" 
+                      value={fee}
+                      onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parseFloat(e.target.value) || 0 })}
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-[#ff914a] outline-none transition-all text-sm font-bold text-[#381010]"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block">Taxa Outros</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">R$</span>
-                  <input 
-                    type="number" 
-                    value={localF7}
-                    onChange={(e) => setLocalF7(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-[#ff914a] outline-none transition-all"
-                  />
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
