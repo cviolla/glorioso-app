@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useStoreStatusStore } from "@/store/storeStatusStore";
 import { Plus, Minus, X, Lock } from "lucide-react";
 import { MenuItem } from "@/data/menu";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function ProductCard({ item }: { item: MenuItem }) {
   const addItem = useCartStore(state => state.addItem);
@@ -143,9 +144,13 @@ export function ProductCard({ item }: { item: MenuItem }) {
   return (
     <>
       {/* Product Card */}
-      <div 
+      <motion.div 
         onClick={handleOpenModal}
-        className="bg-[#ffffff] rounded-2xl p-3 shadow-sm border border-[#f8ece3] mb-3 cursor-pointer hover:shadow-md transition-shadow"
+        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true, margin: "-20px" }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="bg-[#ffffff] rounded-2xl p-3 shadow-sm border border-[#f8ece3] mb-3 cursor-pointer hover:shadow-md transition-all group"
       >
         <div className="flex justify-between items-center gap-3">
           <div className="flex-1">
@@ -163,11 +168,19 @@ export function ProductCard({ item }: { item: MenuItem }) {
               className="object-cover"
               sizes="80px"
             />
-            {totalInCart > 0 && (
-              <div className="absolute top-1 right-1 bg-[#ff914a] text-[#381010] text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md z-10 border-2 border-white">
-                {totalInCart}
-              </div>
-            )}
+            <AnimatePresence>
+              {totalInCart > 0 && (
+                <motion.div 
+                  key="badge"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                  className="absolute top-1 right-1 bg-[#ff914a] text-[#381010] text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md z-10 border-2 border-white"
+                >
+                  {totalInCart}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -189,7 +202,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Product Details Modal Overlay */}
       {isModalOpen && (

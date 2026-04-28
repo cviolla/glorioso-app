@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
+import { StoreStatus } from "@/components/StoreStatus";
 import { ProductCard } from "@/components/ProductCard";
 import { MenuItem, MenuCategory, artesanalAddons, traditionalAddons } from "@/data/menu";
 import { supabase } from "@/lib/supabase";
@@ -148,11 +149,11 @@ export default function MenuPage() {
     <div className="min-h-screen font-sans pb-24 pt-4 px-4 relative">
       {/* Background Image Pattern */}
       <div 
-        className="fixed inset-0 z-0 opacity-40 pointer-events-none"
+        className="fixed inset-0 z-0 opacity-25 pointer-events-none"
         style={{ 
           backgroundImage: "url('/GB2.png')",
           backgroundRepeat: 'repeat',
-          backgroundSize: '350px',
+          backgroundSize: '320px',
           backgroundAttachment: 'fixed'
         }}
       />
@@ -180,6 +181,34 @@ export default function MenuPage() {
       )}
 
       <main className="max-w-md mx-auto relative">
+        {/* Top Info Bar */}
+        <div className="flex justify-between items-center mb-4 px-1">
+          <a 
+            href="https://www.instagram.com/gloriosobrownie/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-[#381010] hover:text-[#ff914a] transition-all active:scale-95"
+          >
+            <div className="bg-[#532120] p-1.5 rounded-lg shadow-sm">
+              <svg 
+                className="w-4 h-4 text-[#f8ece3]" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                viewBox="0 0 24 24"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </div>
+            <span className="text-[15px] font-black lowercase tracking-tighter text-[#532120]">@gloriosobrownie</span>
+          </a>
+          <StoreStatus className="!justify-end" />
+        </div>
+
         {/* Search Bar */}
         <div className="relative mb-6 shadow-sm rounded-2xl overflow-hidden bg-white/90 backdrop-blur-sm border border-[#f8ece3] focus-within:border-[#ff914a] transition-colors">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5" />
@@ -218,8 +247,13 @@ export default function MenuPage() {
           <div className="pt-2 flex flex-col gap-10">
             {categories.map(category => (
               <div key={category.id} id={`category-${category.id}`} className="scroll-mt-24">
-                <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
+                <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
                   {category.name}
+                  <img 
+                    src="/glorioso brownie.png" 
+                    alt="Logo Glorioso Brownie" 
+                    className="h-4 sm:h-5 object-contain"
+                  />
                 </h2>
 
                 {category.items && category.items.map(item => (

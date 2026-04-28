@@ -27,36 +27,39 @@ export function CustomModal({
   const themes = {
     info: {
       icon: AlertCircle,
-      color: "text-blue-500",
-      bg: "bg-blue-50",
-      border: "border-blue-100",
-      button: "bg-blue-500 hover:bg-blue-600",
+      color: "text-[#ff914a]",
+      bg: "bg-[#fff8f4]",
+      border: "border-[#ff914a]/10",
+      button: "bg-[#381010] hover:bg-[#4a1616]",
     },
     success: {
       icon: CheckCircle2,
-      color: "text-green-500",
-      bg: "bg-green-50",
-      border: "border-green-100",
-      button: "bg-green-500 hover:bg-green-600",
+      color: "text-emerald-500",
+      bg: "bg-emerald-50",
+      border: "border-emerald-100",
+      button: "bg-[#381010] hover:bg-[#4a1616]",
     },
     warning: {
       icon: AlertTriangle,
       color: "text-amber-500",
       bg: "bg-amber-50",
       border: "border-amber-100",
-      button: "bg-amber-500 hover:bg-amber-600",
+      button: "bg-[#ff914a] hover:bg-[#ff7a21]",
     },
     danger: {
       icon: AlertTriangle,
-      color: "text-red-500",
-      bg: "bg-red-50",
-      border: "border-red-100",
-      button: "bg-red-500 hover:bg-red-600",
+      color: "text-rose-500",
+      bg: "bg-rose-50",
+      border: "border-rose-100",
+      button: "bg-rose-500 hover:bg-rose-600",
     },
   };
 
   const theme = themes[type];
   const Icon = theme.icon;
+
+  // Se não houver função de confirmação, o texto de cancelar vira "Fechar"
+  const finalCancelText = !onConfirm ? "Fechar" : cancelText;
 
   return (
     <AnimatePresence>
@@ -67,46 +70,53 @@ export function CustomModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[#1a0808]/60 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-[#381010]/40 backdrop-blur-md z-[100]"
           />
           <div className="fixed inset-0 flex items-center justify-center p-4 z-[101] pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden pointer-events-auto"
+              className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(56,16,16,0.15)] w-full max-w-sm overflow-hidden pointer-events-auto border border-white/20"
             >
-              <div className={`p-6 ${theme.bg} border-b ${theme.border} flex items-center gap-4`}>
-                <div className={`p-2 rounded-xl bg-white shadow-sm ${theme.color}`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <h3 className="font-black text-[#381010] text-lg">{title}</h3>
+              <div className={`p-8 ${theme.bg} border-b ${theme.border} flex flex-col items-center text-center relative`}>
                 <button 
                   onClick={onClose}
-                  className="ml-auto p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-6 top-6 p-2 text-gray-300 hover:text-[#381010] transition-colors rounded-full hover:bg-white/50"
                 >
                   <X className="w-5 h-5" />
                 </button>
+                
+                <div className={`mb-4 p-4 rounded-3xl bg-white shadow-xl shadow-[#381010]/5 ${theme.color}`}>
+                  <Icon className="w-10 h-10" />
+                </div>
+                
+                <h3 className="font-black text-[#381010] text-2xl tracking-tight">{title}</h3>
               </div>
               
-              <div className="p-6">
-                <p className="text-gray-600 leading-relaxed">{message}</p>
+              <div className="p-8 text-center">
+                <p className="text-gray-500 font-medium leading-relaxed">{message}</p>
               </div>
 
-              <div className="p-6 pt-0 flex gap-3">
+              <div className="p-8 pt-0 flex gap-3">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-4 py-3 rounded-xl font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-all text-sm"
+                  className={`flex-1 px-4 py-4 rounded-2xl font-black transition-all text-sm ${
+                    !onConfirm 
+                      ? "bg-[#381010] text-white hover:bg-[#4a1616] shadow-lg shadow-[#381010]/20 active:scale-95" 
+                      : "bg-gray-100 text-gray-400 hover:bg-gray-200 active:scale-95"
+                  }`}
                 >
-                  {cancelText}
+                  {finalCancelText}
                 </button>
+                
                 {onConfirm && (
                   <button
                     onClick={() => {
                       onConfirm();
                       onClose();
                     }}
-                    className={`flex-1 px-4 py-3 rounded-xl font-bold text-white transition-all text-sm shadow-lg ${theme.button}`}
+                    className={`flex-1 px-4 py-4 rounded-2xl font-black text-white transition-all text-sm shadow-lg active:scale-95 ${theme.button}`}
                   >
                     {confirmText}
                   </button>

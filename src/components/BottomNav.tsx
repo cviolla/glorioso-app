@@ -1,6 +1,7 @@
 "use client";
 
 import { Home, ShoppingBag, LogOut } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
@@ -30,14 +31,24 @@ export function BottomNav() {
             href="/cart" 
             className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${pathname === '/cart' ? 'text-[#ff914a] drop-shadow-sm' : 'text-[#532120] opacity-80 hover:opacity-100'}`}
           >
-            <div className="relative">
+            <motion.div 
+              key={totalItems}
+              initial={mounted && totalItems > 0 ? { scale: 1.2 } : { scale: 1 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              className="relative"
+            >
               <ShoppingBag className="w-5 h-5" />
               {mounted && totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-[#ff914a] text-[#381010] text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-sm">
+                <motion.span 
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="absolute -top-1.5 -right-2 bg-[#ff914a] text-[#381010] text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full shadow-sm"
+                >
                   {totalItems}
-                </span>
+                </motion.span>
               )}
-            </div>
+            </motion.div>
             <span className="text-[10px] font-bold">Sacola</span>
           </Link>
 

@@ -201,6 +201,8 @@ export default function CartPage() {
         if (address.reference) text += ` | Ref: ${address.reference}`;
         text += `\n`;
       }
+
+      text += `*Previsão:* ${paymentInfo.orderTime}\n`;
       
       text += `\n*Produtos*\n`;
       items.forEach(item => {
@@ -445,9 +447,29 @@ export default function CartPage() {
                 )}
               </div>
               <div className="space-y-4 pt-2">
-                <div>
-                  <label className="text-sm font-bold text-[#381010] mb-1 block">Tipo de pedido</label>
-                  <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={paymentInfo.orderTime} onChange={e => setPaymentInfo({...paymentInfo, orderTime: e.target.value})}><option>Para agora</option><option>Agendar para mais tarde</option></select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-bold text-[#381010] mb-1 block">Tipo de pedido</label>
+                    <select 
+                      className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
+                      value={paymentInfo.orderTime === 'Para agora' ? 'Para agora' : 'Agendar para mais tarde'} 
+                      onChange={e => setPaymentInfo({...paymentInfo, orderTime: e.target.value === 'Para agora' ? 'Para agora' : '15:30'})}
+                    >
+                      <option>Para agora</option>
+                      <option>Agendar para mais tarde</option>
+                    </select>
+                  </div>
+                  {paymentInfo.orderTime !== 'Para agora' && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                      <label className="text-sm font-bold text-[#381010] mb-1 block">Horário de {deliveryType === 'pickup' ? 'retirada' : 'entrega'}</label>
+                      <input 
+                        type="time" 
+                        className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all"
+                        value={paymentInfo.orderTime === 'Agendar para mais tarde' ? '' : paymentInfo.orderTime}
+                        onChange={e => setPaymentInfo({...paymentInfo, orderTime: e.target.value})}
+                      />
+                    </motion.div>
+                  )}
                 </div>
                 <div>
                   <label className="text-sm font-bold text-[#381010] mb-1 block">Observações do pedido</label>

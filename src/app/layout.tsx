@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Glorioso Brownie",
   description: "Peça seu lanche online - Glorioso Brownie",
+  icons: {
+    icon: "/GloriosoBrownie_Logo_fuul.png",
+    apple: "/GloriosoBrownie_Logo_fuul.png",
+  }
 };
 
 export default function RootLayout({

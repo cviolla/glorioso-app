@@ -20,7 +20,8 @@ import {
   History,
   Trash2,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  Receipt
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
@@ -80,6 +81,7 @@ export default function AdminOrdersPage() {
     message: "",
     type: "info"
   });
+  const [isCashModalOpen, setIsCashModalOpen] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -215,7 +217,49 @@ export default function AdminOrdersPage() {
 
   const handlePrint = () => {
     if (!selectedOrder) return;
-    window.print();
+    // Pequeno delay para garantir que o navegador processe o estado antes de abrir o diálogo de impressão no mobile
+    setTimeout(() => {
+      window.print();
+    }, 250);
+  };
+
+  const getCashClosingData = () => {
+    const today = new Date().toDateString();
+    const todayOrders = orders.filter(o => 
+      new Date(o.created_at).toDateString() === today && 
+      o.status === 'delivered'
+    );
+
+    const totals: Record<string, number> = {
+      'PIX': 0,
+      'Cartão de Crédito': 0,
+      'Cartão de Débito': 0,
+      'Dinheiro': 0,
+    };
+
+    let total = 0;
+    todayOrders.forEach(o => {
+      const method = o.payment_method;
+      if (totals[method] !== undefined) {
+        totals[method] += o.total_price;
+      } else {
+        // Fallback para métodos não listados ou variações de nome
+        const normalized = Object.keys(totals).find(k => method.toUpperCase().includes(k.toUpperCase()));
+        if (normalized) totals[normalized] += o.total_price;
+      }
+      total += o.total_price;
+    });
+
+    return { totals, total, count: todayOrders.length };
+  };
+
+  const handlePrintCashReport = () => {
+    // Adiciona uma classe temporária para imprimir apenas o relatório
+    document.body.classList.add('printing-cash-report');
+    setTimeout(() => {
+      window.print();
+      document.body.classList.remove('printing-cash-report');
+    }, 250);
   };
 
   const filteredOrders = orders.filter(order => {
@@ -235,13 +279,20 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <div className="space-y-6 print:hidden">
+    <>
+      <div className="space-y-6 print:hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-[#381010]">Gestão de Pedidos</h1>
           <p className="text-gray-500 text-sm">Acompanhe e gerencie as solicitações em tempo real.</p>
         </div>
         <div className="flex gap-2">
+          <button 
+            onClick={() => setIsCashModalOpen(true)}
+            className="flex items-center gap-2 bg-[#ff914a] text-[#381010] px-4 py-2 rounded-xl font-bold hover:bg-[#ff7a21] transition-all shadow-md active:scale-95"
+          >
+            <Receipt className="w-5 h-5" /> Fechar Caixa
+          </button>
           <button 
             onClick={fetchOrders}
             className="bg-white border border-gray-200 p-2 rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
@@ -392,7 +443,7 @@ export default function AdminOrdersPage() {
                     <div className="text-right">
                       <p className="font-black text-[#381010] mb-1">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
                       <span className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider ${statusConfig[order.status].color} border`}>
-                        {statusConfig[order.status].label}
+                        {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
                       </span>
                     </div>
                   </div>
@@ -470,7 +521,7 @@ export default function AdminOrdersPage() {
                         disabled={selectedOrder.status === 'delivered'}
                         className={`text-xs font-bold py-2 px-3 rounded-lg border transition-all ${selectedOrder.status === 'delivered' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-green-600 border-green-200 hover:bg-green-50'}`}
                       >
-                        Entregue
+                        {selectedOrder.delivery_type === 'pickup' ? 'Retirado' : 'Entregue'}
                       </button>
                       <button 
                         onClick={() => updateOrderStatus(selectedOrder.id, 'cancelled')}
@@ -546,70 +597,218 @@ export default function AdminOrdersPage() {
           </AnimatePresence>
         </div>
       </div>
+    </div>
 
-      {/* Printable Receipt Component */}
-      <div className="hidden print:block font-mono text-black p-4 w-full text-sm">
-        <div className="text-center border-b-2 border-dashed border-black pb-4 mb-4">
-          <h1 className="text-xl font-bold">GLORIOSO BROWNIE</h1>
-          <p className="text-xs">BR-{selectedOrder?.id.slice(-6).toUpperCase()}</p>
-          <p className="text-xs">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
-        </div>
+    <CustomModal 
+      isOpen={modalConfig.isOpen}
+      onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+      onConfirm={modalConfig.onConfirm}
+      title={modalConfig.title}
+      message={modalConfig.message}
+      type={modalConfig.type}
+    />
 
-        <div className="mb-4">
-          <p><strong>CLIENTE:</strong> {selectedOrder?.customer_name}</p>
-          <p><strong>TEL:</strong> {selectedOrder?.customer_phone}</p>
-          <p><strong>TIPO:</strong> {selectedOrder?.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
-          {selectedOrder?.delivery_type === 'delivery' && (
-            <>
-              <p><strong>END:</strong> {selectedOrder.address_street}, {selectedOrder.address_number}</p>
-              <p><strong>BAIRRO:</strong> {selectedOrder.address_neighborhood}</p>
-              {selectedOrder.address_complement && <p><strong>COMPL:</strong> {selectedOrder.address_complement}</p>}
-            </>
-          )}
-        </div>
-
-        <div className="border-b border-dashed border-black pb-2 mb-2">
-          <p className="font-bold border-b border-black mb-2">ITENS DO PEDIDO</p>
-          {selectedOrder?.items.map((item, idx) => (
-            <div key={idx} className="mb-2">
-              <div className="flex justify-between">
-                <span>{item.quantity}x {item.name}</span>
-                <span>R$ {(item.price * item.quantity).toFixed(2)}</span>
+    {/* Cash Closing Modal */}
+    <AnimatePresence>
+        {isCashModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#381010]/40 backdrop-blur-md">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-[0_20px_50px_rgba(56,16,16,0.15)] border border-white/20"
+            >
+              <div className="bg-[#381010] p-8 text-white text-center relative">
+                <button 
+                  onClick={() => setIsCashModalOpen(false)}
+                  className="absolute right-6 top-6 p-2 text-white/30 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="mb-4 p-4 rounded-3xl bg-white/10 w-fit mx-auto shadow-inner">
+                  <Receipt className="w-10 h-10 text-[#ff914a]" />
+                </div>
+                <h2 className="text-2xl font-black tracking-tight">Fechamento de Caixa</h2>
+                <p className="text-[#ff914a] font-bold text-xs uppercase tracking-widest mt-1">
+                  {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </p>
               </div>
-              {item.variant && <p className="text-[10px]">- {item.variant}</p>}
-              {item.addons?.map(a => (
-                <p key={a.name} className="text-[10px]">+ {a.name}</p>
-              ))}
+
+              <div className="p-8 space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  {Object.entries(getCashClosingData().totals).map(([method, value]) => (
+                    <div key={method} className="flex justify-between items-center p-4 bg-[#fff8f4] rounded-2xl border border-[#ff914a]/5 group hover:border-[#ff914a]/20 transition-all">
+                      <span className="text-[#381010] font-bold">{method}</span>
+                      <span className="font-mono font-black text-[#381010] text-lg">R$ {value.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-6 mt-2 border-t border-dashed border-gray-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-400 text-[10px] uppercase font-black tracking-widest">Total de Pedidos</span>
+                    <span className="font-bold text-[#381010] bg-gray-50 px-3 py-1 rounded-full text-xs">{getCashClosingData().count} entregues</span>
+                  </div>
+                  <div className="flex justify-between items-center p-4 bg-[#381010] rounded-2xl shadow-xl shadow-[#381010]/10">
+                    <span className="text-white/60 font-bold">Total Bruto</span>
+                    <span className="text-2xl font-black text-[#ff914a]">R$ {getCashClosingData().total.toFixed(2).replace('.', ',')}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-6">
+                  <button 
+                    onClick={() => setIsCashModalOpen(false)}
+                    className="flex-1 py-4 px-4 rounded-2xl font-black text-gray-400 hover:text-[#381010] hover:bg-gray-50 transition-all text-sm active:scale-95"
+                  >
+                    Voltar
+                  </button>
+                  <button 
+                    onClick={handlePrintCashReport}
+                    className="flex-1 py-4 px-4 bg-[#ff914a] text-[#381010] rounded-2xl font-black hover:bg-[#ff7a21] transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-[#ff914a]/20 active:scale-95"
+                  >
+                    <Printer className="w-5 h-5" /> Imprimir
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Printable Receipt Component - Otimizado para Impressoras Térmicas */}
+      <div className="hidden print:block font-mono text-black p-0 w-full text-[12px] leading-tight bg-white">
+        <div className="max-w-[72mm] mx-auto">
+          <div className="text-center border-b border-dashed border-black pb-4 mb-4">
+            <h1 className="text-lg font-black uppercase">GLORIOSO BROWNIE</h1>
+            <p className="text-[10px]">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
+            <p className="text-[10px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
+          </div>
+
+          <div className="mb-4 space-y-1">
+            <p><strong>CLIENTE:</strong> {selectedOrder?.customer_name}</p>
+            <p><strong>TEL:</strong> {selectedOrder?.customer_phone}</p>
+            <div className="border-y border-dashed border-black/20 py-1 my-1">
+              <p><strong>TIPO:</strong> {selectedOrder?.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
+              <p><strong>PREVISÃO:</strong> {selectedOrder?.order_time}</p>
             </div>
-          ))}
-        </div>
+            {selectedOrder?.delivery_type === 'delivery' && (
+              <div className="text-[11px]">
+                <p><strong>END:</strong> {selectedOrder.address_street}, {selectedOrder.address_number}</p>
+                <p><strong>BAIRRO:</strong> {selectedOrder.address_neighborhood}</p>
+                {selectedOrder.address_complement && <p><strong>COMPL:</strong> {selectedOrder.address_complement}</p>}
+                {selectedOrder.address_reference && <p><strong>REF:</strong> {selectedOrder.address_reference}</p>}
+              </div>
+            )}
+          </div>
 
-        <div className="text-right space-y-1">
-          <p>Subtotal: R$ {(selectedOrder?.total_price || 0).toFixed(2)}</p>
-          <p className="text-lg font-bold">TOTAL: R$ {(selectedOrder?.total_price || 0).toFixed(2)}</p>
-        </div>
+          <div className="border-b border-dashed border-black pb-2 mb-2">
+            <p className="font-bold text-center border-b border-black mb-2 py-1">RESUMO DO PEDIDO</p>
+            {selectedOrder?.items.map((item, idx) => (
+              <div key={idx} className="mb-2">
+                <div className="flex justify-between font-bold">
+                  <span>{item.quantity}x {item.name}</span>
+                  <span>R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+                </div>
+                {item.variant && <p className="text-[10px] ml-2">• {item.variant}</p>}
+                {item.addons?.map(a => (
+                  <p key={a.name} className="text-[10px] ml-2 text-gray-700">+ {a.name}</p>
+                ))}
+              </div>
+            ))}
+          </div>
 
-        <div className="mt-4 pt-4 border-t-2 border-dashed border-black">
-          <p><strong>PAGAMENTO:</strong> {selectedOrder?.payment_method}</p>
-          {selectedOrder?.observation && (
-            <p className="mt-2"><strong>OBS:</strong> {selectedOrder.observation}</p>
-          )}
-        </div>
+          <div className="space-y-1 border-b border-dashed border-black pb-2 mb-2">
+            <div className="flex justify-between text-sm">
+              <span>Subtotal:</span>
+              <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
+            </div>
+            <div className="flex justify-between text-base font-black">
+              <span>TOTAL:</span>
+              <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
+            </div>
+          </div>
 
-        <div className="text-center mt-8 text-[10px]">
-          <p>Obrigado pela preferência!</p>
-          <p>www.gloriosobrownie.com.br</p>
+          <div className="mb-4">
+            <p><strong>PAGAMENTO:</strong> {selectedOrder?.payment_method}</p>
+            {selectedOrder?.observation && (
+              <div className="mt-2 p-1 border border-black border-dotted">
+                <p className="text-[10px]"><strong>OBS:</strong> {selectedOrder.observation}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-6 pt-4 border-t border-dashed border-black text-[10px]">
+            <p className="font-bold">Obrigado pela preferência!</p>
+            <p>www.gloriosobrownie.com.br</p>
+            <p className="mt-2 italic">Documento não fiscal</p>
+          </div>
         </div>
       </div>
 
-      <CustomModal 
-        isOpen={modalConfig.isOpen}
-        onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
-        onConfirm={modalConfig.onConfirm}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-      />
-    </div>
+      {/* Printable Cash Report */}
+      <div className="hidden printing-cash-report:block font-mono text-black p-0 w-full text-sm bg-white">
+        <div className="max-w-[72mm] mx-auto">
+          <div className="text-center border-b-2 border-double border-black pb-4 mb-4">
+            <h1 className="text-xl font-black uppercase">GLORIOSO BROWNIE</h1>
+            <h2 className="text-lg font-bold">FECHAMENTO DE CAIXA</h2>
+            <p>{new Date().toLocaleString('pt-BR')}</p>
+          </div>
+
+          <div className="space-y-2 mb-6">
+            <p className="font-bold border-b border-black">RESUMO POR PAGAMENTO</p>
+            {Object.entries(getCashClosingData().totals).map(([method, value]) => (
+              <div key={method} className="flex justify-between">
+                <span>{method}:</span>
+                <span>R$ {value.toFixed(2).replace('.', ',')}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t-2 border-black pt-2 space-y-1">
+            <div className="flex justify-between">
+              <span>Qtd Pedidos:</span>
+              <span>{getCashClosingData().count}</span>
+            </div>
+            <div className="flex justify-between text-lg font-black">
+              <span>TOTAL BRUTO:</span>
+              <span>R$ {getCashClosingData().total.toFixed(2).replace('.', ',')}</span>
+            </div>
+          </div>
+
+          <div className="mt-10 pt-4 border-t border-dashed border-black text-center">
+            <div className="w-full h-px bg-black mb-1"></div>
+            <p className="text-[10px]">Assinatura do Responsável</p>
+          </div>
+        </div>
+      </div>
+
+      <style jsx global>{`
+        @media print {
+          @page {
+            margin: 0;
+            size: auto;
+          }
+          body {
+            margin: 0;
+            padding: 0;
+            height: auto !important;
+            overflow: hidden !important;
+            -webkit-print-color-adjust: exact;
+          }
+          .print\:hidden {
+            display: none !important;
+          }
+          .printing-cash-report .print\:hidden {
+            display: none !important;
+          }
+          .printing-cash-report .printing-cash-report\:block {
+            display: block !important;
+          }
+          .printing-cash-report .print\:block {
+            display: none !important;
+          }
+        }
+      `}</style>
+    </>
   );
 }
