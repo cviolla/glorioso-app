@@ -4,6 +4,10 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 export const metadata = {
   title: "Admin",
   description: "Painel Administrativo - Glorioso Brownie",
+  icons: {
+    icon: "/admin-icon.png",
+    apple: "/admin-icon.png",
+  },
   openGraph: {
     title: 'Admin | Glorioso Brownie',
     description: 'Acesso restrito ao painel de gestão do Glorioso Brownie.',
