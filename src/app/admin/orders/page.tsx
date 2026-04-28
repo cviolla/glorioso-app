@@ -130,7 +130,12 @@ export default function AdminOrdersPage() {
         setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
       }
     } catch (err) {
-      alert("Erro ao atualizar status do pedido.");
+      setModalConfig({
+        isOpen: true,
+        title: "Erro de Status",
+        message: "Não foi possível atualizar o status do pedido agora.",
+        type: "danger"
+      });
     }
   };
 

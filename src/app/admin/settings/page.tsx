@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { CustomModal } from "@/components/CustomModal";
 
 export default function AdminSettingsPage() {
   const { isAutoMode, isManualOpen, toggleAutoMode, setManualOpen } = useStoreStatusStore();
@@ -31,6 +32,17 @@ export default function AdminSettingsPage() {
   const [localWhatsapp, setLocalWhatsapp] = useState(whatsappNumber);
   const [localFees, setLocalFees] = useState(deliveryFees);
   const [isSaving, setIsSaving] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: "info" | "success" | "warning" | "danger";
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "success"
+  });
 
   const handleSave = () => {
     setIsSaving(true);
@@ -41,7 +53,14 @@ export default function AdminSettingsPage() {
         setDeliveryFee(neighborhood, fee);
       });
       setIsSaving(false);
-      alert("Configurações salvas com sucesso!");
+      
+      // Abre o modal customizado em vez do alert nativo
+      setModalConfig({
+        isOpen: true,
+        title: "Sucesso!",
+        message: "Configurações salvas com sucesso no sistema.",
+        type: "success"
+      });
     }, 800);
   };
 
@@ -181,6 +200,14 @@ export default function AdminSettingsPage() {
           </button>
         </div>
       </div>
+      
+      <CustomModal 
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+      />
     </div>
   );
 }

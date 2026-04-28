@@ -204,7 +204,12 @@ export default function AdminProductsPage() {
       setEditingItem(null);
     } catch (err) {
       console.error("Erro ao salvar produto:", err);
-      alert("Erro ao salvar. Verifique o console.");
+      setModalConfig({
+        isOpen: true,
+        title: "Erro ao Salvar",
+        message: "Houve um problema ao salvar o produto. Verifique sua conexão.",
+        type: "danger"
+      });
     } finally {
       setSaving(false);
     }
@@ -226,7 +231,12 @@ export default function AdminProductsPage() {
 
       if (uploadError) {
         if (uploadError.message.includes('bucket not found')) {
-          alert("O bucket 'products' não existe no Supabase Storage. Crie-o para habilitar o upload.");
+          setModalConfig({
+            isOpen: true,
+            title: "Configuração Necessária",
+            message: "O bucket 'products' não existe no Supabase. Crie-o para habilitar fotos.",
+            type: "warning"
+          });
           return;
         }
         throw uploadError;
@@ -239,7 +249,12 @@ export default function AdminProductsPage() {
       setEditingItem({ ...editingItem, imageUrl: publicUrl });
     } catch (err) {
       console.error("Erro no upload:", err);
-      alert("Erro no upload de imagem.");
+      setModalConfig({
+        isOpen: true,
+        title: "Erro no Upload",
+        message: "Não foi possível enviar a imagem. Tente novamente.",
+        type: "danger"
+      });
     } finally {
       setSaving(false);
     }
