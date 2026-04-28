@@ -280,7 +280,7 @@ export default function AdminProductsPage() {
               <Clock className="w-5 h-5 text-gray-400" />
               <div>
                 <span className="block font-bold text-[#381010] text-sm">Horário Automático</span>
-                <span className="text-[10px] text-gray-500 uppercase font-bold tracking-tight">15:00 - 00:00 (Ter-Dom)</span>
+                <span className="text-xs text-gray-500 uppercase font-bold tracking-tight">15:00 - 00:00 (Ter-Dom)</span>
               </div>
             </div>
             <button 
@@ -296,7 +296,7 @@ export default function AdminProductsPage() {
               <Power className={`w-5 h-5 ${isManualOpen ? 'text-[#25D366]' : 'text-red-500'}`} />
               <div>
                 <span className="block font-bold text-[#381010] text-sm">Status Manual</span>
-                <span className={`text-[10px] uppercase font-bold tracking-tight ${isManualOpen ? 'text-[#25D366]' : 'text-red-500'}`}>
+                <span className={`text-xs uppercase font-bold tracking-tight ${isManualOpen ? 'text-[#25D366]' : 'text-red-500'}`}>
                   {isManualOpen ? 'Forçar Loja Aberta' : 'Forçar Loja Fechada'}
                 </span>
               </div>
@@ -497,7 +497,7 @@ export default function AdminProductsPage() {
                       onChange={(e) => setEditingItem({...editingItem, price: parseFloat(e.target.value)})}
                       disabled={saving}
                     />
-                    <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold">Use 0 se o produto tiver tamanhos abaixo</p>
+                    <p className="text-xs text-gray-400 mt-1 uppercase font-bold">Use 0 se o produto tiver tamanhos abaixo</p>
                   </div>
 
                   {/* Variants Manager */}

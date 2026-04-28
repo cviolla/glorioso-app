@@ -438,7 +438,7 @@ export default function AdminOrdersPage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-bold text-[#381010]">{order.customer_name}</span>
-                          <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-mono">#{order.id.slice(-4).toUpperCase()}</span>
+                          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-mono">#{order.id.slice(-4).toUpperCase()}</span>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-gray-500">
                           <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {formatDate(order.created_at)}</span>
@@ -448,7 +448,7 @@ export default function AdminOrdersPage() {
                     </div>
                     <div className="text-right">
                       <p className="font-black text-[#381010] mb-1">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                      <span className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider ${statusConfig[order.status].color} border`}>
+                      <span className={`text-xs font-bold px-2 py-1 rounded-lg uppercase tracking-wider ${statusConfig[order.status].color} border`}>
                         {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
                       </span>
                     </div>
@@ -551,7 +551,7 @@ export default function AdminOrdersPage() {
                           <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
                           {selectedOrder.address_street}, {selectedOrder.address_number} - {selectedOrder.address_neighborhood}
                         </p>
-                        {selectedOrder.address_complement && <p className="text-[10px] text-gray-400 ml-4">Ref: {selectedOrder.address_complement}</p>}
+                        {selectedOrder.address_complement && <p className="text-xs text-gray-400 ml-4">Ref: {selectedOrder.address_complement}</p>}
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-200">
@@ -567,9 +567,9 @@ export default function AdminOrdersPage() {
                         <div key={idx} className="flex justify-between items-start">
                           <div className="flex-1">
                             <p className="text-sm font-bold text-[#381010]">{item.quantity}x {item.name}</p>
-                            {item.variant && <p className="text-[10px] text-gray-500">{item.variant}</p>}
+                            {item.variant && <p className="text-xs text-gray-500">{item.variant}</p>}
                             {item.addons && item.addons.length > 0 && (
-                              <p className="text-[10px] text-[#ff914a] font-medium">+ {item.addons.map(a => a.name).join(', ')}</p>
+                              <p className="text-xs text-[#ff914a] font-medium">+ {item.addons.map(a => a.name).join(', ')}</p>
                             )}
                           </div>
                           <p className="text-sm font-mono text-gray-400">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
@@ -652,7 +652,7 @@ export default function AdminOrdersPage() {
 
                 <div className="pt-6 mt-2 border-t border-dashed border-gray-100">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-400 text-[10px] uppercase font-black tracking-widest">Total de Pedidos</span>
+                    <span className="text-gray-400 text-xs uppercase font-black tracking-widest">Total de Pedidos</span>
                     <span className="font-bold text-[#381010] bg-gray-50 px-3 py-1 rounded-full text-xs">{getCashClosingData().count} entregues</span>
                   </div>
                   <div className="flex justify-between items-center p-4 bg-[#381010] rounded-2xl shadow-xl shadow-[#381010]/10">

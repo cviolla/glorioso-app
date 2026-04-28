@@ -148,7 +148,7 @@ export default function AdminSettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {Object.entries(localFees).map(([neighborhood, fee]) => (
                 <div key={neighborhood}>
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block truncate">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block truncate">
                     {neighborhood}
                   </label>
                   <div className="relative">
@@ -179,21 +179,21 @@ export default function AdminSettingsPage() {
             {paymentMethods.map((method) => (
               <div key={method} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                 <span className="text-sm font-medium text-[#381010]">{method}</span>
-                <span className="text-[10px] bg-green-100 text-green-600 px-2 py-1 rounded-full font-bold uppercase">Ativo</span>
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-bold uppercase">Ativo</span>
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-gray-400 italic flex items-center gap-1">
+          <p className="text-xs text-gray-400 italic flex items-center gap-1">
             <AlertTriangle className="w-3 h-3" /> Edição de métodos de pagamento disponível na próxima atualização.
           </p>
         </section>
 
         {/* Botão Salvar */}
-        <div className="lg:col-span-2 flex justify-end pt-4">
+        <div className="lg:col-span-2 flex justify-center pt-8">
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-[#ff914a] text-[#381010] font-black px-8 py-4 rounded-2xl shadow-lg shadow-[#ff914a]/20 flex items-center gap-2 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100"
+            className="bg-[#ff914a] text-[#381010] font-black px-12 py-4 rounded-2xl shadow-lg shadow-[#ff914a]/20 flex items-center gap-2 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100"
           >
             {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             Salvar Alterações
