@@ -1,8 +1,18 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, Settings } from 'lucide-react';
+import { Package, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/admin/login');
+    router.refresh();
+  };
+
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col pb-20 md:pb-0 md:flex-row">
       {/* Mobile Header */}
@@ -31,6 +41,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <Settings className="w-5 h-5" />
             Configurações
           </Link>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-red-500 font-medium hover:bg-red-50 rounded-xl transition-all mt-auto"
+          >
+            <LogOut className="w-5 h-5" />
+            Sair
+          </button>
         </nav>
       </aside>
 
@@ -53,6 +70,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <Settings className="w-6 h-6" />
           <span className="text-[10px] font-medium">Ajustes</span>
         </Link>
+        <button 
+          onClick={handleLogout}
+          className="flex flex-col items-center gap-1 text-red-400"
+        >
+          <LogOut className="w-6 h-6" />
+          <span className="text-[10px] font-medium">Sair</span>
+        </button>
       </nav>
     </div>
   );
