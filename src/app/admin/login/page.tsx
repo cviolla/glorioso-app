@@ -118,13 +118,6 @@ export default function AdminLoginPage() {
           </form>
         </div>
       </motion.div>
-
-      <footer className="mt-12 text-center relative z-10">
-        <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">
-          Created by <a href="https://instagram.com/cviolla" target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-accent)] hover:underline">@cviolla</a>
-        </p>
-        <p className="text-gray-300 text-[9px] font-medium">Copyright©2026-2027</p>
-      </footer>
     </div>
   );
 }

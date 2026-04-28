@@ -92,13 +92,6 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
             <LogOut className="w-4 h-4" />
             Sair do Painel
           </button>
-          
-          <div className="text-center pt-2">
-            <p className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">
-              Created by <a href="https://instagram.com/cviolla" target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-accent)] hover:underline">@cviolla</a>
-            </p>
-            <p className="text-gray-300 text-[8px] font-bold tracking-widest">Copyright©2026-2027</p>
-          </div>
         </div>
       </aside>
 
