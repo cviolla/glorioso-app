@@ -742,12 +742,6 @@ export default function AdminOrdersPage() {
               </div>
             )}
           </div>
-
-          <div className="text-center mt-6 pt-4 border-t border-dashed border-black text-[10px]">
-            <p className="font-bold">Obrigado pela preferência!</p>
-            <p>www.gloriosobrownie.com.br</p>
-            <p className="mt-2 italic">Documento não fiscal</p>
-          </div>
         </div>
       </div>
 
