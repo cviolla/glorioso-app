@@ -428,27 +428,30 @@ export default function AdminOrdersPage() {
                   layoutId={order.id}
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`group p-6 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl ${selectedOrder?.id === order.id ? 'bg-white border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10' : 'bg-white border-white hover:border-gray-100 shadow-sm'}`}
+                  className={`group p-5 sm:p-6 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl ${selectedOrder?.id === order.id ? 'bg-white border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10' : 'bg-white border-white hover:border-gray-100 shadow-sm'}`}
                 >
-                  <div className="flex items-center justify-between gap-6">
-                    <div className="flex items-center gap-5">
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 border-2 shadow-inner ${statusConfig[order.status].color}`}>
-                        <StatusIcon className="w-8 h-8" />
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+                    {/* Top Section / Left Section */}
+                    <div className="flex items-center gap-4 sm:gap-5">
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 border-2 shadow-inner ${statusConfig[order.status].color}`}>
+                        <StatusIcon className="w-7 h-7 sm:w-8 sm:h-8" />
                       </div>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-3">
-                          <span className="font-black text-[var(--color-brand-dark)] text-xl tracking-tight leading-none">{order.customer_name}</span>
-                          <span className="text-[10px] bg-gray-50 text-gray-400 px-3 py-1 rounded-full font-black tracking-widest border border-gray-100">#{order.id.slice(-4).toUpperCase()}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <span className="font-black text-[var(--color-brand-dark)] text-lg sm:text-xl tracking-tight leading-none truncate">{order.customer_name}</span>
+                          <span className="text-[9px] bg-gray-50 text-gray-400 px-2 py-0.5 rounded-full font-black tracking-widest border border-gray-100">#{order.id.slice(-4).toUpperCase()}</span>
                         </div>
-                        <div className="flex items-center gap-5 text-[11px] text-gray-400 font-black uppercase tracking-wider">
-                          <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-[var(--color-brand-accent)]/50" /> {formatDate(order.created_at)}</span>
-                          <span className="flex items-center gap-2"><ShoppingBag className="w-4 h-4 text-[var(--color-brand-accent)]/50" /> {order.items.length} {order.items.length === 1 ? 'item' : 'itens'}</span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] sm:text-[11px] text-gray-400 font-black uppercase tracking-wider">
+                          <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-[var(--color-brand-accent)]/50" /> {formatDate(order.created_at)}</span>
+                          <span className="flex items-center gap-1.5"><ShoppingBag className="w-3.5 h-3.5 text-[var(--color-brand-accent)]/50" /> {order.items.length} itens</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right flex flex-col items-end gap-2">
-                      <p className="font-black text-[var(--color-brand-dark)] text-2xl tracking-tighter">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                      <span className={`text-[9px] font-black px-4 py-2 rounded-2xl uppercase tracking-[0.15em] ${statusConfig[order.status].color} border shadow-sm`}>
+
+                    {/* Bottom Section / Right Section */}
+                    <div className="flex items-center sm:flex-col justify-between sm:justify-center sm:items-end pt-3 sm:pt-0 border-t sm:border-0 border-gray-50 gap-2">
+                      <p className="font-black text-[var(--color-brand-dark)] text-xl sm:text-2xl tracking-tighter">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                      <span className={`text-[8px] sm:text-[9px] font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl uppercase tracking-[0.15em] ${statusConfig[order.status].color} border shadow-sm`}>
                         {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
                       </span>
                     </div>
