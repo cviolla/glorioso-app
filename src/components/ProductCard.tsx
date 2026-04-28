@@ -184,7 +184,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               className="w-full h-full relative"
             >
               <Image 
-                src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
+                src={item.imageUrl || "/logo glorioso brownie.png"} 
                 alt={item.name}
                 fill
                 className="object-contain opacity-80"
@@ -246,7 +246,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               {/* Header Image */}
               <div className="w-full h-48 sm:h-64 relative bg-[#f8ece3]">
                 <Image 
-                  src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
+                  src={item.imageUrl || "/logo glorioso brownie.png"} 
                   alt={item.name}
                   fill
                   className="object-cover"
