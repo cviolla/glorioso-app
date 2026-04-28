@@ -1,30 +1,76 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
 
-  const {
-    data: { session },
-  } = await supabase.getSession();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
 
-  // Se o usuário tentar acessar qualquer rota /admin (exceto login) e não estiver logado
-  if (req.nextUrl.pathname.startsWith('/admin') && !req.nextUrl.pathname.includes('/admin/login')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Proteger rotas /admin
+  if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.includes('/admin/login')) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
 
-  // Se o usuário já estiver logado e tentar ir para o login, manda pro dashboard
-  if (req.nextUrl.pathname === '/admin/login' && session) {
-    return NextResponse.redirect(new URL('/admin/orders', req.url));
+  // Se já logado, não deixa ir pro login
+  if (request.nextUrl.pathname === '/admin/login' && user) {
+    return NextResponse.redirect(new URL('/admin/orders', request.url))
   }
 
-  return res;
+  return response
 }
 
 export const config = {
   matcher: ['/admin/:path*'],
-};
+}
