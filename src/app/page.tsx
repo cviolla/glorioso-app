@@ -61,10 +61,10 @@ export default function Home() {
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-          className="flex flex-col items-center text-center w-full max-w-md mt-4 sm:mt-0"
+          className="flex flex-col items-center text-center w-full max-w-md mt-10 sm:mt-0"
         >
-          {/* Official Logo */}
-          <div className="relative w-52 h-52 sm:w-64 h-64 mb-6 sm:mb-8 drop-shadow-2xl">
+          {/* Official Logo - Optimized Size and Spacing */}
+          <div className="relative w-64 h-64 sm:w-80 sm:h-80 mb-8 sm:mb-10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
             <Image 
               src="/GloriosoBrownie_Logo_fuul.png" 
               alt="Logo Glorioso Brownie" 

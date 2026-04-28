@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useStoreStatusStore } from "@/store/storeStatusStore";
 import { supabase } from "@/lib/supabase";
 
 export function StoreStatus({ className = "" }: { className?: string }) {
+  const router = useRouter();
   const { getIsOpen, fetchStatus, isAutoMode, isManualOpen } = useStoreStatusStore();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,9 @@ export function StoreStatus({ className = "" }: { className?: string }) {
           filter: 'id=eq.1',
         },
         () => {
-          fetchStatus();
+          fetchStatus().then(() => {
+            router.refresh();
+          });
         }
       )
       .subscribe();
