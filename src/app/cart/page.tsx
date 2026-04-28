@@ -304,8 +304,8 @@ export default function CartPage() {
                     const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
                     return (
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div className="w-16 h-16 bg-[#381010] rounded-xl flex items-center justify-center shrink-0 border border-[#ff914a]/30 overflow-hidden relative">
-                           <Image src="/GloriosoBrownie_Logo_fuul.png" alt="Logo" fill className="object-cover opacity-50" />
+                        <div className="w-16 h-16 shrink-0 overflow-hidden relative">
+                           <Image src="/GloriosoBrownie_Logo_fuul.png" alt="Logo" fill className="object-contain opacity-50" />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-[15px] leading-tight mb-1">{item.name}</h3>

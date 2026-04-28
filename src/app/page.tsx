@@ -64,7 +64,7 @@ export default function Home() {
           className="flex flex-col items-center text-center w-full max-w-md mt-4 sm:mt-0"
         >
           {/* Official Logo */}
-          <div className="relative w-48 h-48 sm:w-56 sm:h-56 mb-6 sm:mb-8 drop-shadow-xl">
+          <div className="relative w-52 h-52 sm:w-64 h-64 mb-6 sm:mb-8 drop-shadow-2xl">
             <Image 
               src="/GloriosoBrownie_Logo_fuul.png" 
               alt="Logo Glorioso Brownie" 

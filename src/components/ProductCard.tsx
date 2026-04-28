@@ -160,12 +160,12 @@ export function ProductCard({ item }: { item: MenuItem }) {
             )}
           </div>
           
-          <div className="w-20 h-20 shrink-0 bg-[#f8ece3] rounded-xl overflow-hidden relative border border-[#ff914a]/30 shadow-inner">
+          <div className="w-20 h-20 shrink-0 overflow-hidden relative">
             <Image 
               src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
               alt={item.name}
               fill
-              className="object-cover"
+              className="object-contain opacity-80"
               sizes="80px"
             />
             <AnimatePresence>
