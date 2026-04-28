@@ -40,29 +40,49 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
   },
 
   toggleAutoMode: async () => {
-    const newMode = !get().isAutoMode;
+    const { isAutoMode } = get();
+    const newMode = !isAutoMode;
+    
+    // Atualização otimista
     set({ isAutoMode: newMode });
     
     try {
-      await supabase
+      const { error } = await supabase
         .from('store_config')
-        .update({ is_auto_mode: newMode })
-        .eq('id', 1);
+        .upsert({ id: 1, is_auto_mode: newMode })
+        .select();
+
+      if (error) {
+        console.error('Erro Supabase (Modo Automático):', error);
+        // Reverter em caso de erro
+        set({ isAutoMode: isAutoMode });
+      }
     } catch (err) {
-      console.error('Erro ao atualizar modo automático:', err);
+      console.error('Erro catastrófico (Modo Automático):', err);
+      set({ isAutoMode: isAutoMode });
     }
   },
 
   setManualOpen: async (isOpen) => {
+    const { isManualOpen } = get();
+    
+    // Atualização otimista
     set({ isManualOpen: isOpen });
     
     try {
-      await supabase
+      const { error } = await supabase
         .from('store_config')
-        .update({ is_manual_open: isOpen })
-        .eq('id', 1);
+        .upsert({ id: 1, is_manual_open: isOpen })
+        .select();
+
+      if (error) {
+        console.error('Erro Supabase (Controle Manual):', error);
+        // Reverter em caso de erro
+        set({ isManualOpen: isManualOpen });
+      }
     } catch (err) {
-      console.error('Erro ao atualizar status manual:', err);
+      console.error('Erro catastrófico (Controle Manual):', err);
+      set({ isManualOpen: isManualOpen });
     }
   },
 
