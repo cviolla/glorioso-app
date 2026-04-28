@@ -34,9 +34,16 @@ export function ProductCard({ item }: { item: MenuItem }) {
     );
   };
 
+  const [isZooming, setIsZooming] = useState(false);
+
   const handleAddFast = (e: React.MouseEvent, price: number, variant?: string) => {
     e.stopPropagation();
     if (!isOpen) return;
+    
+    // Trigger zoom animation
+    setIsZooming(true);
+    setTimeout(() => setIsZooming(false), 200);
+
     addItem({
       id: item.id,
       name: item.name,
@@ -56,6 +63,11 @@ export function ProductCard({ item }: { item: MenuItem }) {
 
   const handleIncrementFast = (e: React.MouseEvent, cartItemId: string) => {
     e.stopPropagation();
+    
+    // Trigger zoom animation
+    setIsZooming(true);
+    setTimeout(() => setIsZooming(false), 200);
+
     updateQuantity(cartItemId, 1);
   };
 
@@ -64,17 +76,17 @@ export function ProductCard({ item }: { item: MenuItem }) {
     
     if (cartItem && cartItem.quantity > 0) {
       return (
-        <div className="flex items-center gap-2 bg-[#ff914a] rounded-full px-1.5 py-1 shadow-sm" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-2 bg-[var(--color-brand-accent)] rounded-full px-1.5 py-1 shadow-sm" onClick={e => e.stopPropagation()}>
           <button 
             onClick={(e) => handleRemoveFast(e, cartItem.cartItemId, cartItem.quantity)}
-            className="w-6 h-6 flex items-center justify-center text-[#381010] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
           >
             <Minus className="w-3.5 h-3.5 font-bold" />
           </button>
-          <span className="text-[#381010] font-black text-xs w-3 text-center">{cartItem.quantity}</span>
+          <span className="text-[var(--color-brand-dark)] font-black text-xs w-3 text-center">{cartItem.quantity}</span>
           <button 
             onClick={(e) => handleIncrementFast(e, cartItem.cartItemId)}
-            className="w-6 h-6 flex items-center justify-center text-[#381010] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
           >
             <Plus className="w-3.5 h-3.5 font-bold" />
           </button>
@@ -88,7 +100,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
         disabled={!isOpen}
         className={`w-7 h-7 rounded-full flex items-center justify-center font-bold transition-all ${
           isOpen 
-            ? "bg-[#ff914a] text-[#381010] hover:scale-105 active:scale-95" 
+            ? "bg-[var(--color-brand-accent)] text-[var(--color-brand-dark)] hover:scale-110 active:scale-90" 
             : "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
         }`}
       >
@@ -106,6 +118,11 @@ export function ProductCard({ item }: { item: MenuItem }) {
 
   const handleAddFromModal = () => {
     if (!isOpen) return;
+    
+    // Trigger zoom animation
+    setIsZooming(true);
+    setTimeout(() => setIsZooming(false), 200);
+
     let basePrice = item.price || 0;
     if (item.variants) {
       const v = item.variants.find(v => v.name === selectedVariant);
@@ -161,13 +178,19 @@ export function ProductCard({ item }: { item: MenuItem }) {
           </div>
           
           <div className="w-20 h-20 shrink-0 overflow-hidden relative">
-            <Image 
-              src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
-              alt={item.name}
-              fill
-              className="object-contain opacity-80"
-              sizes="80px"
-            />
+            <motion.div
+              animate={isZooming ? { scale: 1.15 } : { scale: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="w-full h-full relative"
+            >
+              <Image 
+                src={item.imageUrl || "/GloriosoBrownie_Logo_fuul.png"} 
+                alt={item.name}
+                fill
+                className="object-contain opacity-80"
+                sizes="80px"
+              />
+            </motion.div>
             <AnimatePresence>
               {totalInCart > 0 && (
                 <motion.div 
