@@ -9,6 +9,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { CustomModal } from "@/components/CustomModal";
+import { useStoreStatusStore } from "@/store/storeStatusStore";
 
 type CheckoutStep = 'cart' | 'address' | 'summary';
 type DeliveryType = 'delivery' | 'pickup' | null;
