@@ -685,23 +685,23 @@ export default function AdminOrdersPage() {
       </AnimatePresence>
 
       {/* Printable Receipt Component - Otimizado para Impressoras Térmicas */}
-      <div id="print-receipt" className="hidden print:block font-mono text-black p-0 w-full text-[12px] leading-tight bg-white">
-        <div className="max-w-[72mm] mx-auto p-4">
-          <div className="text-center border-b border-dashed border-black pb-4 mb-4 print-section">
-            <h1 className="text-lg font-black uppercase">GLORIOSO BROWNIE</h1>
-            <p className="text-[10px]">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
-            <p className="text-[10px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
+      <div id="print-receipt" className="hidden print:block font-mono text-black p-0 w-full text-[10px] leading-tight bg-white">
+        <div className="max-w-[72mm] mx-auto p-0 flex flex-col">
+          <div className="text-center border-b border-dashed border-black pb-2 mb-2">
+            <h1 className="text-base font-black uppercase">GLORIOSO BROWNIE</h1>
+            <p className="text-[9px]">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
+            <p className="text-[9px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
           </div>
 
-          <div className="mb-4 space-y-1 print-section">
+          <div className="mb-2 space-y-0.5">
             <p><strong>CLIENTE:</strong> {selectedOrder?.customer_name}</p>
             <p><strong>TEL:</strong> {selectedOrder?.customer_phone}</p>
-            <div className="border-y border-dashed border-black/20 py-1 my-1">
+            <div className="border-y border-dashed border-black/20 py-0.5 my-1 text-[9px]">
               <p><strong>TIPO:</strong> {selectedOrder?.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
               <p><strong>PREVISÃO:</strong> {selectedOrder?.order_time}</p>
             </div>
             {selectedOrder?.delivery_type === 'delivery' && (
-              <div className="text-[11px]">
+              <div className="text-[9px]">
                 <p><strong>END:</strong> {selectedOrder.address_street}, {selectedOrder.address_number}</p>
                 <p><strong>BAIRRO:</strong> {selectedOrder.address_neighborhood}</p>
                 {selectedOrder.address_complement && <p><strong>COMPL:</strong> {selectedOrder.address_complement}</p>}
@@ -710,38 +710,38 @@ export default function AdminOrdersPage() {
             )}
           </div>
 
-          <div className="border-b border-dashed border-black pb-2 mb-2 print-section">
-            <p className="font-bold text-center border-b border-black mb-2 py-1">RESUMO DO PEDIDO</p>
+          <div className="border-b border-dashed border-black pb-1 mb-1">
+            <p className="font-bold text-center border-b border-black mb-1 py-0.5">RESUMO DO PEDIDO</p>
             {selectedOrder?.items.map((item, idx) => (
-              <div key={idx} className="mb-2">
+              <div key={idx} className="mb-1">
                 <div className="flex justify-between font-bold">
                   <span>{item.quantity}x {item.name}</span>
                   <span>R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
                 </div>
-                {item.variant && <p className="text-[10px] ml-2">• {item.variant}</p>}
+                {item.variant && <p className="text-[9px] ml-1 opacity-70">• {item.variant}</p>}
                 {item.addons?.map(a => (
-                  <p key={a.name} className="text-[10px] ml-2 text-gray-700">+ {a.name}</p>
+                  <p key={a.name} className="text-[9px] ml-1 opacity-70">+ {a.name}</p>
                 ))}
               </div>
             ))}
           </div>
 
-          <div className="space-y-1 border-b border-dashed border-black pb-2 mb-2 print-section">
-            <div className="flex justify-between text-sm">
+          <div className="space-y-0.5 border-b border-dashed border-black pb-1 mb-1">
+            <div className="flex justify-between text-[9px]">
               <span>Subtotal:</span>
               <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
             </div>
-            <div className="flex justify-between text-base font-black">
+            <div className="flex justify-between text-sm font-black">
               <span>TOTAL:</span>
               <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
             </div>
           </div>
 
-          <div className="mb-4 print-section">
+          <div className="mb-2">
             <p><strong>PAGAMENTO:</strong> {selectedOrder?.payment_method}</p>
             {selectedOrder?.observation && (
-              <div className="mt-2 p-1 border border-black border-dotted">
-                <p className="text-[10px]"><strong>OBS:</strong> {selectedOrder.observation}</p>
+              <div className="mt-1 p-1 border border-black border-dotted">
+                <p className="text-[9px]"><strong>OBS:</strong> {selectedOrder.observation}</p>
               </div>
             )}
           </div>
