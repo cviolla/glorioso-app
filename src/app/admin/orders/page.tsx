@@ -428,27 +428,27 @@ export default function AdminOrdersPage() {
                   layoutId={order.id}
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`group p-5 rounded-3xl border-2 transition-all cursor-pointer hover:shadow-lg ${selectedOrder?.id === order.id ? 'bg-white border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10' : 'bg-white border-white hover:border-gray-100 shadow-sm'}`}
+                  className={`group p-6 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl ${selectedOrder?.id === order.id ? 'bg-white border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10' : 'bg-white border-white hover:border-gray-100 shadow-sm'}`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex gap-4">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 border ${statusConfig[order.status].color}`}>
-                        <StatusIcon className="w-7 h-7" />
+                  <div className="flex items-center justify-between gap-6">
+                    <div className="flex items-center gap-5">
+                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 border-2 shadow-inner ${statusConfig[order.status].color}`}>
+                        <StatusIcon className="w-8 h-8" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-black text-[var(--color-brand-dark)] text-lg tracking-tight">{order.customer_name}</span>
-                          <span className="text-[10px] bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-black tracking-widest">#{order.id.slice(-4).toUpperCase()}</span>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-3">
+                          <span className="font-black text-[var(--color-brand-dark)] text-xl tracking-tight leading-none">{order.customer_name}</span>
+                          <span className="text-[10px] bg-gray-50 text-gray-400 px-3 py-1 rounded-full font-black tracking-widest border border-gray-100">#{order.id.slice(-4).toUpperCase()}</span>
                         </div>
-                        <div className="flex items-center gap-4 text-xs text-gray-400 font-bold">
-                          <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> {formatDate(order.created_at)}</span>
-                          <span className="flex items-center gap-1.5"><ShoppingBag className="w-3.5 h-3.5" /> {order.items.length} itens</span>
+                        <div className="flex items-center gap-5 text-[11px] text-gray-400 font-black uppercase tracking-wider">
+                          <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-[var(--color-brand-accent)]/50" /> {formatDate(order.created_at)}</span>
+                          <span className="flex items-center gap-2"><ShoppingBag className="w-4 h-4 text-[var(--color-brand-accent)]/50" /> {order.items.length} {order.items.length === 1 ? 'item' : 'itens'}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-black text-[var(--color-brand-dark)] text-xl tracking-tight mb-1">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                      <span className={`text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-[0.1em] ${statusConfig[order.status].color} border shadow-sm`}>
+                    <div className="text-right flex flex-col items-end gap-2">
+                      <p className="font-black text-[var(--color-brand-dark)] text-2xl tracking-tighter">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                      <span className={`text-[9px] font-black px-4 py-2 rounded-2xl uppercase tracking-[0.15em] ${statusConfig[order.status].color} border shadow-sm`}>
                         {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
                       </span>
                     </div>
