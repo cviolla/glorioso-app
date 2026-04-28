@@ -123,14 +123,27 @@ export default function AdminSettingsPage() {
               </div>
 
               <button 
-                onClick={() => setManualOpen(!isManualOpen)}
-                className={`w-full py-6 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${
+                onClick={async () => {
+                  if (isSaving) return;
+                  setIsSaving(true);
+                  try {
+                    await setManualOpen(!isManualOpen);
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                disabled={isSaving}
+                className={`w-full py-6 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3 ${
                   isManualOpen 
                     ? 'bg-rose-500 text-white shadow-rose-500/20 hover:bg-rose-600' 
                     : 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-600'
-                }`}
+                } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                {isManualOpen ? 'Fechar Loja Agora' : 'Abrir Loja Agora'}
+                {isSaving ? (
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                ) : (
+                  isManualOpen ? 'Fechar Loja Agora' : 'Abrir Loja Agora'
+                )}
               </button>
 
               <p className="text-[10px] text-gray-400 font-medium max-w-[200px]">

@@ -36,9 +36,10 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
   },
 
   setManualOpen: async (isOpen) => {
-    const { isManualOpen } = get();
+    const previousState = get().isManualOpen;
+    console.log(`[Store] Mudando status para: ${isOpen ? 'ABERTO' : 'FECHADO'}`);
     
-    // Atualização otimista
+    // Atualização otimista imediata
     set({ isManualOpen: isOpen });
     
     try {
@@ -50,11 +51,13 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
       if (error) {
         console.error('Erro Supabase (Controle Manual):', error);
         // Reverter em caso de erro
-        set({ isManualOpen: isManualOpen });
+        set({ isManualOpen: previousState });
+      } else {
+        console.log('[Store] Status atualizado com sucesso no Supabase');
       }
     } catch (err) {
       console.error('Erro catastrófico (Controle Manual):', err);
-      set({ isManualOpen: isManualOpen });
+      set({ isManualOpen: previousState });
     }
   },
 
