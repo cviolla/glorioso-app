@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, Settings, LogOut, Instagram } from 'lucide-react';
+import { Package, LayoutDashboard, Settings, LogOut } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter, usePathname } from 'next/navigation';
 import { NotificationListener } from './NotificationListener';
