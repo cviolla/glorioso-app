@@ -128,6 +128,13 @@ export default function AdminSettingsPage() {
                   setIsSaving(true);
                   try {
                     await setManualOpen(!isManualOpen);
+                  } catch (err: any) {
+                    setModalConfig({
+                      isOpen: true,
+                      title: "Erro de Permissão",
+                      message: `Não foi possível atualizar o status no banco de dados. Verifique se você rodou o SQL de permissão de UPDATE no Supabase.\n\nErro: ${err.message || 'Desconhecido'}`,
+                      type: "danger"
+                    });
                   } finally {
                     setIsSaving(false);
                   }
