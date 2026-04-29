@@ -6,7 +6,6 @@ interface StoreStatusState {
   isLoading: boolean;
   setManualOpen: (isOpen: boolean) => Promise<void>;
   fetchStatus: () => Promise<void>;
-  getIsOpen: () => boolean;
 }
 
 export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
