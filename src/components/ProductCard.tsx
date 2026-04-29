@@ -14,8 +14,8 @@ export function ProductCard({ item }: { item: MenuItem }) {
   const updateQuantity = useCartStore(state => state.updateQuantity);
   const removeItem = useCartStore(state => state.removeItem);
   
-  const { getIsOpen } = useStoreStatusStore();
-  const isOpen = getIsOpen();
+  const isManualOpen = useStoreStatusStore(state => state.isManualOpen);
+  const isOpen = isManualOpen;
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   

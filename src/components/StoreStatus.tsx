@@ -8,14 +8,14 @@ import { supabase } from "@/lib/supabase";
 
 export function StoreStatus({ className = "" }: { className?: string }) {
   const router = useRouter();
-  const { getIsOpen, fetchStatus, isManualOpen } = useStoreStatusStore();
+  const { fetchStatus, isManualOpen } = useStoreStatusStore();
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0); // Força re-render a cada minuto
 
   useEffect(() => {
     fetchStatus().then(() => {
       setLoading(false);
-      console.log("[StoreStatus] Status inicial carregado:", getIsOpen() ? "ABERTO" : "FECHADO");
+      console.log("[StoreStatus] Status inicial carregado:", isManualOpen ? "ABERTO" : "FECHADO");
     });
 
     // Subscribe to real-time changes
@@ -27,7 +27,6 @@ export function StoreStatus({ className = "" }: { className?: string }) {
           event: 'UPDATE',
           schema: 'public',
           table: 'store_config',
-          filter: 'id=eq.1',
         },
         (payload) => {
           console.log("[StoreStatus] Mudança detectada via Realtime:", payload);
@@ -52,7 +51,7 @@ export function StoreStatus({ className = "" }: { className?: string }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchStatus, router, getIsOpen]);
+  }, [fetchStatus, router, isManualOpen]);
 
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 60000);
@@ -61,7 +60,7 @@ export function StoreStatus({ className = "" }: { className?: string }) {
 
   if (loading) return null;
 
-  const isOpen = getIsOpen();
+  const isOpen = isManualOpen;
 
   return (
     <div className={`flex justify-center ${className}`}>

@@ -15,11 +15,13 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
 
   fetchStatus: async () => {
     try {
+      console.log('[StoreStatus] Buscando configuração no banco...');
+      // Busca o primeiro registro disponível, independente do ID
       const { data, error } = await supabase
         .from('store_config')
-        .select('is_manual_open')
-        .eq('id', 1)
-        .single();
+        .select('id, is_manual_open')
+        .limit(1)
+        .maybeSingle();
 
       if (error) {
         console.error('[StoreStatus] Erro ao buscar status:', error.message);
@@ -28,46 +30,45 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
       }
 
       if (data) {
+        console.log('[StoreStatus] Configuração encontrada:', data);
         set({ 
-          isManualOpen: data.is_manual_open,
+          isManualOpen: !!data.is_manual_open,
           isLoading: false 
         });
+      } else {
+        console.log('[StoreStatus] Nenhuma configuração encontrada. A loja permanecerá fechada até ser aberta no Admin.');
+        set({ isLoading: false });
       }
     } catch (err) {
-      console.error('Erro catastrófico ao buscar status:', err);
+      console.error('[StoreStatus] Erro catastrófico:', err);
       set({ isLoading: false });
     }
   },
 
   setManualOpen: async (isOpen) => {
     const previousState = get().isManualOpen;
-    console.log(`[Store] Tentando mudar status para: ${isOpen ? 'ABERTO' : 'FECHADO'}`);
-    
-    // Atualização otimista imediata para a UI ficar fluida
     set({ isManualOpen: isOpen });
     
     try {
-      // Usamos upsert para garantir que a linha ID=1 exista
+      // Tenta primeiro encontrar o ID existente para atualizar o registro correto
+      const { data: existing } = await supabase
+        .from('store_config')
+        .select('id')
+        .limit(1)
+        .maybeSingle();
+
+      const targetId = existing?.id || 1;
+      
       const { error } = await supabase
         .from('store_config')
-        .upsert({ id: 1, is_manual_open: isOpen });
+        .upsert({ id: targetId, is_manual_open: isOpen });
 
-      if (error) {
-        console.error('Erro Supabase (Upsert Status):', error);
-        // Reverter em caso de erro
-        set({ isManualOpen: previousState });
-        throw error;
-      } else {
-        console.log('[Store] Status persistido com sucesso no Supabase');
-      }
-    } catch (err: any) {
-      console.error('Erro catastrófico ao persistir status:', err);
+      if (error) throw error;
+      console.log(`[StoreStatus] Status ${isOpen ? 'ABERTO' : 'FECHADO'} salvo com sucesso (ID: ${targetId})`);
+    } catch (err) {
+      console.error('[StoreStatus] Erro ao salvar:', err);
       set({ isManualOpen: previousState });
       throw err;
     }
-  },
-
-  getIsOpen: () => {
-    return get().isManualOpen;
   }
 }));
