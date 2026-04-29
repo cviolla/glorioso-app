@@ -206,13 +206,14 @@ export default function AdminOrdersPage() {
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
-      const dateStr = date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit' });
+      const dateStr = date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'short', day: '2-digit' });
+      const fullDateStr = date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
       
       const dayTotal = orders
         .filter(order => {
           if (order.status !== 'delivered') return false;
-          const orderDate = new Date(order.created_at);
-          return orderDate.toDateString() === date.toDateString();
+          const orderDateStr = new Date(order.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+          return orderDateStr === fullDateStr;
         })
         .reduce((sum, order) => sum + order.total_price, 0);
         
@@ -230,9 +231,9 @@ export default function AdminOrdersPage() {
   };
 
   const getCashClosingData = () => {
-    const today = new Date().toDateString();
+    const today = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     const todayOrders = orders.filter(o => 
-      new Date(o.created_at).toDateString() === today && 
+      new Date(o.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) === today && 
       o.status === 'delivered'
     );
 
@@ -267,6 +268,7 @@ export default function AdminOrdersPage() {
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
       day: '2-digit',
       month: '2-digit',
       hour: '2-digit',
@@ -574,7 +576,7 @@ export default function AdminOrdersPage() {
                   {selectedOrder.observation && (
                     <div className="p-5 bg-[var(--color-brand-light)] border-2 border-[var(--color-brand-accent)]/10 rounded-2xl">
                       <p className="text-[10px] font-black text-[var(--color-brand-dark)] mb-2 uppercase tracking-widest">Observação:</p>
-                      <p className="text-sm text-[var(--color-brand-dark)]/80 font-medium italic">"{selectedOrder.observation}"</p>
+                      <p className="text-sm text-[var(--color-brand-dark)]/80 font-medium italic">&quot;{selectedOrder.observation}&quot;</p>
                     </div>
                   )}
                 </div>
@@ -674,103 +676,117 @@ export default function AdminOrdersPage() {
         )}
       </AnimatePresence>
 
-      {/* Printable Receipt Component - Otimizado para Impressoras Térmicas */}
-      <div id="print-receipt" className="hidden print:block font-mono text-black p-0 w-full text-[10px] leading-tight bg-white">
-        <div className="max-w-[72mm] mx-auto p-0 flex flex-col">
-          <div className="text-center border-b border-dashed border-black pb-2 mb-2">
-            <h1 className="text-base font-black uppercase">GLORIOSO BROWNIE</h1>
-            <p className="text-[9px]">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
-            <p className="text-[9px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
+      {/* Printable Receipt Component - Otimizado para Impressoras Térmicas (58mm/80mm) */}
+      <div id="print-receipt" className="hidden print:block font-mono text-black p-0 w-[58mm] text-[10px] leading-tight bg-white overflow-hidden">
+        <div className="w-full mx-auto p-0 flex flex-col">
+          <div className="text-center pb-2">
+            <h1 className="text-sm font-black uppercase">GLORIOSO BROWNIE</h1>
+            <p className="text-[8px]">--------------------------------</p>
+            <p className="text-[9px] font-bold">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
+            <p className="text-[8px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
+            <p className="text-[8px]">--------------------------------</p>
           </div>
 
-          <div className="mb-2 space-y-0.5">
+          <div className="mb-2">
             <p><strong>CLIENTE:</strong> {selectedOrder?.customer_name}</p>
             <p><strong>TEL:</strong> {selectedOrder?.customer_phone}</p>
-            <div className="border-y border-dashed border-black/20 py-0.5 my-1 text-[9px]">
-              <p><strong>TIPO:</strong> {selectedOrder?.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
-              <p><strong>PREVISÃO:</strong> {selectedOrder?.order_time}</p>
-            </div>
+            <p className="text-[8px]">--------------------------------</p>
+            <p><strong>TIPO:</strong> {selectedOrder?.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
+            <p><strong>PREVISÃO:</strong> {selectedOrder?.order_time}</p>
             {selectedOrder?.delivery_type === 'delivery' && (
-              <div className="text-[9px]">
+              <>
                 <p><strong>END:</strong> {selectedOrder.address_street}, {selectedOrder.address_number}</p>
                 <p><strong>BAIRRO:</strong> {selectedOrder.address_neighborhood}</p>
                 {selectedOrder.address_complement && <p><strong>COMPL:</strong> {selectedOrder.address_complement}</p>}
                 {selectedOrder.address_reference && <p><strong>REF:</strong> {selectedOrder.address_reference}</p>}
-              </div>
+              </>
             )}
-          </div>
-
-          <div className="border-b border-dashed border-black pb-1 mb-1">
-            <p className="font-bold text-center border-b border-black mb-1 py-0.5">RESUMO DO PEDIDO</p>
-            {selectedOrder?.items.map((item, idx) => (
-              <div key={idx} className="mb-1">
-                <div className="flex justify-between font-bold">
-                  <span>{item.quantity}x {item.name}</span>
-                  <span>R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
-                </div>
-                {item.variant && <p className="text-[9px] ml-1 opacity-70">• {item.variant}</p>}
-                {item.addons?.map(a => (
-                  <p key={a.name} className="text-[9px] ml-1 opacity-70">+ {a.name}</p>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <div className="space-y-0.5 border-b border-dashed border-black pb-1 mb-1">
-            <div className="flex justify-between text-[9px]">
-              <span>Subtotal:</span>
-              <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
-            </div>
-            <div className="flex justify-between text-sm font-black">
-              <span>TOTAL:</span>
-              <span>R$ {(selectedOrder?.total_price || 0).toFixed(2).replace('.', ',')}</span>
-            </div>
+            <p className="text-[8px]">--------------------------------</p>
           </div>
 
           <div className="mb-2">
+            <p className="font-bold text-center mb-1">RESUMO DO PEDIDO</p>
+            {selectedOrder?.items.map((item, idx) => (
+              <div key={idx} className="mb-2">
+                <div className="flex justify-between gap-2">
+                  <span className="font-bold">{item.quantity}x {item.name.substring(0, 18)}</span>
+                  <span className="font-bold shrink-0">R${(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+                {item.variant && <p className="text-[8px] ml-2 opacity-70">• {item.variant}</p>}
+                {item.addons?.map(a => (
+                  <p key={a.name} className="text-[8px] ml-2 opacity-70">+ {a.name}</p>
+                ))}
+              </div>
+            ))}
+            <p className="text-[8px]">--------------------------------</p>
+          </div>
+
+          <div className="mb-2">
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>R${(selectedOrder?.total_price || 0).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm font-black mt-1">
+              <span>TOTAL:</span>
+              <span>R${(selectedOrder?.total_price || 0).toFixed(2)}</span>
+            </div>
+            <p className="text-[8px] mt-1">--------------------------------</p>
+          </div>
+
+          <div className="mb-4">
             <p><strong>PAGAMENTO:</strong> {selectedOrder?.payment_method}</p>
             {selectedOrder?.observation && (
-              <div className="mt-1 p-1 border border-black border-dotted">
-                <p className="text-[9px]"><strong>OBS:</strong> {selectedOrder.observation}</p>
+              <div className="mt-1 whitespace-pre-wrap">
+                <p className="text-[8px]"><strong>OBS:</strong> {selectedOrder.observation}</p>
               </div>
             )}
+          </div>
+          
+          <div className="text-center mt-2 pb-8">
+            <p className="text-[8px] uppercase tracking-widest">Obrigado pela preferência!</p>
+            <p className="text-[7px] mt-1">gloriosobrownie.com.br</p>
+            <p className="text-[8px] mt-2">. . . . . . . . . . . . . . . .</p>
           </div>
         </div>
       </div>
 
       {/* Printable Cash Report */}
-      <div id="print-cash-report" className="hidden printing-cash-report:block font-mono text-black p-0 w-full text-sm bg-white">
-        <div className="max-w-[72mm] mx-auto">
-          <div className="text-center border-b-2 border-double border-black pb-4 mb-4">
-            <h1 className="text-xl font-black uppercase">GLORIOSO BROWNIE</h1>
-            <h2 className="text-lg font-bold">FECHAMENTO DE CAIXA</h2>
-            <p>{new Date().toLocaleString('pt-BR')}</p>
+      <div id="print-cash-report" className="hidden printing-cash-report:block font-mono text-black p-0 w-[58mm] text-[10px] bg-white overflow-hidden">
+        <div className="w-full mx-auto p-0">
+          <div className="text-center pb-2">
+            <h1 className="text-sm font-black uppercase">GLORIOSO BROWNIE</h1>
+            <p className="text-[8px]">--------------------------------</p>
+            <h2 className="text-[10px] font-bold uppercase">FECHAMENTO DE CAIXA</h2>
+            <p className="text-[8px]">{new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
+            <p className="text-[8px]">--------------------------------</p>
           </div>
 
-          <div className="space-y-2 mb-6">
-            <p className="font-bold border-b border-black">RESUMO POR PAGAMENTO</p>
+          <div className="mb-4">
+            <p className="font-bold text-center mb-2">RESUMO POR PAGAMENTO</p>
             {Object.entries(getCashClosingData().totals).map(([method, value]) => (
-              <div key={method} className="flex justify-between">
+              <div key={method} className="flex justify-between py-0.5">
                 <span>{method}:</span>
-                <span>R$ {value.toFixed(2).replace('.', ',')}</span>
+                <span className="font-bold">R${value.toFixed(2)}</span>
               </div>
             ))}
+            <p className="text-[8px] mt-1">--------------------------------</p>
           </div>
 
-          <div className="border-t-2 border-black pt-2 space-y-1">
+          <div className="space-y-1">
             <div className="flex justify-between">
               <span>Qtd Pedidos:</span>
               <span>{getCashClosingData().count}</span>
             </div>
-            <div className="flex justify-between text-lg font-black">
+            <div className="flex justify-between text-sm font-black mt-1">
               <span>TOTAL BRUTO:</span>
-              <span>R$ {getCashClosingData().total.toFixed(2).replace('.', ',')}</span>
+              <span>R${getCashClosingData().total.toFixed(2)}</span>
             </div>
           </div>
 
-          <div className="mt-10 pt-4 border-t border-dashed border-black text-center">
-            <div className="w-full h-px bg-black mb-1"></div>
-            <p className="text-[10px]">Assinatura do Responsável</p>
+          <div className="mt-10 pt-4 text-center pb-8">
+            <p className="text-[8px]">________________________________</p>
+            <p className="text-[7px] mt-1">Assinatura do Responsável</p>
+            <p className="text-[8px] mt-4">********************************</p>
           </div>
         </div>
       </div>
@@ -779,38 +795,49 @@ export default function AdminOrdersPage() {
         @media print {
           @page {
             margin: 0;
-            size: auto;
+            size: 58mm auto;
           }
           html, body {
             margin: 0 !important;
             padding: 0 !important;
+            width: 58mm !important;
             height: auto !important;
             background: white !important;
+            font-family: 'Courier New', Courier, monospace !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
           /* Esconde tudo */
-          body {
+          body * {
             visibility: hidden;
+            height: 0;
+            margin: 0;
+            padding: 0;
           }
           /* Mostra apenas o ticket ou o relatório de caixa */
-          #print-receipt, #print-cash-report {
+          #print-receipt, #print-cash-report, 
+          #print-receipt *, #print-cash-report * {
             visibility: visible !important;
+            height: auto !important;
+          }
+          #print-receipt, #print-cash-report {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
-            width: 100% !important;
+            width: 58mm !important;
             display: block !important;
             background: white !important;
-          }
-          #print-receipt *, #print-cash-report * {
-            visibility: visible !important;
+            margin: 0 !important;
+            padding: 2mm !important;
+            box-sizing: border-box !important;
           }
           .print\:hidden {
             display: none !important;
           }
-          /* Evita quebras no meio de blocos importantes */
-          .print-section {
-            page-break-inside: avoid;
-            break-inside: avoid;
+          /* Estabilização de texto para impressoras térmicas */
+          .font-mono {
+            font-family: 'Courier New', Courier, monospace !important;
+            letter-spacing: -0.5px;
           }
         }
       `}</style>

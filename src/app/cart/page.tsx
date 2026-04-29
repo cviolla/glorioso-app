@@ -193,6 +193,7 @@ export default function CartPage() {
       const orderId = savedOrder.id.slice(-6).toUpperCase();
       const now = new Date();
       const formattedDateTime = now.toLocaleString('pt-BR', { 
+        timeZone: 'America/Sao_Paulo',
         day: '2-digit', month: '2-digit', year: 'numeric', 
         hour: '2-digit', minute: '2-digit' 
       }).replace(',', '');
