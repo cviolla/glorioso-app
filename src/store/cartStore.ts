@@ -14,6 +14,7 @@ export type CartItem = {
   quantity: number;
   variant?: string;
   addons?: CartAddon[];
+  imageUrl?: string;
 };
 
 interface CartState {

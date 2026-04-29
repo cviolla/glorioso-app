@@ -83,6 +83,8 @@ export default function AdminOrdersPage() {
     type: "info"
   });
   const [isCashModalOpen, setIsCashModalOpen] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [showRefreshSuccess, setShowRefreshSuccess] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -94,6 +96,9 @@ export default function AdminOrdersPage() {
       
       if (error) throw error;
       setOrders(data || []);
+      setLastUpdated(new Date());
+      setShowRefreshSuccess(true);
+      setTimeout(() => setShowRefreshSuccess(false), 2000);
     } catch (err) {
       console.error("Erro ao buscar pedidos:", err);
     } finally {
@@ -287,18 +292,38 @@ export default function AdminOrdersPage() {
           <h1 className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Gestão de Pedidos</h1>
           <p className="text-gray-500 text-sm">Acompanhe e gerencie as solicitações em tempo real.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sincronização</span>
+            <span className="text-[10px] text-gray-400 font-medium">
+              Última: {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          </div>
+          <button 
+            onClick={fetchOrders}
+            disabled={loading}
+            title="Atualizar Pedidos"
+            className={`relative group p-3 rounded-2xl transition-all duration-300 shadow-sm border-2 ${
+              showRefreshSuccess 
+                ? 'bg-green-50 border-green-200 text-green-500' 
+                : 'bg-white border-gray-100 text-gray-400 hover:text-[var(--color-brand-accent)] hover:border-[var(--color-brand-accent)]/20 hover:shadow-lg hover:shadow-[var(--color-brand-accent)]/10'
+            }`}
+          >
+            {showRefreshSuccess ? (
+              <CheckCircle2 className="w-5 h-5" />
+            ) : (
+              <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
+            )}
+            
+            {loading && (
+              <div className="absolute inset-0 rounded-2xl border-2 border-[var(--color-brand-accent)] border-t-transparent animate-spin" />
+            )}
+          </button>
           <button 
             onClick={() => setIsCashModalOpen(true)}
             className="flex items-center gap-2 bg-[var(--color-brand-accent)] text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-brand-accent)]/20"
           >
             <Receipt className="w-5 h-5" /> Fechar Caixa
-          </button>
-          <button 
-            onClick={fetchOrders}
-            className="bg-white border-2 border-gray-100 p-3 rounded-2xl hover:bg-gray-50 transition-colors shadow-sm text-gray-400 hover:text-[var(--color-brand-accent)]"
-          >
-            <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
@@ -804,50 +829,42 @@ export default function AdminOrdersPage() {
             margin: 0 !important;
             padding: 0 !important;
             width: 58mm !important;
-            height: auto !important;
             background: white !important;
             font-family: 'Courier New', Courier, monospace !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
           }
-          /* Esconde tudo */
+
+          /* Esconde absolutamente tudo por padrão na impressão */
           body * {
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-            padding: 0;
+            display: none !important;
           }
-          /* Mostra apenas o conteúdo relevante baseado na classe do body */
+
+          /* Mostra apenas o bloco de impressão específico baseado na classe do body */
           body.printing-order #print-receipt,
           body.printing-order #print-receipt *,
           body.printing-cash-report #print-cash-report,
           body.printing-cash-report #print-cash-report * {
-            visibility: visible !important;
-            height: auto !important;
+            display: block !important;
           }
 
+          /* Ajustes de layout para o bloco visível */
           body.printing-order #print-receipt,
           body.printing-cash-report #print-cash-report {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 58mm !important;
-            display: block !important;
-            background: white !important;
-            margin: 0 !important;
+            height: auto !important;
             padding: 2mm !important;
             box-sizing: border-box !important;
+            background: white !important;
           }
 
-          /* Esconde o que não deve ser impresso */
-          body:not(.printing-order) #print-receipt,
-          body:not(.printing-cash-report) #print-cash-report {
-            display: none !important;
-            visibility: hidden !important;
+          /* Garante que textos e fontes fiquem pretos e nítidos */
+          #print-receipt *, #print-cash-report * {
+            color: black !important;
+            background: transparent !important;
           }
-          .print\:hidden {
-            display: none !important;
-          }
+          
           /* Estabilização de texto para impressoras térmicas */
           .font-mono {
             font-family: 'Courier New', Courier, monospace !important;

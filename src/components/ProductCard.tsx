@@ -48,7 +48,8 @@ export function ProductCard({ item }: { item: MenuItem }) {
       id: item.id,
       name: item.name,
       price: price,
-      variant: variant
+      variant: variant,
+      imageUrl: item.imageUrl
     });
   };
 
@@ -145,7 +146,8 @@ export function ProductCard({ item }: { item: MenuItem }) {
         name: item.name,
         price: basePrice,
         variant: selectedVariant || undefined,
-        addons: addonsToAdd
+        addons: addonsToAdd,
+        imageUrl: item.imageUrl
       });
     }
     setIsModalOpen(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useSettingsStore } from "@/store/settingsStore";
 import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, Motorbike, Store, User, Phone, Loader2 } from "lucide-react";
@@ -15,6 +16,7 @@ type CheckoutStep = 'cart' | 'address' | 'summary';
 type DeliveryType = 'delivery' | 'pickup' | null;
 
 export default function CartPage() {
+  const router = useRouter();
   const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCartStore();
   const { whatsappNumber, deliveryFees, paymentMethods, fetchSettings } = useSettingsStore();
   const [isHydrated, setIsHydrated] = useState(false);
@@ -247,7 +249,12 @@ export default function CartPage() {
       const cleanNumber = whatsappNumber.replace(/\D/g, '');
       const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
-      clearCart();
+      
+      // Automatização: Limpar e voltar para o menu após um pequeno delay
+      setTimeout(() => {
+        clearCart();
+        router.push('/menu');
+      }, 500);
       
     } catch (err: any) {
       console.error("Erro ao salvar pedido:", err);
@@ -310,11 +317,19 @@ export default function CartPage() {
             {step === 'cart' ? 'Sacola' : step === 'address' ? 'Endereço de entrega' : 'Resumo e Pagamento'}
           </span>
         </div>
-        {step === 'cart' && (
+        {step === 'cart' ? (
           <div className="text-right flex flex-col">
             <span className="text-xs opacity-60">Subtotal</span>
             <span className="font-bold">R$ {totalPrice().toFixed(2).replace('.', ',')}</span>
           </div>
+        ) : (
+          <button 
+            onClick={() => router.push('/menu')}
+            className="p-2 hover:bg-[#532120]/10 rounded-full transition-colors text-[#532120]/60 hover:text-[#532120]"
+            title="Fechar e voltar ao cardápio"
+          >
+            <X className="w-6 h-6" />
+          </button>
         )}
       </header>
 
@@ -336,8 +351,13 @@ export default function CartPage() {
                     const itemTotal = item.price + (item.addons?.reduce((sum, a) => sum + a.price, 0) || 0);
                     return (
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
-                        <div className="w-16 h-16 shrink-0 overflow-hidden relative">
-                           <Image src="/glorioso brownie.png" alt="Logo" fill className="object-contain opacity-50" />
+                        <div className="w-16 h-16 shrink-0 overflow-hidden relative rounded-xl border border-white/10">
+                           <Image 
+                             src={item.imageUrl || "/glorioso brownie.png"} 
+                             alt={item.name} 
+                             fill 
+                             className="object-cover" 
+                           />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-[15px] leading-tight mb-1">{item.name}</h3>
@@ -418,7 +438,7 @@ export default function CartPage() {
                     <div>
                       <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
                       <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
-                        {Object.keys(deliveryFees).sort().map(neighborhood => (
+                        {Object.keys(deliveryFees).filter(n => n !== 'Outros').sort().map(neighborhood => (
                           <option key={neighborhood}>{neighborhood}</option>
                         ))}
                       </select>
