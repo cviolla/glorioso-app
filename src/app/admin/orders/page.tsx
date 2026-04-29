@@ -224,9 +224,12 @@ export default function AdminOrdersPage() {
 
   const handlePrint = () => {
     if (!selectedOrder) return;
+    // Adiciona uma classe temporária para imprimir apenas o recibo
+    document.body.classList.add('printing-order');
     // Pequeno delay para garantir que o navegador processe o estado antes de abrir o diálogo de impressão no mobile
     setTimeout(() => {
       window.print();
+      document.body.classList.remove('printing-order');
     }, 250);
   };
 
@@ -814,13 +817,17 @@ export default function AdminOrdersPage() {
             margin: 0;
             padding: 0;
           }
-          /* Mostra apenas o ticket ou o relatório de caixa */
-          #print-receipt, #print-cash-report, 
-          #print-receipt *, #print-cash-report * {
+          /* Mostra apenas o conteúdo relevante baseado na classe do body */
+          body.printing-order #print-receipt,
+          body.printing-order #print-receipt *,
+          body.printing-cash-report #print-cash-report,
+          body.printing-cash-report #print-cash-report * {
             visibility: visible !important;
             height: auto !important;
           }
-          #print-receipt, #print-cash-report {
+
+          body.printing-order #print-receipt,
+          body.printing-cash-report #print-cash-report {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
@@ -830,6 +837,13 @@ export default function AdminOrdersPage() {
             margin: 0 !important;
             padding: 2mm !important;
             box-sizing: border-box !important;
+          }
+
+          /* Esconde o que não deve ser impresso */
+          body:not(.printing-order) #print-receipt,
+          body:not(.printing-cash-report) #print-cash-report {
+            display: none !important;
+            visibility: hidden !important;
           }
           .print\:hidden {
             display: none !important;
