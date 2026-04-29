@@ -21,16 +21,20 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
         .eq('id', 1)
         .single();
 
-      if (data && !error) {
+      if (error) {
+        console.error('[StoreStatus] Erro ao buscar status:', error.message);
+        set({ isLoading: false });
+        return;
+      }
+
+      if (data) {
         set({ 
           isManualOpen: data.is_manual_open,
           isLoading: false 
         });
-      } else {
-        set({ isLoading: false });
       }
     } catch (err) {
-      console.error('Erro ao buscar status da loja:', err);
+      console.error('Erro catastrófico ao buscar status:', err);
       set({ isLoading: false });
     }
   },
@@ -43,22 +47,21 @@ export const useStoreStatusStore = create<StoreStatusState>((set, get) => ({
     set({ isManualOpen: isOpen });
     
     try {
-      // Usamos update em vez de upsert para ser mais específico
+      // Usamos upsert para garantir que a linha ID=1 exista
       const { error } = await supabase
         .from('store_config')
-        .update({ is_manual_open: isOpen })
-        .eq('id', 1);
+        .upsert({ id: 1, is_manual_open: isOpen });
 
       if (error) {
-        console.error('Erro Supabase (Controle Manual):', error);
+        console.error('Erro Supabase (Upsert Status):', error);
         // Reverter em caso de erro
         set({ isManualOpen: previousState });
-        throw error; // Repassa o erro para o componente tratar
+        throw error;
       } else {
-        console.log('[Store] Status atualizado com sucesso no Supabase');
+        console.log('[Store] Status persistido com sucesso no Supabase');
       }
     } catch (err: any) {
-      console.error('Erro catastrófico (Controle Manual):', err);
+      console.error('Erro catastrófico ao persistir status:', err);
       set({ isManualOpen: previousState });
       throw err;
     }

@@ -13,7 +13,10 @@ export function StoreStatus({ className = "" }: { className?: string }) {
   const [tick, setTick] = useState(0); // Força re-render a cada minuto
 
   useEffect(() => {
-    fetchStatus().then(() => setLoading(false));
+    fetchStatus().then(() => {
+      setLoading(false);
+      console.log("[StoreStatus] Status inicial carregado:", getIsOpen() ? "ABERTO" : "FECHADO");
+    });
 
     // Subscribe to real-time changes
     const channel = supabase
@@ -27,24 +30,29 @@ export function StoreStatus({ className = "" }: { className?: string }) {
           filter: 'id=eq.1',
         },
         (payload) => {
+          console.log("[StoreStatus] Mudança detectada via Realtime:", payload);
           // Atualiza o store global com os novos dados do payload diretamente
           const { is_manual_open } = payload.new;
           
-          // Acessamos o store diretamente para atualizar o estado sem re-fetch
-          useStoreStatusStore.setState({ 
-            isManualOpen: is_manual_open 
-          });
+          if (is_manual_open !== undefined) {
+            // Acessamos o store diretamente para atualizar o estado sem re-fetch
+            useStoreStatusStore.setState({ 
+              isManualOpen: is_manual_open 
+            });
 
-          router.refresh();
-          setTick(t => t + 1);
+            router.refresh();
+            setTick(t => t + 1);
+          }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log("[StoreStatus] Status da inscrição Realtime:", status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchStatus, router]);
+  }, [fetchStatus, router, getIsOpen]);
 
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 60000);
