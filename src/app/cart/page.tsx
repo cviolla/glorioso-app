@@ -139,8 +139,8 @@ export default function CartPage() {
     if (items.length === 0 || isSubmitting) return;
 
     // Segurança: Verificar se a loja está aberta antes de processar
-    const { getIsOpen } = useStoreStatusStore.getState();
-    if (!getIsOpen()) {
+    const { isManualOpen } = useStoreStatusStore.getState();
+    if (!isManualOpen) {
       setModalConfig({
         isOpen: true,
         title: "Loja Fechada",
