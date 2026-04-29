@@ -48,12 +48,17 @@ export default function AdminSettingsPage() {
     type: "success"
   });
 
-  // Sincroniza estado local quando os dados chegam do Supabase
+  // Sincroniza estado local apenas na primeira vez que os dados chegam do Supabase
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (whatsappNumber) setLocalWhatsapp(whatsappNumber);
-    if (deliveryFees && Object.keys(deliveryFees).length > 0) setLocalFees(deliveryFees);
-    if (paymentMethods) setLocalMethods(paymentMethods);
-  }, [whatsappNumber, deliveryFees, paymentMethods]);
+    if (!hasInitialized && !useSettingsStore.getState().isLoading) {
+      if (whatsappNumber) setLocalWhatsapp(whatsappNumber);
+      if (deliveryFees && Object.keys(deliveryFees).length > 0) setLocalFees(deliveryFees);
+      if (paymentMethods) setLocalMethods(paymentMethods);
+      setHasInitialized(true);
+    }
+  }, [whatsappNumber, deliveryFees, paymentMethods, hasInitialized]);
 
   const toggleMethod = (method: string) => {
     setLocalMethods(prev => 
