@@ -41,9 +41,14 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         feesObj[f.neighborhood] = Number(f.fee);
       });
 
+      let methods = generalData?.payment_methods || get().paymentMethods;
+      if (Array.isArray(methods) && !methods.includes('Voucher')) {
+        methods = [...methods, 'Voucher'];
+      }
+
       set({
         whatsappNumber: generalData?.whatsapp_number || get().whatsappNumber,
-        paymentMethods: generalData?.payment_methods || get().paymentMethods,
+        paymentMethods: methods,
         deliveryFees: feesObj,
         isLoading: false
       });
