@@ -290,6 +290,13 @@ export default function AdminHistoryPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); window.open(`/admin/orders/${order.id}/print`, '_blank'); }}
+                            className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors p-1.5 hover:bg-[var(--color-brand-accent)]/10 rounded-lg opacity-0 group-hover:opacity-100"
+                            title="Imprimir pedido"
+                          >
+                            <Printer className="w-4 h-4" />
+                          </button>
                           <p className="font-black text-[var(--color-brand-dark)]">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
                           <ChevronRight className={`w-4 h-4 transition-all ${
                             selectedOrder?.id === order.id ? 'text-[var(--color-brand-accent)]' : 'text-gray-300 group-hover:text-gray-400'
