@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { Package, LayoutDashboard, Settings, LogOut, History } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter, usePathname } from 'next/navigation';
 import { NotificationListener } from './NotificationListener';
@@ -69,6 +69,17 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
             Pedidos
           </Link>
           <Link 
+            href="/admin/history" 
+            className={`flex items-center gap-3 px-4 py-4 font-black text-xs uppercase tracking-widest rounded-2xl transition-all ${
+              pathname === '/admin/history' 
+                ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' 
+                : 'text-gray-400 hover:bg-gray-50 hover:text-[var(--color-brand-dark)]'
+            }`}
+          >
+            <History className="w-5 h-5" />
+            Histórico
+          </Link>
+          <Link 
             href="/admin/settings" 
             className={`flex items-center gap-3 px-4 py-4 font-black text-xs uppercase tracking-widest rounded-2xl transition-all ${
               pathname === '/admin/settings' 
@@ -107,6 +118,10 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
         <Link href="/admin/orders" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/admin/orders' ? 'text-[var(--color-brand-accent)]' : 'text-gray-400'}`}>
           <LayoutDashboard className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase tracking-tight">Pedidos</span>
+        </Link>
+        <Link href="/admin/history" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/admin/history' ? 'text-[var(--color-brand-accent)]' : 'text-gray-400'}`}>
+          <History className="w-6 h-6" />
+          <span className="text-[10px] font-black uppercase tracking-tight">Histórico</span>
         </Link>
         <Link href="/admin/settings" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/admin/settings' ? 'text-[var(--color-brand-accent)]' : 'text-gray-400'}`}>
           <Settings className="w-6 h-6" />

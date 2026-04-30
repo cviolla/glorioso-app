@@ -301,8 +301,8 @@ export default function CartPage() {
   };
 
   return (
-    <div className={`min-h-screen font-sans pb-6 ${step === 'cart' ? 'bg-[#1a0808] text-[#f8ece3]' : 'bg-[#f8ece3] text-[#381010]'}`}>
-      <header className={`p-5 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${step === 'cart' ? 'border-white/5 bg-[#1a0808]/95' : 'border-[#532120]/10 bg-[#f8ece3]/95'}`}>
+    <div className={`min-h-screen font-sans pb-6 ${step === 'cart' ? 'bg-[#1a0808] text-[#f8ece3]' : 'bg-[#fff5e9] text-[#381010]'}`}>
+      <header className={`p-5 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${step === 'cart' ? 'border-white/5 bg-[#1a0808]/95' : 'border-[#532120]/10 bg-[#fff5e9]/95'}`}>
         <div className="flex items-center gap-3">
           {step === 'cart' ? (
             <Link href="/" className="hover:bg-white/10 p-2 -ml-2 rounded-full transition-colors">
@@ -353,7 +353,7 @@ export default function CartPage() {
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-16 h-16 shrink-0 overflow-hidden relative rounded-xl border border-white/10">
                            <Image 
-                             src={item.imageUrl || "/glorioso brownie.png"} 
+                             src={item.imageUrl || "/logo glorioso brownie 3.png"} 
                              alt={item.name} 
                              fill 
                              className="object-cover" 
@@ -523,7 +523,7 @@ export default function CartPage() {
       </main>
 
       {!isCartEmpty && (
-        <div className={`fixed bottom-0 inset-x-0 border-t p-4 pb-6 z-30 transition-colors duration-300 ${step === 'cart' ? 'bg-[#1a0808] border-white/10' : 'bg-[#f8ece3] border-[#532120]/10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`}>
+        <div className={`fixed bottom-0 inset-x-0 border-t p-4 pb-6 z-30 transition-colors duration-300 ${step === 'cart' ? 'bg-[#1a0808] border-white/10' : 'bg-[#fff5e9] border-[#532120]/10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]'}`}>
           <div className="max-w-3xl mx-auto">
             {step === 'cart' && (
               <>

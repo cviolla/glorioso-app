@@ -22,7 +22,8 @@ import {
   TrendingUp,
   DollarSign,
   Receipt,
-  X
+  X,
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
@@ -229,13 +230,7 @@ export default function AdminOrdersPage() {
 
   const handlePrint = () => {
     if (!selectedOrder) return;
-    // Adiciona uma classe temporária para imprimir apenas o recibo
-    document.body.classList.add('printing-order');
-    // Pequeno delay para garantir que o navegador processe o estado antes de abrir o diálogo de impressão no mobile
-    setTimeout(() => {
-      window.print();
-      document.body.classList.remove('printing-order');
-    }, 250);
+    window.open(`/admin/orders/${selectedOrder.id}/print`, '_blank');
   };
 
   const getCashClosingData = () => {
@@ -255,7 +250,7 @@ export default function AdminOrdersPage() {
       total += value;
     });
 
-    return { totals, total, count: todayOrders.length };
+    return { totals, total, count: todayOrders.length, items: todayOrders };
   };
 
   const handlePrintCashReport = () => {
@@ -290,7 +285,6 @@ export default function AdminOrdersPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Gestão de Pedidos</h1>
-          <p className="text-gray-500 text-sm">Acompanhe e gerencie as solicitações em tempo real.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col items-end">
@@ -299,26 +293,50 @@ export default function AdminOrdersPage() {
               Última: {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
-          <button 
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={fetchOrders}
             disabled={loading}
             title="Atualizar Pedidos"
-            className={`relative group p-3 rounded-2xl transition-all duration-300 shadow-sm border-2 ${
+            className={`relative p-3 rounded-2xl transition-all duration-500 shadow-sm border-2 overflow-hidden ${
               showRefreshSuccess 
-                ? 'bg-green-50 border-green-200 text-green-500' 
-                : 'bg-white border-gray-100 text-gray-400 hover:text-[var(--color-brand-accent)] hover:border-[var(--color-brand-accent)]/20 hover:shadow-lg hover:shadow-[var(--color-brand-accent)]/10'
+                ? 'bg-green-50 border-green-200 text-green-500 shadow-green-100' 
+                : 'bg-white border-gray-100 text-gray-400 hover:text-[var(--color-brand-accent)] hover:border-[var(--color-brand-accent)]/30 hover:shadow-xl hover:shadow-[var(--color-brand-accent)]/10'
             }`}
           >
-            {showRefreshSuccess ? (
-              <CheckCircle2 className="w-5 h-5" />
-            ) : (
-              <Loader2 className={`w-5 h-5 ${loading ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
-            )}
+            <AnimatePresence mode="wait">
+              {showRefreshSuccess ? (
+                <motion.div
+                  key="success"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
+                >
+                  <CheckCircle2 className="w-5 h-5" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="idle"
+                  initial={{ rotate: -180, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 180, opacity: 0 }}
+                >
+                  <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+                </motion.div>
+              )}
+            </AnimatePresence>
             
             {loading && (
-              <div className="absolute inset-0 rounded-2xl border-2 border-[var(--color-brand-accent)] border-t-transparent animate-spin" />
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-[var(--color-brand-accent)]/5 flex items-center justify-center"
+              >
+                <div className="absolute inset-0 border-2 border-[var(--color-brand-accent)] border-t-transparent rounded-2xl animate-spin" />
+              </motion.div>
             )}
-          </button>
+          </motion.button>
           <button 
             onClick={() => setIsCashModalOpen(true)}
             className="flex items-center gap-2 bg-[var(--color-brand-accent)] text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-brand-accent)]/20"
@@ -674,10 +692,23 @@ export default function AdminOrdersPage() {
                 </div>
 
                 <div className="pt-6 mt-2 border-t border-dashed border-gray-100">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-400 text-xs uppercase font-black tracking-widest">Total de Pedidos</span>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-gray-400 text-xs uppercase font-black tracking-widest">Detalhamento do Dia</span>
                     <span className="font-bold text-[#381010] bg-gray-50 px-3 py-1 rounded-full text-xs">{getCashClosingData().count} entregues</span>
                   </div>
+                  
+                  <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar mb-6 pr-1">
+                    {getCashClosingData().items.map((order) => (
+                      <div key={order.id} className="flex justify-between items-center text-xs p-2 hover:bg-gray-50 rounded-lg transition-colors border-b border-gray-50">
+                        <div className="flex flex-col">
+                          <span className="font-black text-[#381010] truncate max-w-[120px]">{order.customer_name}</span>
+                          <span className="text-[10px] text-gray-400">{new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} • {order.payment_method}</span>
+                        </div>
+                        <span className="font-bold text-[#381010]">R$ {order.total_price.toFixed(2).replace('.', ',')}</span>
+                      </div>
+                    ))}
+                  </div>
+
                   <div className="flex justify-between items-center p-4 bg-[#381010] rounded-2xl shadow-xl shadow-[#381010]/10">
                     <span className="text-white/60 font-bold">Total Bruto</span>
                     <span className="text-2xl font-black text-[#ff914a]">R$ {getCashClosingData().total.toFixed(2).replace('.', ',')}</span>
@@ -703,80 +734,6 @@ export default function AdminOrdersPage() {
           </div>
         )}
       </AnimatePresence>
-
-      {/* Printable Receipt Component - Otimizado para Impressoras Térmicas (58mm/80mm) */}
-      <div id="print-receipt" className="hidden print:block font-mono text-black p-0 w-[58mm] text-[10px] leading-tight bg-white overflow-hidden">
-        <div className="w-full mx-auto p-0 flex flex-col">
-          <div className="text-center pb-2">
-            <h1 className="text-sm font-black uppercase">GLORIOSO BROWNIE</h1>
-            <p className="text-[8px]">--------------------------------</p>
-            <p className="text-[9px] font-bold">PEDIDO: #{selectedOrder?.id.slice(-6).toUpperCase()}</p>
-            <p className="text-[8px]">{selectedOrder && formatDate(selectedOrder.created_at)}</p>
-            <p className="text-[8px]">--------------------------------</p>
-          </div>
-
-          <div className="mb-2">
-            <p><strong>CLIENTE:</strong> {selectedOrder?.customer_name}</p>
-            <p><strong>TEL:</strong> {selectedOrder?.customer_phone}</p>
-            <p className="text-[8px]">--------------------------------</p>
-            <p><strong>TIPO:</strong> {selectedOrder?.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
-            <p><strong>PREVISÃO:</strong> {selectedOrder?.order_time}</p>
-            {selectedOrder?.delivery_type === 'delivery' && (
-              <>
-                <p><strong>END:</strong> {selectedOrder.address_street}, {selectedOrder.address_number}</p>
-                <p><strong>BAIRRO:</strong> {selectedOrder.address_neighborhood}</p>
-                {selectedOrder.address_complement && <p><strong>COMPL:</strong> {selectedOrder.address_complement}</p>}
-                {selectedOrder.address_reference && <p><strong>REF:</strong> {selectedOrder.address_reference}</p>}
-              </>
-            )}
-            <p className="text-[8px]">--------------------------------</p>
-          </div>
-
-          <div className="mb-2">
-            <p className="font-bold text-center mb-1">RESUMO DO PEDIDO</p>
-            {selectedOrder?.items.map((item, idx) => (
-              <div key={idx} className="mb-2">
-                <div className="flex justify-between gap-2">
-                  <span className="font-bold">{item.quantity}x {item.name.substring(0, 18)}</span>
-                  <span className="font-bold shrink-0">R${(item.price * item.quantity).toFixed(2)}</span>
-                </div>
-                {item.variant && <p className="text-[8px] ml-2 opacity-70">• {item.variant}</p>}
-                {item.addons?.map(a => (
-                  <p key={a.name} className="text-[8px] ml-2 opacity-70">+ {a.name}</p>
-                ))}
-              </div>
-            ))}
-            <p className="text-[8px]">--------------------------------</p>
-          </div>
-
-          <div className="mb-2">
-            <div className="flex justify-between">
-              <span>Subtotal:</span>
-              <span>R${(selectedOrder?.total_price || 0).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm font-black mt-1">
-              <span>TOTAL:</span>
-              <span>R${(selectedOrder?.total_price || 0).toFixed(2)}</span>
-            </div>
-            <p className="text-[8px] mt-1">--------------------------------</p>
-          </div>
-
-          <div className="mb-4">
-            <p><strong>PAGAMENTO:</strong> {selectedOrder?.payment_method}</p>
-            {selectedOrder?.observation && (
-              <div className="mt-1 whitespace-pre-wrap">
-                <p className="text-[8px]"><strong>OBS:</strong> {selectedOrder.observation}</p>
-              </div>
-            )}
-          </div>
-          
-          <div className="text-center mt-2 pb-8">
-            <p className="text-[8px] uppercase tracking-widest">Obrigado pela preferência!</p>
-            <p className="text-[7px] mt-1">gloriosobrownie.com.br</p>
-            <p className="text-[8px] mt-2">. . . . . . . . . . . . . . . .</p>
-          </div>
-        </div>
-      </div>
 
       {/* Printable Cash Report */}
       <div id="print-cash-report" className="hidden printing-cash-report:block font-mono text-black p-0 w-[58mm] text-[10px] bg-white overflow-hidden">

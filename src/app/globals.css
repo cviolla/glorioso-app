@@ -62,13 +62,78 @@ img {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* ===== ESTILOS PARA IMPRESSORA TÉRMICA (58mm/80mm) ===== */
+
+.thermal-receipt {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  line-height: 1.3;
+  color: black;
+  background: white;
+  width: 58mm;
+  padding: 2mm;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.thermal-receipt .item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
 @media print {
-  footer, .print\:hidden {
-    display: none !important;
+  @page {
+    margin: 0;
+    size: 58mm auto;
   }
-  body, html {
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 58mm !important;
     background: white !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 10px !important;
+    color: black !important;
     height: auto !important;
     overflow: visible !important;
+  }
+
+  /* Esconde tudo que não é o recibo */
+  body * {
+    visibility: hidden;
+  }
+
+  .thermal-receipt,
+  .thermal-receipt * {
+    visibility: visible !important;
+    color: black !important;
+    background: transparent !important;
+  }
+
+  .thermal-receipt {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 58mm !important;
+    padding: 2mm !important;
+  }
+
+  /* Esconde elementos de UI */
+  footer, nav, aside,
+  .print\:hidden,
+  header {
+    display: none !important;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Estabilização para térmicas */
+  .font-mono {
+    font-family: 'Courier New', Courier, monospace !important;
+    letter-spacing: -0.5px;
   }
 }
