@@ -499,7 +499,7 @@ export default function AdminOrdersPage() {
         </div>
 
         {/* Order Details Panel */}
-        <div className="relative">
+        <div className="relative hidden lg:block">
           <AnimatePresence mode="wait">
             {selectedOrder ? (
               <motion.div 
@@ -643,6 +643,158 @@ export default function AdminOrdersPage() {
         </div>
       </div>
     </div>
+
+    {/* Mobile Order Detail Bottom Sheet */}
+    <AnimatePresence>
+      {selectedOrder && (
+        <div className="fixed inset-0 z-[90] lg:hidden">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-[#381010]/40 backdrop-blur-sm"
+            onClick={() => setSelectedOrder(null)}
+          />
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.15)] max-h-[92vh] flex flex-col"
+          >
+            {/* Drag Handle */}
+            <div className="flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 rounded-full bg-gray-300" />
+            </div>
+
+            {/* Header */}
+            <div className="px-5 pb-4 border-b border-gray-100 shrink-0">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => setSelectedOrder(null)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  <button 
+                    onClick={handlePrint}
+                    className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
+                  >
+                    <Printer className="w-4 h-4" /> Imprimir
+                  </button>
+                  <button 
+                    onClick={() => deleteOrder(selectedOrder.id)}
+                    className="text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
+                    title="Apagar Pedido"
+                  >
+                    <Trash2 className="w-4 h-4" /> Apagar
+                  </button>
+                </div>
+                <span className="font-black text-[10px] text-gray-300 tracking-widest uppercase">ID: {selectedOrder.id.slice(-6).toUpperCase()}</span>
+              </div>
+              <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">{selectedOrder.customer_name}</h2>
+              <a href={`tel:${selectedOrder.customer_phone}`} className="flex items-center gap-1.5 text-sm font-black text-[var(--color-brand-accent)] hover:underline mt-1">
+                <Phone className="w-4 h-4" /> {selectedOrder.customer_phone}
+              </a>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-5 no-scrollbar">
+              {/* Status Buttons */}
+              <div className="space-y-2">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Mudar Status</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => updateOrderStatus(selectedOrder.id, 'preparing')}
+                    disabled={selectedOrder.status === 'preparing'}
+                    className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all ${selectedOrder.status === 'preparing' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50'}`}
+                  >
+                    Em Preparo
+                  </button>
+                  <button 
+                    onClick={() => updateOrderStatus(selectedOrder.id, 'shipped')}
+                    disabled={selectedOrder.status === 'shipped'}
+                    className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all ${selectedOrder.status === 'shipped' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-purple-600 border-purple-200 hover:bg-purple-50'}`}
+                  >
+                    Sair p/ Entrega
+                  </button>
+                  <button 
+                    onClick={() => updateOrderStatus(selectedOrder.id, 'delivered')}
+                    disabled={selectedOrder.status === 'delivered'}
+                    className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all ${selectedOrder.status === 'delivered' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-green-600 border-green-200 hover:bg-green-50'}`}
+                  >
+                    {selectedOrder.delivery_type === 'pickup' ? 'Retirado' : 'Entregue'}
+                  </button>
+                  <button 
+                    onClick={() => updateOrderStatus(selectedOrder.id, 'cancelled')}
+                    disabled={selectedOrder.status === 'cancelled'}
+                    className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all ${selectedOrder.status === 'cancelled' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-red-600 border-red-200 hover:bg-red-50'}`}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+
+              {/* Delivery Info */}
+              <div className="space-y-3 p-4 bg-gray-50 rounded-2xl">
+                <div className="flex items-center gap-2 text-[#381010] font-bold text-sm">
+                  {selectedOrder.delivery_type === 'delivery' ? <Truck className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                  {selectedOrder.delivery_type === 'delivery' ? 'Delivery' : 'Retirada'}
+                </div>
+                {selectedOrder.delivery_type === 'delivery' && (
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-600 flex items-start gap-1">
+                      <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
+                      {selectedOrder.address_street}, {selectedOrder.address_number} - {selectedOrder.address_neighborhood}
+                    </p>
+                    {selectedOrder.address_complement && <p className="text-xs text-gray-400 ml-4">Ref: {selectedOrder.address_complement}</p>}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-200">
+                  <CreditCard className="w-3 h-3" /> {selectedOrder.payment_method}
+                </div>
+              </div>
+
+              {/* Items */}
+              <div className="space-y-3">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Itens do Pedido</p>
+                <div className="space-y-2">
+                  {selectedOrder.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#381010]">{item.quantity}x {item.name}</p>
+                        {item.variant && <p className="text-xs text-gray-500">{item.variant}</p>}
+                        {item.addons && item.addons.length > 0 && (
+                          <p className="text-xs text-[#ff914a] font-medium">+ {item.addons.map(a => a.name).join(', ')}</p>
+                        )}
+                      </div>
+                      <p className="text-sm font-mono text-gray-400">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Observation */}
+              {selectedOrder.observation && (
+                <div className="p-4 bg-[var(--color-brand-light)] border-2 border-[var(--color-brand-accent)]/10 rounded-2xl">
+                  <p className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 uppercase tracking-widest">Observação:</p>
+                  <p className="text-sm text-[var(--color-brand-dark)]/80 font-medium italic">&quot;{selectedOrder.observation}&quot;</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Total */}
+            <div className="p-5 bg-gray-50/50 border-t border-gray-100 shrink-0">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 font-black text-xs uppercase tracking-[0.2em]">Total do Pedido</span>
+                <span className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tighter">R$ {selectedOrder.total_price.toFixed(2).replace('.', ',')}</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
 
     <CustomModal 
       isOpen={modalConfig.isOpen}
