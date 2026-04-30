@@ -9,19 +9,43 @@ import {
   ShoppingBag,
   Loader2,
   Search,
-  ArrowLeft,
   CalendarDays,
   Filter,
-  CreditCard
+  CreditCard,
+  Phone,
+  MapPin,
+  Truck,
+  Clock,
+  XCircle,
+  Printer,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  variant?: string;
+  addons?: { name: string; price: number }[];
+}
 
 interface Order {
   id: string;
   created_at: string;
   customer_name: string;
-  total_price: number;
+  customer_phone: string;
+  delivery_type: 'delivery' | 'pickup';
+  address_street?: string;
+  address_number?: string;
+  address_neighborhood?: string;
+  address_complement?: string;
+  address_reference?: string;
   payment_method: string;
+  order_time: string;
+  observation?: string;
+  total_price: number;
+  items: OrderItem[];
   status: string;
 }
 
@@ -36,6 +60,7 @@ export default function AdminHistoryPage() {
   const [dailySummaries, setDailySummaries] = useState<DailySummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<DailySummary | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
@@ -45,14 +70,13 @@ export default function AdminHistoryPage() {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .select('id, created_at, customer_name, total_price, payment_method, status')
+        .select('*')
         .eq('status', 'delivered')
         .order('created_at', { ascending: false });
       
       if (error) throw error;
 
       if (data) {
-        // Agrupar pedidos por data (YYYY-MM-DD)
         const groups: Record<string, DailySummary> = {};
         
         data.forEach((order: any) => {
@@ -79,7 +103,6 @@ export default function AdminHistoryPage() {
 
         setDailySummaries(Object.values(groups));
 
-        // Extrair métodos de pagamento únicos
         const methods = Array.from(new Set(data.map((o: any) => o.payment_method))).filter(Boolean) as string[];
         setAvailableMethods(methods);
       }
@@ -95,13 +118,10 @@ export default function AdminHistoryPage() {
   }, [fetchHistory]);
 
   const filteredSummaries = dailySummaries.map(summary => {
-    // Se o filtro for 'all', retorna o sumário original
     if (paymentFilter === 'all') return summary;
     
-    // Filtrar pedidos dentro do sumário
     const filteredOrders = summary.orders.filter(o => o.payment_method === paymentFilter);
     
-    // Recalcular total e count para este filtro específico
     return {
       ...summary,
       total: filteredOrders.reduce((sum, o) => sum + Number(o.total_price), 0),
@@ -112,13 +132,27 @@ export default function AdminHistoryPage() {
     summary.date.includes(searchQuery) && summary.count > 0
   );
 
-  // Sincronizar o selectedDay se o filtro mudar
   useEffect(() => {
     if (selectedDay) {
       const updated = filteredSummaries.find(s => s.date === selectedDay.date);
       setSelectedDay(updated || null);
     }
   }, [paymentFilter, searchQuery, dailySummaries]);
+
+  const handlePrintOrder = () => {
+    if (!selectedOrder) return;
+    window.open(`/admin/orders/${selectedOrder.id}/print`, '_blank');
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -172,7 +206,7 @@ export default function AdminHistoryPage() {
               <motion.div
                 layoutId={summary.date}
                 key={summary.date}
-                onClick={() => setSelectedDay(summary)}
+                onClick={() => { setSelectedDay(summary); setSelectedOrder(null); }}
                 className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
                   selectedDay?.date === summary.date 
                     ? 'bg-white border-[var(--color-brand-accent)] shadow-lg shadow-[var(--color-brand-accent)]/10' 
@@ -226,19 +260,42 @@ export default function AdminHistoryPage() {
                 <div className="p-8">
                   <div className="space-y-4">
                     {selectedDay.orders.map((order) => (
-                      <div key={order.id} className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-all group">
+                      <motion.div 
+                        key={order.id} 
+                        onClick={() => setSelectedOrder(order)}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className={`flex justify-between items-center p-4 rounded-2xl transition-all cursor-pointer group ${
+                          selectedOrder?.id === order.id
+                            ? 'bg-[var(--color-brand-accent)]/10 border-2 border-[var(--color-brand-accent)]/30 shadow-md'
+                            : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100 hover:border-gray-200'
+                        }`}
+                      >
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center text-[var(--color-brand-dark)] font-black text-xs shadow-sm group-hover:border-[var(--color-brand-accent)]/30 transition-all">
-                            {new Date(order.created_at).getHours().toString().padStart(2, '0')}:
-                            {new Date(order.created_at).getMinutes().toString().padStart(2, '0')}
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shadow-sm transition-all ${
+                            selectedOrder?.id === order.id
+                              ? 'bg-[var(--color-brand-accent)] text-white border border-[var(--color-brand-accent)]'
+                              : 'bg-white border border-gray-100 text-[var(--color-brand-dark)] group-hover:border-[var(--color-brand-accent)]/30'
+                          }`}>
+                            {new Date(order.created_at).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })}
                           </div>
                           <div>
                             <p className="font-black text-[var(--color-brand-dark)] text-sm">{order.customer_name}</p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{order.payment_method}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{order.payment_method}</p>
+                              {order.delivery_type === 'delivery' && (
+                                <span className="text-[9px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-bold">DELIVERY</span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <p className="font-black text-[var(--color-brand-dark)]">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                      </div>
+                        <div className="flex items-center gap-3">
+                          <p className="font-black text-[var(--color-brand-dark)]">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                          <ChevronRight className={`w-4 h-4 transition-all ${
+                            selectedOrder?.id === order.id ? 'text-[var(--color-brand-accent)]' : 'text-gray-300 group-hover:text-gray-400'
+                          }`} />
+                        </div>
+                      </motion.div>
                     ))}
                   </div>
 
@@ -268,6 +325,118 @@ export default function AdminHistoryPage() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Order Detail Modal */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <div 
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#381010]/40 backdrop-blur-md"
+            onClick={(e) => { if (e.target === e.currentTarget) setSelectedOrder(null); }}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-[0_20px_60px_rgba(56,16,16,0.2)] border border-white/20 max-h-[90vh] flex flex-col"
+            >
+              {/* Header */}
+              <div className="p-6 border-b border-gray-100 shrink-0">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => setSelectedOrder(null)}
+                      className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={handlePrintOrder}
+                      className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
+                    >
+                      <Printer className="w-4 h-4" /> Imprimir
+                    </button>
+                  </div>
+                  <span className="font-black text-[10px] text-gray-300 tracking-widest uppercase bg-gray-50 px-3 py-1.5 rounded-full">ID: {selectedOrder.id.slice(-6).toUpperCase()}</span>
+                </div>
+                <h2 className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tight">{selectedOrder.customer_name}</h2>
+                <div className="flex items-center gap-3 mt-2">
+                  <a href={`tel:${selectedOrder.customer_phone}`} className="flex items-center gap-1.5 text-sm font-black text-[var(--color-brand-accent)] hover:underline">
+                    <Phone className="w-4 h-4" /> {selectedOrder.customer_phone}
+                  </a>
+                  <span className="text-xs text-gray-300">•</span>
+                  <span className="flex items-center gap-1 text-xs text-gray-400 font-medium">
+                    <Clock className="w-3 h-3" /> {formatDate(selectedOrder.created_at)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="p-6 space-y-5 overflow-y-auto no-scrollbar flex-1">
+                {/* Delivery / Pickup Info */}
+                <div className="space-y-3 p-4 bg-gray-50 rounded-2xl">
+                  <div className="flex items-center gap-2 text-[#381010] font-bold text-sm">
+                    {selectedOrder.delivery_type === 'delivery' ? <Truck className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                    {selectedOrder.delivery_type === 'delivery' ? 'Delivery' : 'Retirada'}
+                    <span className="ml-auto text-[9px] bg-green-50 text-green-600 px-2 py-1 rounded-lg font-black uppercase tracking-wider border border-green-100">Entregue</span>
+                  </div>
+                  {selectedOrder.delivery_type === 'delivery' && (
+                    <div className="space-y-1">
+                      <p className="text-xs text-gray-600 flex items-start gap-1">
+                        <MapPin className="w-3 h-3 mt-0.5 shrink-0" />
+                        {selectedOrder.address_street}, {selectedOrder.address_number} - {selectedOrder.address_neighborhood}
+                      </p>
+                      {selectedOrder.address_complement && <p className="text-xs text-gray-400 ml-4">Compl: {selectedOrder.address_complement}</p>}
+                      {selectedOrder.address_reference && <p className="text-xs text-gray-400 ml-4">Ref: {selectedOrder.address_reference}</p>}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-200">
+                    <CreditCard className="w-3 h-3" /> {selectedOrder.payment_method}
+                    {selectedOrder.order_time && selectedOrder.order_time !== 'Para agora' && (
+                      <span className="ml-auto text-[10px] text-gray-400">Agendado: {selectedOrder.order_time}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Items List */}
+                <div className="space-y-3">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Itens do Pedido</p>
+                  <div className="space-y-2.5">
+                    {selectedOrder.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-start p-3 bg-gray-50/70 rounded-xl">
+                        <div className="flex-1">
+                          <p className="text-sm font-bold text-[#381010]">{item.quantity}x {item.name}</p>
+                          {item.variant && <p className="text-xs text-gray-500">{item.variant}</p>}
+                          {item.addons && item.addons.length > 0 && (
+                            <p className="text-xs text-[#ff914a] font-medium">+ {item.addons.map(a => a.name).join(', ')}</p>
+                          )}
+                        </div>
+                        <p className="text-sm font-mono text-gray-400 shrink-0 ml-3">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Observation */}
+                {selectedOrder.observation && (
+                  <div className="p-4 bg-[var(--color-brand-light)] border-2 border-[var(--color-brand-accent)]/10 rounded-2xl">
+                    <p className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 uppercase tracking-widest">Observação:</p>
+                    <p className="text-sm text-[var(--color-brand-dark)]/80 font-medium italic whitespace-pre-line">&quot;{selectedOrder.observation}&quot;</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer - Total */}
+              <div className="p-6 bg-gray-50/50 border-t border-gray-100 shrink-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 font-black text-xs uppercase tracking-[0.2em]">Total do Pedido</span>
+                  <span className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tighter">R$ {selectedOrder.total_price.toFixed(2).replace('.', ',')}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

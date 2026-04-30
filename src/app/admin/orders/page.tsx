@@ -254,12 +254,7 @@ export default function AdminOrdersPage() {
   };
 
   const handlePrintCashReport = () => {
-    // Adiciona uma classe temporária para imprimir apenas o relatório
-    document.body.classList.add('printing-cash-report');
-    setTimeout(() => {
-      window.print();
-      document.body.classList.remove('printing-cash-report');
-    }, 250);
+    window.open('/admin/cash-report/print', '_blank');
   };
 
   const filteredOrders = orders.filter(order => {

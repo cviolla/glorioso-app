@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useSettingsStore } from "@/store/settingsStore";
-import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, Motorbike, Store, User, Phone, Loader2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, Motorbike, Store, User, Phone, Loader2, X, Banknote } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -39,6 +39,8 @@ export default function CartPage() {
   const [userInfo, setUserInfo] = useState({ name: '', phone: '' });
   const [address, setAddress] = useState({ street: '', number: '', neighborhood: 'Santa Cruz da Serra', complement: '', reference: '' });
   const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: 'PIX', orderTime: 'Para agora', coupon: '' });
+  const [needsChange, setNeedsChange] = useState(false);
+  const [changeFor, setChangeFor] = useState('');
 
   useEffect(() => {
     fetchSettings();
@@ -165,7 +167,21 @@ export default function CartPage() {
         last_order_at: new Date().toISOString()
       }, { onConflict: 'phone' });
 
-      // 2. Salvar Pedido no Supabase
+      // 2. Montar observação final (inclui info de troco se aplicável)
+      let finalObservation = paymentInfo.observation;
+      if (paymentInfo.paymentMethod === 'Dinheiro' && needsChange && changeFor) {
+        const changeAmount = parseFloat(changeFor.replace(',', '.'));
+        if (!isNaN(changeAmount) && changeAmount > finalTotal) {
+          const trocoValue = (changeAmount - finalTotal).toFixed(2).replace('.', ',');
+          const trocoInfo = `💰 TROCO: Levar troco para R$ ${changeFor} (troco de R$ ${trocoValue})`;
+          finalObservation = finalObservation ? `${trocoInfo}\n${finalObservation}` : trocoInfo;
+        }
+      } else if (paymentInfo.paymentMethod === 'Dinheiro' && !needsChange) {
+        const trocoInfo = `💰 TROCO: Não precisa de troco`;
+        finalObservation = finalObservation ? `${trocoInfo}\n${finalObservation}` : trocoInfo;
+      }
+
+      // 3. Salvar Pedido no Supabase
       const { data: savedOrder, error } = await supabase.from('orders').insert({
         customer_name: userInfo.name,
         customer_phone: userInfo.phone,
@@ -177,7 +193,7 @@ export default function CartPage() {
         address_reference: address.reference,
         payment_method: paymentInfo.paymentMethod,
         order_time: paymentInfo.orderTime,
-        observation: paymentInfo.observation,
+        observation: finalObservation,
         total_price: finalTotal,
         items: items.map(item => ({
           name: item.name,
@@ -191,7 +207,7 @@ export default function CartPage() {
 
       if (error) throw error;
 
-      // 3. Montar texto do WhatsApp conforme novo template
+      // 4. Montar texto do WhatsApp conforme novo template
       const orderId = savedOrder.id.slice(-6).toUpperCase();
       const now = new Date();
       const formattedDateTime = now.toLocaleString('pt-BR', { 
@@ -239,13 +255,24 @@ export default function CartPage() {
       text += `Total a pagar: R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
       text += `${paymentInfo.paymentMethod} ${finalTotal.toFixed(2).replace('.', ',')}\n`;
       
+      if (paymentInfo.paymentMethod === 'Dinheiro') {
+        if (needsChange && changeFor) {
+          const changeAmount = parseFloat(changeFor.replace(',', '.'));
+          if (!isNaN(changeAmount) && changeAmount > finalTotal) {
+            text += `💰 *Troco para:* R$ ${changeFor} (troco de R$ ${(changeAmount - finalTotal).toFixed(2).replace('.', ',')})\n`;
+          }
+        } else {
+          text += `💰 *Não precisa de troco*\n`;
+        }
+      }
+      
       if (paymentInfo.observation) {
         text += `\n*Comentários adicionais:*\n${paymentInfo.observation}\n`;
       }
       
       text += `\nPor favor, envie-nos esta mensagem agora. Assim que recebermos estaremos atendendo você.`;
       
-      // 4. Abrir WhatsApp e limpar carrinho
+      // 5. Abrir WhatsApp e limpar carrinho
       const cleanNumber = whatsappNumber.replace(/\D/g, '');
       const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
@@ -509,12 +536,108 @@ export default function CartPage() {
                   <select 
                     className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
                     value={paymentInfo.paymentMethod} 
-                    onChange={e => setPaymentInfo({...paymentInfo, paymentMethod: e.target.value})}
+                    onChange={e => {
+                      setPaymentInfo({...paymentInfo, paymentMethod: e.target.value});
+                      if (e.target.value !== 'Dinheiro') {
+                        setNeedsChange(false);
+                        setChangeFor('');
+                      }
+                    }}
                   >
                     {paymentMethods.map(method => (
                       <option key={method} value={method}>{method}</option>
                     ))}
                   </select>
+
+                  {/* Seção de Troco - aparece somente quando método é Dinheiro */}
+                  <AnimatePresence>
+                    {paymentInfo.paymentMethod === 'Dinheiro' && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-4 p-4 bg-[#fff8f0] border border-[#ff914a]/20 rounded-xl space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Banknote className="w-4 h-4 text-[#ff914a]" />
+                            <span className="text-sm font-bold text-[#381010]">Precisa de troco?</span>
+                          </div>
+                          
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => { setNeedsChange(false); setChangeFor(''); }}
+                              className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border-2 ${
+                                !needsChange 
+                                  ? 'bg-[#ff914a] text-white border-[#ff914a] shadow-md shadow-[#ff914a]/20' 
+                                  : 'bg-white text-[#381010] border-gray-200 hover:border-[#ff914a]/40'
+                              }`}
+                            >
+                              Não
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setNeedsChange(true)}
+                              className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all border-2 ${
+                                needsChange 
+                                  ? 'bg-[#ff914a] text-white border-[#ff914a] shadow-md shadow-[#ff914a]/20' 
+                                  : 'bg-white text-[#381010] border-gray-200 hover:border-[#ff914a]/40'
+                              }`}
+                            >
+                              Sim
+                            </button>
+                          </div>
+
+                          <AnimatePresence>
+                            {needsChange && (
+                              <motion.div
+                                initial={{ opacity: 0, y: -8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                <label className="text-xs font-bold text-[#381010]/70 mb-1 block">Troco para quanto?</label>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#381010]/40 font-bold text-sm">R$</span>
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder={`Ex: ${Math.ceil(finalTotal / 10) * 10},00`}
+                                    className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all"
+                                    value={changeFor}
+                                    onChange={e => {
+                                      const val = e.target.value.replace(/[^0-9,\.]/g, '');
+                                      setChangeFor(val);
+                                    }}
+                                  />
+                                </div>
+                                {changeFor && (() => {
+                                  const amount = parseFloat(changeFor.replace(',', '.'));
+                                  if (!isNaN(amount) && amount > finalTotal) {
+                                    const trocoVal = (amount - finalTotal).toFixed(2).replace('.', ',');
+                                    return (
+                                      <p className="text-xs text-green-600 font-semibold mt-1 flex items-center gap-1">
+                                        <Banknote className="w-3 h-3" /> Troco: R$ {trocoVal}
+                                      </p>
+                                    );
+                                  } else if (!isNaN(amount) && amount <= finalTotal) {
+                                    return (
+                                      <p className="text-xs text-red-500 font-semibold mt-1">
+                                        O valor precisa ser maior que o total (R$ {finalTotal.toFixed(2).replace('.', ',')})
+                                      </p>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </motion.div>
