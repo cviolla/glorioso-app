@@ -17,7 +17,7 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   whatsappNumber: '5521990062956',
   deliveryFees: {},
-  paymentMethods: ['PIX', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro'],
+  paymentMethods: ['PIX', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro', 'Voucher'],
   isLoading: true,
 
   fetchSettings: async () => {

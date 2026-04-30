@@ -94,7 +94,10 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const allPossibleMethods = ['PIX', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro'];
+  const allPossibleMethods = ['PIX', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro', 'Voucher'];
+  const methodSubLabels: Record<string, string> = {
+    'Voucher': 'Alelo, Ticket, iFood, VR'
+  };
 
   return (
     <div className="space-y-8 pb-20 md:pb-0">
@@ -222,14 +225,20 @@ export default function AdminSettingsPage() {
           <div className="space-y-3">
             {allPossibleMethods.map((method) => {
               const isActive = localMethods.includes(method);
+              const subLabel = methodSubLabels[method];
               return (
                 <div 
                   key={method} 
                   onClick={() => toggleMethod(method)}
                   className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive ? 'bg-indigo-50 border-indigo-100 shadow-sm' : 'bg-gray-50 border-transparent hover:border-gray-200 opacity-60'}`}
                 >
-                  <span className={`text-sm font-black uppercase tracking-tight ${isActive ? 'text-indigo-900' : 'text-gray-400'}`}>{method}</span>
-                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'}`}>
+                  <div className="flex flex-col min-w-0">
+                    <span className={`text-sm font-black uppercase tracking-tight ${isActive ? 'text-indigo-900' : 'text-gray-400'}`}>{method}</span>
+                    {subLabel && (
+                      <span className={`text-[10px] font-bold tracking-wide mt-0.5 ${isActive ? 'text-indigo-500' : 'text-gray-400'}`}>{subLabel}</span>
+                    )}
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shrink-0 ${isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'}`}>
                     {isActive ? 'Ativo' : 'Inativo'}
                     {isActive ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                   </div>

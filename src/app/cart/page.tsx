@@ -41,6 +41,7 @@ export default function CartPage() {
   const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: 'PIX', orderTime: 'Para agora', coupon: '' });
   const [needsChange, setNeedsChange] = useState(false);
   const [changeFor, setChangeFor] = useState('');
+  const [voucherBrand, setVoucherBrand] = useState('');
 
   useEffect(() => {
     fetchSettings();
@@ -191,7 +192,7 @@ export default function CartPage() {
         address_neighborhood: address.neighborhood,
         address_complement: address.complement,
         address_reference: address.reference,
-        payment_method: paymentInfo.paymentMethod,
+        payment_method: paymentInfo.paymentMethod === 'Voucher' && voucherBrand ? `Voucher (${voucherBrand})` : paymentInfo.paymentMethod,
         order_time: paymentInfo.orderTime,
         observation: finalObservation,
         total_price: finalTotal,
@@ -249,11 +250,11 @@ export default function CartPage() {
         text += `*Delivery:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}\n`;
       }
       text += `*Total:* R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
-      
+      const displayPaymentMethod = paymentInfo.paymentMethod === 'Voucher' && voucherBrand ? `Voucher (${voucherBrand})` : paymentInfo.paymentMethod;
       text += `\n*Pagamento*\n`;
       text += `Estado do pagamento: Não pago\n`;
       text += `Total a pagar: R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
-      text += `${paymentInfo.paymentMethod} ${finalTotal.toFixed(2).replace('.', ',')}\n`;
+      text += `${displayPaymentMethod} ${finalTotal.toFixed(2).replace('.', ',')}\n`;
       
       if (paymentInfo.paymentMethod === 'Dinheiro') {
         if (needsChange && changeFor) {
@@ -313,7 +314,8 @@ export default function CartPage() {
     }
 
     if (step === 'summary') {
-      return isBasicInfoValid && paymentInfo.paymentMethod !== '';
+      const isVoucherValid = paymentInfo.paymentMethod === 'Voucher' ? voucherBrand !== '' : true;
+      return isBasicInfoValid && paymentInfo.paymentMethod !== '' && isVoucherValid;
     }
 
     return true;
@@ -542,12 +544,48 @@ export default function CartPage() {
                         setNeedsChange(false);
                         setChangeFor('');
                       }
+                      if (e.target.value !== 'Voucher') {
+                        setVoucherBrand('');
+                      }
                     }}
                   >
                     {paymentMethods.map(method => (
                       <option key={method} value={method}>{method}</option>
                     ))}
                   </select>
+
+                  {/* Seleção de Bandeira do Voucher */}
+                  <AnimatePresence>
+                    {paymentInfo.paymentMethod === 'Voucher' && (
+                      <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-3 p-4 bg-[#fff8f0] border border-[#ff914a]/20 rounded-xl space-y-3">
+                          <span className="text-xs font-bold text-[#381010]">Selecione a bandeira:</span>
+                          <div className="grid grid-cols-2 gap-2">
+                            {['Alelo', 'Ticket', 'iFood', 'VR'].map(brand => (
+                              <button
+                                key={brand}
+                                type="button"
+                                onClick={() => setVoucherBrand(brand)}
+                                className={`py-2.5 rounded-lg text-[13px] font-bold transition-all border-2 ${
+                                  voucherBrand === brand 
+                                    ? 'bg-[#ff914a] text-white border-[#ff914a] shadow-md shadow-[#ff914a]/20' 
+                                    : 'bg-white text-[#381010] border-gray-200 hover:border-[#ff914a]/40'
+                                }`}
+                              >
+                                {brand}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Seção de Troco - aparece somente quando método é Dinheiro */}
                   <AnimatePresence>
