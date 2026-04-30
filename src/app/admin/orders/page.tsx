@@ -8,16 +8,13 @@ import {
   CheckCircle2, 
   Truck, 
   XCircle, 
-  ChevronRight, 
   Phone, 
   MapPin, 
   CreditCard, 
   ShoppingBag,
   Loader2,
   Filter,
-  Calendar,
   Printer,
-  History,
   Trash2,
   TrendingUp,
   DollarSign,
@@ -84,7 +81,8 @@ export default function AdminOrdersPage() {
     type: "info"
   });
   const [isCashModalOpen, setIsCashModalOpen] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const [showRefreshSuccess, setShowRefreshSuccess] = useState(false);
 
   const fetchOrders = useCallback(async () => {
@@ -108,6 +106,8 @@ export default function AdminOrdersPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
     fetchOrders();
 
     const channel = supabase
@@ -135,7 +135,7 @@ export default function AdminOrdersPage() {
       if (selectedOrder?.id === orderId) {
         setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
       }
-    } catch (err) {
+    } catch {
       setModalConfig({
         isOpen: true,
         title: "Erro de Status",
@@ -177,11 +177,11 @@ export default function AdminOrdersPage() {
             message: "Pedido removido com sucesso!",
             type: "success"
           });
-        } catch (err: any) {
+        } catch (err: unknown) {
           setModalConfig({
             isOpen: true,
             title: "Erro na Exclusão",
-            message: err.message || "Erro desconhecido ao apagar pedido.",
+            message: err instanceof Error ? err.message : "Erro desconhecido ao apagar pedido.",
             type: "danger"
           });
         }
@@ -192,7 +192,7 @@ export default function AdminOrdersPage() {
   const calculateSales = (days: '1' | '3' | '7' | '15' | 'all') => {
     const now = new Date();
     const filtered = orders.filter(order => {
-      if (order.status !== 'delivered') return false;
+      if (order.status === 'cancelled') return false;
       if (days === 'all') return true;
       
       const orderDate = new Date(order.created_at);
@@ -217,7 +217,7 @@ export default function AdminOrdersPage() {
       
       const dayTotal = orders
         .filter(order => {
-          if (order.status !== 'delivered') return false;
+          if (order.status === 'cancelled') return false;
           const orderDateStr = new Date(order.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
           return orderDateStr === fullDateStr;
         })
@@ -285,7 +285,7 @@ export default function AdminOrdersPage() {
           <div className="hidden sm:flex flex-col items-end">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Sincronização</span>
             <span className="text-[10px] text-gray-400 font-medium">
-              Última: {lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              Última: {isMounted && lastUpdated ? lastUpdated.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
             </span>
           </div>
           <motion.button 
@@ -364,7 +364,7 @@ export default function AdminOrdersPage() {
               ].map((p) => (
                 <button
                   key={p.id}
-                  onClick={() => setSalesPeriod(p.id as any)}
+                  onClick={() => setSalesPeriod(p.id as '1' | '3' | '7' | '15' | 'all')}
                   className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${salesPeriod === p.id ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
                 >
                   {p.label}
@@ -405,7 +405,7 @@ export default function AdminOrdersPage() {
           <div>
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Ticket Médio</p>
             <p className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">
-              R$ {(calculateSales('all') / (orders.filter(o => o.status === 'delivered').length || 1)).toFixed(2).replace('.', ',')}
+              R$ {(calculateSales('all') / (orders.filter(o => o.status !== 'cancelled').length || 1)).toFixed(2).replace('.', ',')}
             </p>
           </div>
         </div>
@@ -428,7 +428,7 @@ export default function AdminOrdersPage() {
           <select 
             className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-black appearance-none"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
+            onChange={(e) => setFilterStatus(e.target.value as OrderStatus | 'all')}
           >
             <option value="all">TODOS STATUS</option>
             <option value="pending">PENDENTES</option>
@@ -730,100 +730,6 @@ export default function AdminOrdersPage() {
         )}
       </AnimatePresence>
 
-      {/* Printable Cash Report */}
-      <div id="print-cash-report" className="hidden printing-cash-report:block font-mono text-black p-0 w-[58mm] text-[10px] bg-white overflow-hidden">
-        <div className="w-full mx-auto p-0">
-          <div className="text-center pb-2">
-            <h1 className="text-sm font-black uppercase">GLORIOSO BROWNIE</h1>
-            <p className="text-[8px]">--------------------------------</p>
-            <h2 className="text-[10px] font-bold uppercase">FECHAMENTO DE CAIXA</h2>
-            <p className="text-[8px]">{new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
-            <p className="text-[8px]">--------------------------------</p>
-          </div>
-
-          <div className="mb-4">
-            <p className="font-bold text-center mb-2">RESUMO POR PAGAMENTO</p>
-            {Object.entries(getCashClosingData().totals).map(([method, value]) => (
-              <div key={method} className="flex justify-between py-0.5">
-                <span>{method}:</span>
-                <span className="font-bold">R${value.toFixed(2)}</span>
-              </div>
-            ))}
-            <p className="text-[8px] mt-1">--------------------------------</p>
-          </div>
-
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <span>Qtd Pedidos:</span>
-              <span>{getCashClosingData().count}</span>
-            </div>
-            <div className="flex justify-between text-sm font-black mt-1">
-              <span>TOTAL BRUTO:</span>
-              <span>R${getCashClosingData().total.toFixed(2)}</span>
-            </div>
-          </div>
-
-          <div className="mt-10 pt-4 text-center pb-8">
-            <p className="text-[8px]">________________________________</p>
-            <p className="text-[7px] mt-1">Assinatura do Responsável</p>
-            <p className="text-[8px] mt-4">********************************</p>
-          </div>
-        </div>
-      </div>
-
-      <style jsx global>{`
-        @media print {
-          @page {
-            margin: 0;
-            size: 58mm auto;
-          }
-          html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 58mm !important;
-            background: white !important;
-            font-family: 'Courier New', Courier, monospace !important;
-          }
-
-          /* Esconde absolutamente tudo por padrão na impressão */
-          body * {
-            display: none !important;
-          }
-
-          /* Mostra apenas o bloco de impressão específico baseado na classe do body */
-          body.printing-order #print-receipt,
-          body.printing-order #print-receipt *,
-          body.printing-cash-report #print-cash-report,
-          body.printing-cash-report #print-cash-report * {
-            display: block !important;
-          }
-
-          /* Ajustes de layout para o bloco visível */
-          body.printing-order #print-receipt,
-          body.printing-cash-report #print-cash-report {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 58mm !important;
-            height: auto !important;
-            padding: 2mm !important;
-            box-sizing: border-box !important;
-            background: white !important;
-          }
-
-          /* Garante que textos e fontes fiquem pretos e nítidos */
-          #print-receipt *, #print-cash-report * {
-            color: black !important;
-            background: transparent !important;
-          }
-          
-          /* Estabilização de texto para impressoras térmicas */
-          .font-mono {
-            font-family: 'Courier New', Courier, monospace !important;
-            letter-spacing: -0.5px;
-          }
-        }
-      `}</style>
     </>
   );
 }
