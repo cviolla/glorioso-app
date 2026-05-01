@@ -286,8 +286,8 @@ export default function AdminProductsPage() {
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div>
-          <h2 className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Gerenciar Produtos</h2>
-          <p className="text-sm text-gray-500 mt-1">Altere preços, nomes e descrições do cardápio.</p>
+          <h2 className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tight">Gerenciar Produtos</h2>
+          <p className="text-[13px] text-gray-500 mt-0.5">Altere preços, nomes e descrições do cardápio.</p>
         </div>
         <button 
           onClick={handleNewClick}
@@ -304,7 +304,7 @@ export default function AdminProductsPage() {
         <input 
           type="text" 
           placeholder="Buscar produto por nome..." 
-          className="w-full bg-white border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] text-[16px] shadow-sm transition-all placeholder:text-gray-400"
+          className="w-full bg-white border-2 border-transparent rounded-2xl py-3 pl-12 pr-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] text-sm shadow-sm transition-all placeholder:text-gray-400"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -321,12 +321,12 @@ export default function AdminProductsPage() {
           {categories.map((category) => (
             <div key={category.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-white hover:shadow-md transition-shadow">
               <button 
-                className="w-full px-6 py-5 flex items-center justify-between bg-white transition-colors"
+                className="w-full px-6 py-4 flex items-center justify-between bg-white transition-colors"
                 onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-8 rounded-full transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]' : 'bg-gray-100'}`} />
-                  <h3 className="font-black text-[var(--color-brand-dark)] text-xl tracking-tight">{category.name}</h3>
+                  <div className={`w-1.5 h-7 rounded-full transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]' : 'bg-gray-100'}`} />
+                  <h3 className="font-black text-[var(--color-brand-dark)] text-lg tracking-tight">{category.name}</h3>
                 </div>
                 <div className={`p-2 rounded-xl transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]/10 text-[var(--color-brand-accent)]' : 'bg-gray-50 text-gray-400'}`}>
                   {expandedCategory === category.id ? (
@@ -607,9 +607,9 @@ function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item:
           )}
         </div>
         <div>
-          <h4 className={`font-bold text-[var(--color-brand-dark)] text-lg leading-tight flex items-center gap-2`}>
+          <h4 className={`font-bold text-[var(--color-brand-dark)] text-base leading-tight flex items-center gap-2`}>
             {item.name}
-            {!item.is_active && <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest font-black">Oculto</span>}
+            {!item.is_active && <span className="text-[9px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest font-black">Oculto</span>}
           </h4>
           {item.price !== undefined && item.price > 0 ? (
             <p className="text-sm text-gray-500 font-semibold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
