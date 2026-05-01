@@ -298,7 +298,7 @@ export default function AdminOrdersPage() {
           <motion.button 
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={fetchOrders}
+            onClick={() => fetchOrders()}
             disabled={loading}
             title="Atualizar Pedidos"
             className={`relative p-3 rounded-2xl transition-all duration-500 shadow-sm border-2 overflow-hidden ${
