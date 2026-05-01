@@ -38,7 +38,8 @@ export default function CartPage() {
   });
   const [userInfo, setUserInfo] = useState({ name: '', phone: '' });
   const [address, setAddress] = useState({ street: '', number: '', neighborhood: 'Santa Cruz da Serra', complement: '', reference: '' });
-  const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: 'PIX', orderTime: 'Para agora', coupon: '' });
+  const [paymentInfo, setPaymentInfo] = useState({ observation: '', paymentMethod: '', orderTime: 'Para agora', coupon: '' });
+  const [splitPayments, setSplitPayments] = useState<{ method: string; value: string }[]>([]);
   const [needsChange, setNeedsChange] = useState(false);
   const [changeFor, setChangeFor] = useState('');
   const [voucherBrand, setVoucherBrand] = useState('');
@@ -87,12 +88,11 @@ export default function CartPage() {
   }, [isHydrated]);
 
   useEffect(() => {
-    if (isHydrated && paymentMethods.length > 0) {
-      if (!paymentMethods.includes(paymentInfo.paymentMethod)) {
-        setPaymentInfo(prev => ({ ...prev, paymentMethod: paymentMethods[0] }));
-      }
+    if (isHydrated && paymentMethods.length > 0 && splitPayments.length === 0) {
+      // Inicia com o primeiro método de pagamento disponível se nenhum estiver selecionado
+      setSplitPayments([{ method: paymentMethods[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
     }
-  }, [isHydrated, paymentMethods]);
+  }, [isHydrated, paymentMethods, finalTotal]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -136,6 +136,13 @@ export default function CartPage() {
   const deliveryFee = getDeliveryFee();
   const finalTotal = totalPrice() + deliveryFee;
 
+  const currentSplitTotal = splitPayments.reduce((sum, p) => {
+    const val = parseFloat(p.value.replace(',', '.')) || 0;
+    return sum + val;
+  }, 0);
+
+  const isTotalMatched = Math.abs(currentSplitTotal - finalTotal) < 0.01;
+
   if (!isHydrated) return null;
 
   const handleCheckoutSubmit = async () => {
@@ -170,17 +177,31 @@ export default function CartPage() {
 
       // 2. Montar observação final (inclui info de troco se aplicável)
       let finalObservation = paymentInfo.observation;
-      if (paymentInfo.paymentMethod === 'Dinheiro' && needsChange && changeFor) {
+      const hasCash = splitPayments.some(p => p.method === 'Dinheiro');
+      
+      if (hasCash && needsChange && changeFor) {
+        const cashPayment = splitPayments.find(p => p.method === 'Dinheiro');
+        const cashValue = parseFloat(cashPayment?.value.replace(',', '.') || '0');
         const changeAmount = parseFloat(changeFor.replace(',', '.'));
-        if (!isNaN(changeAmount) && changeAmount > finalTotal) {
-          const trocoValue = (changeAmount - finalTotal).toFixed(2).replace('.', ',');
+        
+        if (!isNaN(changeAmount) && changeAmount > cashValue) {
+          const trocoValue = (changeAmount - cashValue).toFixed(2).replace('.', ',');
           const trocoInfo = `💰 TROCO: Levar troco para R$ ${changeFor} (troco de R$ ${trocoValue})`;
           finalObservation = finalObservation ? `${trocoInfo}\n${finalObservation}` : trocoInfo;
         }
-      } else if (paymentInfo.paymentMethod === 'Dinheiro' && !needsChange) {
+      } else if (hasCash && !needsChange) {
         const trocoInfo = `💰 TROCO: Não precisa de troco`;
         finalObservation = finalObservation ? `${trocoInfo}\n${finalObservation}` : trocoInfo;
       }
+
+      // Montar string de métodos de pagamento para o banco
+      const paymentSummary = splitPayments
+        .map(p => {
+          let methodStr = `${p.method}: R$ ${p.value}`;
+          if (p.method === 'Voucher' && voucherBrand) methodStr += ` (${voucherBrand})`;
+          return methodStr;
+        })
+        .join(' | ');
 
       // 3. Salvar Pedido no Supabase
       const { data: savedOrder, error } = await supabase.from('orders').insert({
@@ -192,7 +213,7 @@ export default function CartPage() {
         address_neighborhood: address.neighborhood,
         address_complement: address.complement,
         address_reference: address.reference,
-        payment_method: paymentInfo.paymentMethod === 'Voucher' && voucherBrand ? `Voucher (${voucherBrand})` : paymentInfo.paymentMethod,
+        payment_method: paymentSummary,
         order_time: paymentInfo.orderTime,
         observation: finalObservation,
         total_price: finalTotal,
@@ -250,17 +271,25 @@ export default function CartPage() {
         text += `*Delivery:* R$ ${deliveryFee.toFixed(2).replace('.', ',')}\n`;
       }
       text += `*Total:* R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
-      const displayPaymentMethod = paymentInfo.paymentMethod === 'Voucher' && voucherBrand ? `Voucher (${voucherBrand})` : paymentInfo.paymentMethod;
+      
       text += `\n*Pagamento*\n`;
       text += `Estado do pagamento: Não pago\n`;
       text += `Total a pagar: R$ ${finalTotal.toFixed(2).replace('.', ',')}\n`;
-      text += `${displayPaymentMethod} ${finalTotal.toFixed(2).replace('.', ',')}\n`;
       
-      if (paymentInfo.paymentMethod === 'Dinheiro') {
+      splitPayments.forEach(p => {
+        let pMethod = p.method;
+        if (pMethod === 'Voucher' && voucherBrand) pMethod += ` (${voucherBrand})`;
+        text += `${pMethod}: R$ ${p.value}\n`;
+      });
+      
+      if (hasCash) {
+        const cashPayment = splitPayments.find(p => p.method === 'Dinheiro');
+        const cashValue = parseFloat(cashPayment?.value.replace(',', '.') || '0');
+        
         if (needsChange && changeFor) {
           const changeAmount = parseFloat(changeFor.replace(',', '.'));
-          if (!isNaN(changeAmount) && changeAmount > finalTotal) {
-            text += `💰 *Troco para:* R$ ${changeFor} (troco de R$ ${(changeAmount - finalTotal).toFixed(2).replace('.', ',')})\n`;
+          if (!isNaN(changeAmount) && changeAmount > cashValue) {
+            text += `💰 *Troco para:* R$ ${changeFor} (troco de R$ ${(changeAmount - cashValue).toFixed(2).replace('.', ',')})\n`;
           }
         } else {
           text += `💰 *Não precisa de troco*\n`;
@@ -314,8 +343,9 @@ export default function CartPage() {
     }
 
     if (step === 'summary') {
-      const isVoucherValid = paymentInfo.paymentMethod === 'Voucher' ? voucherBrand !== '' : true;
-      return isBasicInfoValid && paymentInfo.paymentMethod !== '' && isVoucherValid;
+      const isVoucherSelected = splitPayments.some(p => p.method === 'Voucher');
+      const isVoucherValid = isVoucherSelected ? voucherBrand !== '' : true;
+      return isBasicInfoValid && splitPayments.length > 0 && isVoucherValid && isTotalMatched;
     }
 
     return true;
@@ -534,29 +564,95 @@ export default function CartPage() {
                   <textarea placeholder="Ex: Tirar cebola, enviar bastante calda..." className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white h-24 resize-none text-[16px] transition-all" value={paymentInfo.observation} onChange={e => setPaymentInfo({...paymentInfo, observation: e.target.value})} />
                 </div>
                 <div className="border border-gray-300 rounded-xl p-4 bg-white/50">
-                  <label className="text-sm font-bold text-[#381010] flex gap-2 items-center mb-2"><CreditCard className="w-4 h-4" /> Forma de pagamento</label>
-                  <select 
-                    className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" 
-                    value={paymentInfo.paymentMethod} 
-                    onChange={e => {
-                      setPaymentInfo({...paymentInfo, paymentMethod: e.target.value});
-                      if (e.target.value !== 'Dinheiro') {
-                        setNeedsChange(false);
-                        setChangeFor('');
-                      }
-                      if (e.target.value !== 'Voucher') {
-                        setVoucherBrand('');
-                      }
-                    }}
-                  >
-                    {paymentMethods.map(method => (
-                      <option key={method} value={method}>{method}</option>
-                    ))}
-                  </select>
+                  <label className="text-sm font-bold text-[#381010] flex gap-2 items-center mb-3"><CreditCard className="w-4 h-4" /> Formas de pagamento</label>
+                  
+                  <div className="space-y-3">
+                    {/* Lista de formas selecionadas */}
+                    <div className="space-y-3">
+                      {splitPayments.map((payment, index) => (
+                        <div key={index} className="flex flex-col gap-2 p-3 bg-white border border-gray-200 rounded-xl shadow-sm">
+                          <div className="flex items-center justify-between">
+                            <select 
+                              className="bg-transparent font-bold text-[14px] outline-none text-[#381010]"
+                              value={payment.method}
+                              onChange={(e) => {
+                                const newPayments = [...splitPayments];
+                                newPayments[index].method = e.target.value;
+                                setSplitPayments(newPayments);
+                                if (!newPayments.some(p => p.method === 'Dinheiro')) {
+                                  setNeedsChange(false);
+                                  setChangeFor('');
+                                }
+                                if (!newPayments.some(p => p.method === 'Voucher')) {
+                                  setVoucherBrand('');
+                                }
+                              }}
+                            >
+                              {paymentMethods.map(method => (
+                                <option key={method} value={method}>{method}</option>
+                              ))}
+                            </select>
+                            <button 
+                              onClick={() => {
+                                if (splitPayments.length > 1) {
+                                  setSplitPayments(splitPayments.filter((_, i) => i !== index));
+                                }
+                              }}
+                              className="text-red-400 p-1 hover:bg-red-50 rounded-full transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">R$</span>
+                            <input 
+                              type="text"
+                              inputMode="decimal"
+                              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-[#ff914a] font-mono text-[15px]"
+                              value={payment.value}
+                              onChange={(e) => {
+                                const val = e.target.value.replace(/[^0-9,\.]/g, '');
+                                const newPayments = [...splitPayments];
+                                newPayments[index].value = val;
+                                setSplitPayments(newPayments);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Botão para adicionar outra forma */}
+                    {splitPayments.length < paymentMethods.length && (
+                      <button 
+                        onClick={() => setSplitPayments([...splitPayments, { method: paymentMethods.find(m => !splitPayments.some(p => p.method === m)) || paymentMethods[0], value: '0,00' }])}
+                        className="w-full py-2 border-2 border-dashed border-gray-300 rounded-xl text-gray-400 text-sm font-bold flex items-center justify-center gap-2 hover:border-[#ff914a]/40 hover:text-[#ff914a]/60 transition-all"
+                      >
+                        <Plus className="w-4 h-4" /> Adicionar outra forma
+                      </button>
+                    )}
+
+                    {/* Resumo da Validação */}
+                    <div className={`p-3 rounded-xl border ${isTotalMatched ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'} transition-all`}>
+                      <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
+                        <span>Total Inserido:</span>
+                        <span>R$ {currentSplitTotal.toFixed(2).replace('.', ',')}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] opacity-70 mt-1">
+                        <span>Faltando:</span>
+                        <span>R$ {Math.max(0, finalTotal - currentSplitTotal).toFixed(2).replace('.', ',')}</span>
+                      </div>
+                      {!isTotalMatched && (
+                        <p className="text-[10px] mt-2 font-bold animate-pulse">
+                          ⚠️ O total inserido deve ser exatamente R$ {finalTotal.toFixed(2).replace('.', ',')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
                   {/* Seleção de Bandeira do Voucher */}
                   <AnimatePresence>
-                    {paymentInfo.paymentMethod === 'Voucher' && (
+                    {splitPayments.some(p => p.method === 'Voucher') && (
                       <motion.div 
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -565,7 +661,7 @@ export default function CartPage() {
                         className="overflow-hidden"
                       >
                         <div className="mt-3 p-4 bg-[#fff8f0] border border-[#ff914a]/20 rounded-xl space-y-3">
-                          <span className="text-xs font-bold text-[#381010]">Selecione a bandeira:</span>
+                          <span className="text-xs font-bold text-[#381010]">Selecione a bandeira do Voucher:</span>
                           <div className="grid grid-cols-2 gap-2">
                             {['Alelo', 'Ticket', 'iFood', 'VR'].map(brand => (
                               <button
@@ -587,9 +683,9 @@ export default function CartPage() {
                     )}
                   </AnimatePresence>
 
-                  {/* Seção de Troco - aparece somente quando método é Dinheiro */}
+                  {/* Seção de Troco - aparece somente quando algum método é Dinheiro */}
                   <AnimatePresence>
-                    {paymentInfo.paymentMethod === 'Dinheiro' && (
+                    {splitPayments.some(p => p.method === 'Dinheiro') && (
                       <motion.div 
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -600,7 +696,7 @@ export default function CartPage() {
                         <div className="mt-4 p-4 bg-[#fff8f0] border border-[#ff914a]/20 rounded-xl space-y-3">
                           <div className="flex items-center gap-2">
                             <Banknote className="w-4 h-4 text-[#ff914a]" />
-                            <span className="text-sm font-bold text-[#381010]">Precisa de troco?</span>
+                            <span className="text-sm font-bold text-[#381010]">Precisa de troco para o Dinheiro?</span>
                           </div>
                           
                           <div className="flex gap-3">
@@ -642,7 +738,7 @@ export default function CartPage() {
                                   <input
                                     type="text"
                                     inputMode="decimal"
-                                    placeholder={`Ex: ${Math.ceil(finalTotal / 10) * 10},00`}
+                                    placeholder={`Ex: 50,00`}
                                     className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all"
                                     value={changeFor}
                                     onChange={e => {
@@ -653,17 +749,20 @@ export default function CartPage() {
                                 </div>
                                 {changeFor && (() => {
                                   const amount = parseFloat(changeFor.replace(',', '.'));
-                                  if (!isNaN(amount) && amount > finalTotal) {
-                                    const trocoVal = (amount - finalTotal).toFixed(2).replace('.', ',');
+                                  const cashPayment = splitPayments.find(p => p.method === 'Dinheiro');
+                                  const cashValue = parseFloat(cashPayment?.value.replace(',', '.') || '0');
+                                  
+                                  if (!isNaN(amount) && amount > cashValue) {
+                                    const trocoVal = (amount - cashValue).toFixed(2).replace('.', ',');
                                     return (
                                       <p className="text-xs text-green-600 font-semibold mt-1 flex items-center gap-1">
                                         <Banknote className="w-3 h-3" /> Troco: R$ {trocoVal}
                                       </p>
                                     );
-                                  } else if (!isNaN(amount) && amount <= finalTotal) {
+                                  } else if (!isNaN(amount) && amount <= cashValue) {
                                     return (
                                       <p className="text-xs text-red-500 font-semibold mt-1">
-                                        O valor precisa ser maior que o total (R$ {finalTotal.toFixed(2).replace('.', ',')})
+                                        O valor precisa ser maior que a parte em dinheiro (R$ {cashValue.toFixed(2).replace('.', ',')})
                                       </p>
                                     );
                                   }
