@@ -13,7 +13,9 @@ export default function CashReportPrintPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const today = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        const searchParams = new URLSearchParams(window.location.search);
+        const dateParam = searchParams.get('date');
+        const today = dateParam || new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
         const { data, error } = await supabase
           .from('orders')
@@ -23,14 +25,14 @@ export default function CashReportPrintPage() {
 
         if (error) throw error;
 
-        const todayOrders = (data || []).filter(o =>
+        const filteredOrders = (data || []).filter(o =>
           new Date(o.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) === today
         );
 
         const totals: Record<string, number> = {};
         let total = 0;
 
-        todayOrders.forEach(o => {
+        filteredOrders.forEach(o => {
           const method = o.payment_method || 'Outros';
           const value = Number(o.total_price) || 0;
           totals[method] = (totals[method] || 0) + value;
@@ -38,11 +40,11 @@ export default function CashReportPrintPage() {
         });
 
         setReportData({
-          date: new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+          date: today,
           totals,
           total,
-          count: todayOrders.length,
-          items: todayOrders
+          count: filteredOrders.length,
+          items: filteredOrders
         });
       } catch (err) {
         console.error("Erro ao buscar dados:", err);

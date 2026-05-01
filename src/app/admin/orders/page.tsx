@@ -487,9 +487,21 @@ export default function AdminOrdersPage() {
                     {/* Bottom Section / Right Section */}
                     <div className="flex items-center sm:flex-col justify-between sm:justify-center sm:items-end pt-3 sm:pt-0 border-t sm:border-0 border-gray-50 gap-2">
                       <p className="font-black text-[var(--color-brand-dark)] text-xl sm:text-2xl tracking-tighter">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                      <span className={`text-[8px] sm:text-[9px] font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl uppercase tracking-[0.15em] ${statusConfig[order.status].color} border shadow-sm`}>
-                        {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`/admin/orders/${order.id}/print`, '_blank');
+                          }}
+                          className="p-2.5 bg-gray-50 text-[var(--color-brand-accent)] border border-gray-100 rounded-xl hover:bg-[var(--color-brand-accent)]/10 hover:border-[var(--color-brand-accent)]/20 transition-all shadow-sm"
+                          title="Imprimir Pedido"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </button>
+                        <span className={`text-[8px] sm:text-[9px] font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl uppercase tracking-[0.15em] ${statusConfig[order.status].color} border shadow-sm`}>
+                          {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

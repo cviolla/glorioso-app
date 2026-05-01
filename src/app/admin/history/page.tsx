@@ -249,6 +249,12 @@ export default function AdminHistoryPage() {
                     <div>
                       <h2 className="text-3xl font-black tracking-tight">{selectedDay.date}</h2>
                       <p className="text-[var(--color-brand-accent)] font-black text-xs uppercase tracking-widest mt-1">Detalhamento das Vendas</p>
+                      <button 
+                        onClick={() => window.open(`/admin/cash-report/print?date=${selectedDay.date}`, '_blank')}
+                        className="mt-4 flex items-center gap-2 bg-[#ff914a] text-[#381010] px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#ff914a]/20"
+                      >
+                        <Printer className="w-4 h-4" /> Imprimir Relatório
+                      </button>
                     </div>
                     <div className="text-right">
                       <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">FATURAMENTO</p>
@@ -333,20 +339,25 @@ export default function AdminHistoryPage() {
         </div>
       </div>
 
-      {/* Order Detail Modal */}
+      {/* Order Detail Modal / Mobile Bottom Sheet */}
       <AnimatePresence>
         {selectedOrder && (
           <div 
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#381010]/40 backdrop-blur-md"
+            className="fixed inset-0 z-[100] flex items-end lg:items-center justify-center lg:p-4 bg-[#381010]/40 backdrop-blur-md"
             onClick={(e) => { if (e.target === e.currentTarget) setSelectedOrder(null); }}
           >
             <motion.div 
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white rounded-[2rem] w-full max-w-lg overflow-hidden shadow-[0_20px_60px_rgba(56,16,16,0.2)] border border-white/20 max-h-[90vh] flex flex-col"
+              initial={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              exit={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="bg-white rounded-t-[2rem] lg:rounded-[2rem] w-full max-w-lg overflow-hidden shadow-[0_20px_60px_rgba(56,16,16,0.2)] border border-white/20 max-h-[96dvh] lg:h-auto lg:max-h-[90vh] flex flex-col"
             >
+              {/* Mobile Drag Handle */}
+              <div className="flex justify-center pt-3 pb-1 lg:hidden shrink-0">
+                <div className="w-10 h-1 rounded-full bg-gray-200" />
+              </div>
+
               {/* Header */}
               <div className="p-6 border-b border-gray-100 shrink-0">
                 <div className="flex items-center justify-between mb-4">
@@ -434,7 +445,7 @@ export default function AdminHistoryPage() {
               </div>
 
               {/* Footer - Total */}
-              <div className="p-6 bg-gray-50/50 border-t border-gray-100 shrink-0">
+              <div className="p-6 bg-gray-50/50 border-t border-gray-100 shrink-0 pb-14 lg:pb-6">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400 font-black text-xs uppercase tracking-[0.2em]">Total do Pedido</span>
                   <span className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tighter">R$ {selectedOrder.total_price.toFixed(2).replace('.', ',')}</span>
