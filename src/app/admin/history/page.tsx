@@ -155,31 +155,33 @@ export default function AdminHistoryPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+  return (
+    <div className="space-y-4 md:space-y-6">
+      {/* Header Section - Refined for Mobile */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1 md:px-0">
         <div>
-          <h1 className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Histórico de Vendas</h1>
-          <p className="text-gray-400 font-medium text-sm">Resumo financeiro agrupado por dia.</p>
+          <h1 className="text-xl md:text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Histórico de Vendas</h1>
+          <p className="text-gray-400 font-medium text-[10px] md:text-sm uppercase tracking-wider">Gestão financeira diária</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1 md:flex-none">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <input 
               type="text" 
-              placeholder="Buscar por data..." 
-              className="pl-10 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-sm"
+              placeholder="Buscar data..." 
+              className="w-full pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-xs md:text-sm font-bold"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="relative group">
-            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="relative flex-1 md:flex-none">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <select 
-              className="pl-10 pr-8 py-2.5 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-sm font-bold appearance-none cursor-pointer"
+              className="w-full pl-9 pr-6 py-2 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-[11px] md:text-sm font-bold appearance-none cursor-pointer uppercase"
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
             >
-              <option value="all">TODOS MÉTODOS</option>
+              <option value="all">TODOS</option>
               {availableMethods.map(method => (
                 <option key={method} value={method}>{method.toUpperCase()}</option>
               ))}
@@ -188,18 +190,18 @@ export default function AdminHistoryPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* List of Days */}
-        <div className="lg:col-span-1 space-y-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+        {/* List of Days - Compacted */}
+        <div className="lg:col-span-1 space-y-2 md:space-y-3">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
-              <Loader2 className="w-8 h-8 text-[#ff914a] animate-spin mb-2" />
-              <p className="text-gray-500 text-xs font-medium">Processando histórico...</p>
+            <div className="flex flex-col items-center justify-center py-12 md:py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+              <Loader2 className="w-6 h-6 text-[#ff914a] animate-spin mb-2" />
+              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Carregando...</p>
             </div>
           ) : filteredSummaries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
-              <CalendarDays className="w-10 h-10 text-gray-200 mb-2" />
-              <p className="text-gray-400 text-xs font-medium">Nenhum registro encontrado.</p>
+            <div className="flex flex-col items-center justify-center py-12 md:py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+              <CalendarDays className="w-8 h-8 text-gray-100 mb-2" />
+              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Sem registros</p>
             </div>
           ) : (
             filteredSummaries.map((summary) => (
@@ -207,25 +209,25 @@ export default function AdminHistoryPage() {
                 layoutId={summary.date}
                 key={summary.date}
                 onClick={() => { setSelectedDay(summary); setSelectedOrder(null); }}
-                className={`p-5 rounded-2xl border-2 transition-all cursor-pointer ${
+                className={`p-4 md:p-5 rounded-2xl border-2 transition-all cursor-pointer ${
                   selectedDay?.date === summary.date 
-                    ? 'bg-white border-[var(--color-brand-accent)] shadow-lg shadow-[var(--color-brand-accent)]/10' 
+                    ? 'bg-white border-[var(--color-brand-accent)] shadow-lg shadow-[var(--color-brand-accent)]/5' 
                     : 'bg-white border-white hover:border-gray-50 shadow-sm'
                 }`}
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">DATA</p>
-                    <p className="font-black text-[var(--color-brand-dark)]">{summary.date}</p>
+                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-0.5">DATA</p>
+                    <p className="font-black text-[var(--color-brand-dark)] text-sm md:text-base">{summary.date}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">TOTAL</p>
-                    <p className="font-black text-[var(--color-brand-accent)]">R$ {summary.total.toFixed(2).replace('.', ',')}</p>
+                    <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest mb-0.5">TOTAL</p>
+                    <p className="font-black text-[var(--color-brand-accent)] text-sm md:text-base">R$ {summary.total.toFixed(2).replace('.', ',')}</p>
                   </div>
                 </div>
                 <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
-                   <span className="text-[10px] font-black text-gray-300 uppercase tracking-tighter">{summary.count} pedidos realizados</span>
-                   <ChevronRight className={`w-4 h-4 transition-transform ${selectedDay?.date === summary.date ? 'text-[var(--color-brand-accent)]' : 'text-gray-300'}`} />
+                   <span className="text-[9px] font-bold text-gray-300 uppercase">{summary.count} {summary.count === 1 ? 'pedido' : 'pedidos'}</span>
+                   <ChevronRight className={`w-3.5 h-3.5 transition-transform ${selectedDay?.date === summary.date ? 'text-[var(--color-brand-accent)] translate-x-1' : 'text-gray-200'}`} />
                 </div>
               </motion.div>
             ))
@@ -316,7 +318,7 @@ export default function AdminHistoryPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-[var(--color-brand-accent)]/5 rounded-2xl border border-[var(--color-brand-accent)]/10">
                         <p className="text-[10px] font-black text-[var(--color-brand-accent)] uppercase tracking-widest mb-1">Média por Pedido</p>
-                        <p className="text-xl font-black text-[var(--color-brand-dark)]">R$ {(selectedDay.total / selectedDay.count).toFixed(2).replace('.', ',')}</p>
+                        <p className="text-xl font-black text-[var(--color-brand-dark)]">R$ {(selectedDay.total / (selectedDay.count || 1)).toFixed(2).replace('.', ',')}</p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Volume de Vendas</p>
@@ -339,105 +341,102 @@ export default function AdminHistoryPage() {
         </div>
       </div>
 
-      {/* Mobile Day Detail Modal */}
+      {/* Mobile Day Detail Modal - PREMIUM OVERHAUL */}
       <AnimatePresence>
         {selectedDay && (
           <div 
-            className="lg:hidden fixed inset-0 z-[100] flex items-end justify-center bg-[#381010]/60 backdrop-blur-md"
+            className="lg:hidden fixed inset-0 z-[100] flex flex-col bg-[#381010]/80 backdrop-blur-md"
             onClick={(e) => { if (e.target === e.currentTarget) setSelectedDay(null); }}
           >
             <motion.div 
-              key={`mobile-modal-${selectedDay.date}`}
+              key={`mobile-modal-premium-${selectedDay.date}`}
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{ height: '94dvh', maxHeight: '94dvh' }}
-              className="bg-white rounded-t-[2.5rem] w-full shadow-[0_-10px_60px_rgba(0,0,0,0.3)] border-t border-white/20 flex flex-col overflow-hidden"
+              transition={{ type: 'spring', damping: 30, stiffness: 250 }}
+              className="bg-white rounded-t-[2rem] w-full shadow-[0_-15px_50px_rgba(0,0,0,0.4)] fixed top-[8dvh] bottom-0 left-0 right-0 flex flex-col overflow-hidden"
             >
-              {/* Mobile Drag Handle Area */}
-              <div className="flex justify-center pt-4 pb-2 shrink-0 bg-[var(--color-brand-dark)]">
-                <div className="w-12 h-1.5 rounded-full bg-white/20" />
+              {/* Drag Handle */}
+              <div className="flex justify-center pt-3 pb-2 bg-[var(--color-brand-dark)]">
+                <div className="w-10 h-1 rounded-full bg-white/10" />
               </div>
               
-              {/* Header */}
-              <div className="bg-[var(--color-brand-dark)] px-8 pb-8 text-white relative shrink-0">
-                <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-brand-accent)]/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                
+              {/* Compact Premium Header */}
+              <div className="bg-[var(--color-brand-dark)] px-6 pb-6 text-white relative shrink-0">
                 <button 
                   onClick={() => setSelectedDay(null)}
-                  className="absolute right-6 top-0 p-2 text-white/30 hover:text-white transition-colors rounded-full hover:bg-white/10 z-20"
+                  className="absolute right-4 top-0 p-2 text-white/30 hover:text-white transition-colors"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
 
-                <div className="flex justify-between items-end relative z-10 pt-2">
+                <div className="flex justify-between items-center relative z-10 pt-1">
                   <div>
-                    <h2 className="text-3xl font-black tracking-tight">{selectedDay.date}</h2>
-                    <p className="text-[var(--color-brand-accent)] font-black text-[10px] uppercase tracking-[0.2em] mt-1">DETALHAMENTO DE VENDAS [V3]</p>
-                    <button 
-                      onClick={() => window.open(`/admin/cash-report/print?date=${selectedDay.date}`, '_blank')}
-                      className="mt-4 flex items-center gap-2 bg-[#ff914a] text-[#381010] px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#ff914a]/20"
-                    >
-                      <Printer className="w-4 h-4" /> Imprimir Relatório
-                    </button>
+                    <h2 className="text-xl font-black tracking-tight">{selectedDay.date}</h2>
+                    <p className="text-[var(--color-brand-accent)] font-bold text-[9px] uppercase tracking-wider mt-0.5">RESUMO DIÁRIO</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">FATURAMENTO</p>
-                    <p className="text-3xl font-black text-[#ff914a]">R$ {selectedDay.total.toFixed(2).replace('.', ',')}</p>
+                    <p className="text-white/40 text-[8px] font-black uppercase tracking-widest mb-0.5">FATURAMENTO</p>
+                    <p className="text-xl font-black text-[#ff914a]">R$ {selectedDay.total.toFixed(2).replace('.', ',')}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex gap-2">
+                  <button 
+                    onClick={() => window.open(`/admin/cash-report/print?date=${selectedDay.date}`, '_blank')}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#ff914a] text-[#381010] py-2 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-[#ff914a]/10 active:scale-95 transition-all"
+                  >
+                    <Printer className="w-3.5 h-3.5" /> Imprimir Relatório
+                  </button>
+                  <div className="px-3 py-2 bg-white/5 rounded-xl flex flex-col items-center justify-center border border-white/5">
+                    <span className="text-[7px] text-white/40 font-black uppercase tracking-widest mb-0.5">PEDIDOS</span>
+                    <span className="text-xs font-black text-white">{selectedDay.count}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Orders List Container */}
+              {/* Clean Orders List - Optimized Spacing */}
               <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50/50">
-                <div className="p-6 space-y-4 pb-40"> {/* pb-40 garante visibilidade total */}
-                  {selectedDay.orders.length > 0 ? (
-                    selectedDay.orders.map((order) => (
-                      <motion.div 
-                        key={`mobile-order-${order.id}`}
-                        onClick={() => setSelectedOrder(order)}
-                        whileTap={{ scale: 0.98 }}
-                        className={`flex justify-between items-center p-5 rounded-2xl transition-all cursor-pointer bg-white border border-gray-100 shadow-sm ${
-                          selectedOrder?.id === order.id ? 'ring-2 ring-[var(--color-brand-accent)] border-transparent' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center font-black text-[11px] text-[var(--color-brand-dark)] border border-gray-100">
+                <div className="p-4 space-y-2 pb-32">
+                  {selectedDay.orders.map((order) => (
+                    <motion.div 
+                      key={`mob-order-ref-${order.id}`}
+                      onClick={() => setSelectedOrder(order)}
+                      whileTap={{ scale: 0.98 }}
+                      className={`flex justify-between items-center p-3 rounded-xl transition-all cursor-pointer bg-white border ${
+                        selectedOrder?.id === order.id ? 'border-[var(--color-brand-accent)] shadow-sm' : 'border-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100 shrink-0">
+                          <span className="text-[9px] font-black text-[var(--color-brand-dark)]">
                             {new Date(order.created_at).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })}
-                          </div>
-                          <div>
-                            <p className="font-black text-[var(--color-brand-dark)] text-[15px]">{order.customer_name}</p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{order.payment_method}</p>
-                              {order.delivery_type === 'delivery' && (
-                                <span className="text-[9px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-black tracking-tighter">DELIVERY</span>
-                              )}
-                            </div>
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-bold text-[var(--color-brand-dark)] text-[13px] truncate">{order.customer_name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-[9px] text-gray-400 font-semibold uppercase truncate">{order.payment_method}</p>
+                            {order.delivery_type === 'delivery' && (
+                              <span className="text-[8px] text-blue-500 font-black uppercase tracking-tighter">DELIVERY</span>
+                            )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-black text-[var(--color-brand-dark)]">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
-                          <ChevronRight className="w-4 h-4 text-gray-300" />
-                        </div>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <div className="py-20 text-center">
-                      <p className="text-gray-400 font-medium italic">Nenhum pedido registrado.</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
+                        <p className="font-black text-[var(--color-brand-dark)] text-sm">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-200" />
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {/* Stats Summary */}
+                  <div className="p-4 bg-white rounded-xl border border-gray-100 shadow-sm mt-2 flex justify-between items-center">
+                    <div className="flex flex-col">
+                      <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">Tíquete Médio</span>
+                      <span className="text-sm font-black text-[var(--color-brand-dark)]">R$ {(selectedDay.total / (selectedDay.count || 1)).toFixed(2).replace('.', ',')}</span>
                     </div>
-                  )}
-
-                  {/* Summary Stats in the list */}
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-[10px] font-black text-[var(--color-brand-accent)] uppercase tracking-widest mb-1">Média</p>
-                      <p className="text-xl font-black text-[var(--color-brand-dark)]">R$ {(selectedDay.total / (selectedDay.count || 1)).toFixed(2).replace('.', ',')}</p>
-                    </div>
-                    <div className="p-5 bg-white rounded-2xl border border-gray-100 shadow-sm">
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Volume</p>
-                      <p className="text-xl font-black text-[var(--color-brand-dark)]">{selectedDay.count} Pedidos</p>
-                    </div>
+                    <TrendingUp className="w-4 h-4 text-[var(--color-brand-accent)]/20" />
                   </div>
                 </div>
               </div>
