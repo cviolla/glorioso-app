@@ -79,7 +79,7 @@ export default function AdminHistoryPage() {
       if (data) {
         const groups: Record<string, DailySummary> = {};
         
-        data.forEach((order: any) => {
+        data.forEach((order: Order) => {
           const date = new Date(order.created_at).toLocaleDateString('pt-BR', { 
             timeZone: 'America/Sao_Paulo',
             year: 'numeric',
@@ -103,7 +103,7 @@ export default function AdminHistoryPage() {
 
         setDailySummaries(Object.values(groups));
 
-        const methods = Array.from(new Set(data.map((o: any) => o.payment_method))).filter(Boolean) as string[];
+        const methods = Array.from(new Set(data.map((o: Order) => o.payment_method))).filter(Boolean) as string[];
         setAvailableMethods(methods);
       }
     } catch (err) {

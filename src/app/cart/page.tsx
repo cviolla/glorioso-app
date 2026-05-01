@@ -81,18 +81,36 @@ export default function CartPage() {
     setUserInfo({ ...userInfo, phone: formatted });
   };
 
+  const getDeliveryFee = () => {
+    if (deliveryType !== 'delivery') return 0;
+    const neighborhood = address.neighborhood;
+    return deliveryFees[neighborhood] || deliveryFees['Outros'] || 7.00;
+  };
+  
+  const deliveryFee = getDeliveryFee();
+  const finalTotal = totalPrice() + deliveryFee;
+
+  const currentSplitTotal = splitPayments.reduce((sum, p) => {
+    const val = parseFloat(p.value.replace(',', '.')) || 0;
+    return sum + val;
+  }, 0);
+
+  const isTotalMatched = Math.abs(currentSplitTotal - finalTotal) < 0.01;
+  const isCartEmpty = items.length === 0;
+
   useEffect(() => {
     if (isHydrated && !userInfo.phone) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUserInfo(prev => ({ ...prev, phone: '+55 (21) ' }));
     }
-  }, [isHydrated]);
+  }, [isHydrated, userInfo.phone]);
 
   useEffect(() => {
     if (isHydrated && paymentMethods.length > 0 && splitPayments.length === 0) {
-      // Inicia com o primeiro método de pagamento disponível se nenhum estiver selecionado
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSplitPayments([{ method: paymentMethods[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
     }
-  }, [isHydrated, paymentMethods, finalTotal]);
+  }, [isHydrated, paymentMethods, finalTotal, splitPayments.length]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -119,29 +137,7 @@ export default function CartPage() {
     };
 
     fetchCustomerData();
-  }, [userInfo.phone]);
-
-  const isCartEmpty = items.length === 0;
-  
-  const getDeliveryFee = () => {
-    if (deliveryType !== 'delivery') return 0;
-    
-    const neighborhood = address.neighborhood;
-    
-    // Busca a taxa configurada no painel administrativo
-    // Se não encontrar o bairro específico, usa a taxa de 'Outros'
-    return deliveryFees[neighborhood] || deliveryFees['Outros'] || 7.00;
-  };
-  
-  const deliveryFee = getDeliveryFee();
-  const finalTotal = totalPrice() + deliveryFee;
-
-  const currentSplitTotal = splitPayments.reduce((sum, p) => {
-    const val = parseFloat(p.value.replace(',', '.')) || 0;
-    return sum + val;
-  }, 0);
-
-  const isTotalMatched = Math.abs(currentSplitTotal - finalTotal) < 0.01;
+  }, [userInfo.phone, userInfo.name]);
 
   if (!isHydrated) return null;
 
@@ -313,7 +309,7 @@ export default function CartPage() {
         router.push('/menu');
       }, 500);
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erro ao salvar pedido:", err);
       setModalConfig({
         isOpen: true,
