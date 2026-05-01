@@ -26,7 +26,7 @@ interface Order {
   items: OrderItem[];
 }
 
-const SEP = '--------------------------------';
+const SEP = '================================';
 
 export function InvoicePrint({ order }: { order: Order }) {
   const formatDate = (dateStr: string) => {
@@ -43,78 +43,79 @@ export function InvoicePrint({ order }: { order: Order }) {
   return (
     <div id="thermal-receipt" className="thermal-receipt">
       {/* Cabeçalho */}
-      <div className="text-center">
-        <p className="text-sm font-bold">GLORIOSO BROWNIE</p>
-        <p className="text-[8px]">{SEP}</p>
-        <p className="text-[9px] font-bold">PEDIDO: #{order.id.slice(-6).toUpperCase()}</p>
-        <p className="text-[8px]">{formatDate(order.created_at)}</p>
-        <p className="text-[8px]">{SEP}</p>
+      <div className="text-center mb-1">
+        <p className="text-[14px] leading-tight">GLORIOSO BROWNIE</p>
+        <p className="text-[11px] mt-1">PEDIDO: #{order.id.slice(-6).toUpperCase()}</p>
+        <p className="text-[10px] opacity-80">{formatDate(order.created_at)}</p>
+        <p className="mt-1">{SEP}</p>
       </div>
 
       {/* Dados do Cliente */}
-      <div className="mb-1">
-        <p><strong>CLIENTE:</strong> {order.customer_name}</p>
-        <p><strong>TEL:</strong> {order.customer_phone}</p>
-        <p className="text-[8px]">{SEP}</p>
-        <p><strong>TIPO:</strong> {order.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
-        <p><strong>PREVISÃO:</strong> {order.order_time}</p>
+      <div className="space-y-0.5 mb-1 text-[11px]">
+        <p>CLIENTE: {order.customer_name.toUpperCase()}</p>
+        <p>TEL: {order.customer_phone}</p>
+        <p>TIPO: {order.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
+        <p>PREVISÃO: {order.order_time}</p>
+        
         {order.delivery_type === 'delivery' && (
-          <>
-            <p><strong>END:</strong> {order.address_street}, {order.address_number}</p>
-            <p><strong>BAIRRO:</strong> {order.address_neighborhood}</p>
-            {order.address_complement && <p><strong>COMPL:</strong> {order.address_complement}</p>}
-            {order.address_reference && <p><strong>REF:</strong> {order.address_reference}</p>}
-          </>
+          <div className="mt-1">
+            <p>END: {order.address_street}, {order.address_number}</p>
+            <p>BAIRRO: {order.address_neighborhood}</p>
+            {order.address_complement && <p>COMPL: {order.address_complement}</p>}
+            {order.address_reference && <p>REF: {order.address_reference}</p>}
+          </div>
         )}
-        <p className="text-[8px]">{SEP}</p>
+        <p className="mt-1">{SEP}</p>
       </div>
 
       {/* Itens do Pedido */}
       <div className="mb-1">
-        <p className="font-bold text-center mb-1">RESUMO DO PEDIDO</p>
-        {order.items.map((item, idx) => (
-          <div key={idx} className="mb-1">
-            <div className="item-row">
-              <span className="font-bold">{item.quantity}x {item.name.substring(0, 18)}</span>
-              <span className="font-bold">R${(item.price * item.quantity).toFixed(2)}</span>
+        <p className="text-center mb-1 text-[12px]">RESUMO DO PEDIDO</p>
+        <div className="space-y-2">
+          {order.items.map((item, idx) => (
+            <div key={idx} className="text-[11px]">
+              <div className="item-row">
+                <span className="flex-1">{item.quantity}x {item.name.toUpperCase()}</span>
+                <span className="whitespace-nowrap ml-2">R${(item.price * item.quantity).toFixed(2)}</span>
+              </div>
+              {item.variant && <p className="text-[10px] ml-4 opacity-80">• {item.variant}</p>}
+              {item.addons?.map(a => (
+                <p key={a.name} className="text-[10px] ml-4 opacity-80">+ {a.name}</p>
+              ))}
             </div>
-            {item.variant && <p className="text-[8px] ml-1 opacity-70">• {item.variant}</p>}
-            {item.addons?.map(a => (
-              <p key={a.name} className="text-[8px] ml-1 opacity-70">+ {a.name}</p>
-            ))}
-          </div>
-        ))}
-        <p className="text-[8px]">{SEP}</p>
+          ))}
+        </div>
+        <p className="mt-2">{SEP}</p>
       </div>
 
       {/* Totais */}
-      <div className="mb-1">
-        <div className="item-row">
-          <span>Subtotal:</span>
+      <div className="space-y-1 mb-1">
+        <div className="item-row text-[11px]">
+          <span>SUBTOTAL:</span>
           <span>R${order.total_price.toFixed(2)}</span>
         </div>
-        <div className="item-row font-bold">
+        <div className="item-row text-[14px]">
           <span>TOTAL:</span>
           <span>R${order.total_price.toFixed(2)}</span>
         </div>
-        <p className="text-[8px] mt-1">{SEP}</p>
+        <p className="mt-1">{SEP}</p>
       </div>
 
       {/* Pagamento e Observações */}
-      <div className="mb-2">
-        <p><strong>PAGAMENTO:</strong> {order.payment_method}</p>
+      <div className="mb-2 text-[11px]">
+        <p>PAGAMENTO: {order.payment_method.toUpperCase()}</p>
         {order.observation && (
-          <div className="mt-1">
-            <p className="text-[8px]"><strong>OBS:</strong> {order.observation}</p>
+          <div className="mt-2 p-1 border border-black/10 rounded">
+            <p className="text-[10px]">OBS: {order.observation}</p>
           </div>
         )}
       </div>
 
       {/* Rodapé */}
-      <div className="text-center mt-2 pb-4">
-        <p className="text-[8px] uppercase tracking-widest">Obrigado pela preferência!</p>
-        <p className="text-[7px] mt-1">gloriosobrownie.com.br</p>
-        <p className="text-[8px] mt-2">. . . . . . . . . . . . . . . .</p>
+      <div className="text-center mt-2 pb-6">
+        <p className="text-[10px] uppercase">Obrigado pela preferência!</p>
+        <p className="text-[9px] mt-1">gloriosobrownie.com.br</p>
+        <p className="text-[11px] mt-2">. . . . . . . . . . . .</p>
       </div>
     </div>
   );
