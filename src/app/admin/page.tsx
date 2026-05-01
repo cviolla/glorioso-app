@@ -607,16 +607,16 @@ function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item:
           )}
         </div>
         <div>
-          <h4 className={`font-bold text-[var(--color-brand-dark)] text-base leading-tight flex items-center gap-2`}>
+          <h4 className={`font-bold text-[var(--color-brand-dark)] text-[14.5px] leading-tight flex items-center gap-2`}>
             {item.name}
-            {!item.is_active && <span className="text-[9px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest font-black">Oculto</span>}
+            {!item.is_active && <span className="text-[8px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest font-black">Oculto</span>}
           </h4>
           {item.price !== undefined && item.price > 0 ? (
-            <p className="text-sm text-gray-500 font-semibold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+            <p className="text-[12.5px] text-gray-500 font-semibold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
           ) : item.variants && item.variants.length > 0 ? (
-            <p className="text-sm text-[var(--color-brand-accent)] font-bold mt-0.5">Várias opções</p>
+            <p className="text-[12.5px] text-[var(--color-brand-accent)] font-bold mt-0.5">Várias opções</p>
           ) : (
-            <p className="text-sm text-gray-400 mt-0.5 italic">Consulte as opções</p>
+            <p className="text-[12.5px] text-gray-400 mt-0.5 italic">Consulte as opções</p>
           )}
         </div>
       </div>
