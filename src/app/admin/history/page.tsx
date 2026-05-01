@@ -246,7 +246,7 @@ export default function AdminHistoryPage() {
                   animate={{ y: 0, opacity: 1, x: 0 }}
                   exit={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { opacity: 0, x: -20 }}
                   transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                  className="bg-white rounded-t-[2rem] lg:rounded-[2rem] w-full lg:max-w-none overflow-hidden shadow-xl border border-gray-100 sticky top-24 max-h-[92dvh] lg:max-h-none flex flex-col lg:block"
+                  className="bg-white rounded-t-[2rem] lg:rounded-[2rem] w-full lg:max-w-none overflow-hidden shadow-xl border border-gray-100 lg:sticky lg:top-24 h-[92dvh] lg:h-auto lg:max-h-none flex flex-col lg:block"
                 >
                   {/* Mobile Drag Handle */}
                   <div className="flex justify-center pt-3 pb-1 lg:hidden shrink-0">
