@@ -46,7 +46,13 @@ export default function CartPage() {
 
   useEffect(() => {
     fetchSettings();
-    setIsHydrated(true);
+    
+    // Use a small delay to avoid the synchronous setState warning on mount
+    const timer = setTimeout(() => {
+      setIsHydrated(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
   }, [fetchSettings]);
 
   // Force scroll to top on step change

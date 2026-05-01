@@ -9,10 +9,8 @@ import {
   RefreshCw,
   ToggleLeft,
   ToggleRight,
-  AlertTriangle
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { CustomModal } from "@/components/CustomModal";
 
 export default function AdminSettingsPage() {
@@ -53,10 +51,13 @@ export default function AdminSettingsPage() {
 
   useEffect(() => {
     if (!hasInitialized && !useSettingsStore.getState().isLoading) {
-      if (whatsappNumber) setLocalWhatsapp(whatsappNumber);
-      if (deliveryFees && Object.keys(deliveryFees).length > 0) setLocalFees(deliveryFees);
-      if (paymentMethods) setLocalMethods(paymentMethods);
-      setHasInitialized(true);
+      // Use microtask to avoid synchronous setState warning during initial mount
+      queueMicrotask(() => {
+        setHasInitialized(true);
+        if (whatsappNumber) setLocalWhatsapp(whatsappNumber);
+        if (deliveryFees && Object.keys(deliveryFees).length > 0) setLocalFees(deliveryFees);
+        if (paymentMethods) setLocalMethods(paymentMethods);
+      });
     }
   }, [whatsappNumber, deliveryFees, paymentMethods, hasInitialized]);
 
@@ -136,11 +137,12 @@ export default function AdminSettingsPage() {
                   setIsSaving(true);
                   try {
                     await setManualOpen(!isManualOpen);
-                  } catch (err: any) {
+                  } catch (err: unknown) {
+                    const error = err as Error;
                     setModalConfig({
                       isOpen: true,
                       title: "Erro de Permissão",
-                      message: `Não foi possível atualizar o status no banco de dados. Verifique se você rodou o SQL de permissão de UPDATE no Supabase.\n\nErro: ${err.message || 'Desconhecido'}`,
+                      message: `Não foi possível atualizar o status no banco de dados. Verifique se você rodou o SQL de permissão de UPDATE no Supabase.\n\nErro: ${error.message || 'Desconhecido'}`,
                       type: "danger"
                     });
                   } finally {

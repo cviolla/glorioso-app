@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { 
-  Calendar, 
   ChevronRight, 
   TrendingUp, 
   ShoppingBag,
@@ -16,7 +15,6 @@ import {
   MapPin,
   Truck,
   Clock,
-  XCircle,
   Printer,
   X
 } from 'lucide-react';
@@ -65,8 +63,8 @@ export default function AdminHistoryPage() {
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
 
-  const fetchHistory = useCallback(async () => {
-    setLoading(true);
+  const fetchHistory = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
     try {
       const { data, error } = await supabase
         .from('orders')
@@ -114,7 +112,7 @@ export default function AdminHistoryPage() {
   }, []);
 
   useEffect(() => {
-    fetchHistory();
+    fetchHistory(true);
   }, [fetchHistory]);
 
   const filteredSummaries = dailySummaries.map(summary => {
@@ -135,9 +133,11 @@ export default function AdminHistoryPage() {
   useEffect(() => {
     if (selectedDay) {
       const updated = filteredSummaries.find(s => s.date === selectedDay.date);
-      setSelectedDay(updated || null);
+      queueMicrotask(() => {
+        setSelectedDay(updated || null);
+      });
     }
-  }, [paymentFilter, searchQuery, dailySummaries]);
+  }, [paymentFilter, searchQuery, dailySummaries, selectedDay?.date, filteredSummaries]);
 
   const handlePrintOrder = () => {
     if (!selectedOrder) return;
@@ -236,15 +236,33 @@ export default function AdminHistoryPage() {
         <div className="lg:col-span-2">
           <AnimatePresence mode="wait">
             {selectedDay ? (
-              <motion.div 
-                key={selectedDay.date}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden sticky top-24"
+              <div 
+                className="fixed inset-0 z-[100] flex items-end lg:items-start justify-center lg:p-0 bg-[#381010]/40 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none lg:static lg:block"
+                onClick={(e) => { if (e.target === e.currentTarget && typeof window !== 'undefined' && window.innerWidth < 1024) setSelectedDay(null); }}
               >
-                <div className="bg-[var(--color-brand-dark)] p-8 text-white relative">
+                <motion.div 
+                  key={selectedDay.date}
+                  initial={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { opacity: 0, x: 20 }}
+                  animate={{ y: 0, opacity: 1, x: 0 }}
+                  exit={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { opacity: 0, x: -20 }}
+                  transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                  className="bg-white rounded-t-[2rem] lg:rounded-[2rem] w-full lg:max-w-none overflow-hidden shadow-xl border border-gray-100 sticky top-24 max-h-[92dvh] lg:max-h-none flex flex-col lg:block"
+                >
+                  {/* Mobile Drag Handle */}
+                  <div className="flex justify-center pt-3 pb-1 lg:hidden shrink-0">
+                    <div className="w-10 h-1 rounded-full bg-gray-200" />
+                  </div>
+                <div className="bg-[var(--color-brand-dark)] p-8 text-white relative shrink-0">
                   <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-brand-accent)]/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                  
+                  {/* Mobile Close Button */}
+                  <button 
+                    onClick={() => setSelectedDay(null)}
+                    className="absolute right-6 top-6 p-2 text-white/30 hover:text-white transition-colors rounded-full hover:bg-white/10 lg:hidden z-20"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+
                   <div className="flex justify-between items-start relative z-10">
                     <div>
                       <h2 className="text-3xl font-black tracking-tight">{selectedDay.date}</h2>
@@ -263,7 +281,7 @@ export default function AdminHistoryPage() {
                   </div>
                 </div>
 
-                <div className="p-8">
+                <div className="p-8 overflow-y-auto no-scrollbar flex-1">
                   <div className="space-y-4">
                     {selectedDay.orders.map((order) => (
                       <motion.div 
@@ -312,7 +330,7 @@ export default function AdminHistoryPage() {
                     ))}
                   </div>
 
-                  <div className="mt-8 pt-8 border-t border-dashed border-gray-200">
+                  <div className="mt-8 pt-8 border-t border-dashed border-gray-200 pb-10 lg:pb-0">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-[var(--color-brand-accent)]/5 rounded-2xl border border-[var(--color-brand-accent)]/10">
                         <p className="text-[10px] font-black text-[var(--color-brand-accent)] uppercase tracking-widest mb-1">Média por Pedido</p>
@@ -326,7 +344,8 @@ export default function AdminHistoryPage() {
                   </div>
                 </div>
               </motion.div>
-            ) : (
+            </div>
+          ) : (
               <div className="h-[60vh] flex flex-col items-center justify-center bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-200 p-8 text-center">
                 <div className="p-6 rounded-3xl bg-white shadow-sm mb-6">
                   <TrendingUp className="w-12 h-12 text-[var(--color-brand-accent)] opacity-20" />

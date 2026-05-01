@@ -85,8 +85,8 @@ export default function AdminOrdersPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [showRefreshSuccess, setShowRefreshSuccess] = useState(false);
 
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
+  const fetchOrders = useCallback(async (isInitial = false) => {
+    if (!isInitial) setLoading(true);
     try {
       const { data, error } = await supabase
         .from('orders')
@@ -96,8 +96,11 @@ export default function AdminOrdersPage() {
       if (error) throw error;
       setOrders(data || []);
       setLastUpdated(new Date());
-      setShowRefreshSuccess(true);
-      setTimeout(() => setShowRefreshSuccess(false), 2000);
+      
+      if (!isInitial) {
+        setShowRefreshSuccess(true);
+        setTimeout(() => setShowRefreshSuccess(false), 2000);
+      }
     } catch (err) {
       console.error("Erro ao buscar pedidos:", err);
     } finally {
@@ -106,9 +109,10 @@ export default function AdminOrdersPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMounted(true);
-    fetchOrders();
+    queueMicrotask(() => {
+      setIsMounted(true);
+      fetchOrders(true);
+    });
 
     const channel = supabase
       .channel('orders_changes')
@@ -364,7 +368,7 @@ export default function AdminOrdersPage() {
                 { id: '7', label: '7d' },
                 { id: '15', label: '15d' },
                 { id: 'all', label: 'Tudo' }
-              ].map((p) => (
+              ].map((p: { id: string; label: string }) => (
                 <button
                   key={p.id}
                   onClick={() => setSalesPeriod(p.id as '1' | '3' | '7' | '15' | 'all')}
@@ -431,7 +435,7 @@ export default function AdminOrdersPage() {
           <select 
             className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-black appearance-none"
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as OrderStatus | 'all')}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value as OrderStatus | 'all')}
           >
             <option value="all">TODOS STATUS</option>
             <option value="pending">PENDENTES</option>
