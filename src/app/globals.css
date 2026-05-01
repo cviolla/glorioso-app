@@ -65,16 +65,18 @@ img {
 /* ===== ESTILOS PARA IMPRESSORA TÉRMICA (58mm/80mm) ===== */
 
 .thermal-receipt {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 13.5px !important; /* Aumentado conforme solicitado */
   font-weight: 700 !important;
-  line-height: 1.2;
+  line-height: 1.3;
   color: black;
   background: white;
-  width: 54mm; /* Reduzido levemente para evitar cortes laterais */
-  padding: 1mm;
+  width: 56mm; /* Preenche melhor a largura de 58mm */
+  padding: 0;
+  margin: 0 auto !important;
   box-sizing: border-box;
   overflow: hidden;
+  text-align: center; /* Centraliza todo o texto por padrão */
 }
 
 .thermal-receipt * {
@@ -122,10 +124,12 @@ img {
 
   .thermal-receipt {
     position: absolute !important;
-    left: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
     top: 0 !important;
-    width: 54mm !important;
-    padding: 1mm !important;
+    width: 56mm !important;
+    padding: 0 !important;
+    text-align: center !important;
   }
 
   /* Esconde elementos de UI */

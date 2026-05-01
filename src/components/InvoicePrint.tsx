@@ -43,15 +43,15 @@ export function InvoicePrint({ order }: { order: Order }) {
   return (
     <div id="thermal-receipt" className="thermal-receipt">
       {/* Cabeçalho */}
-      <div className="text-center mb-1">
-        <p className="text-[14px] leading-tight">GLORIOSO BROWNIE</p>
-        <p className="text-[11px] mt-1">PEDIDO: #{order.id.slice(-6).toUpperCase()}</p>
-        <p className="text-[10px] opacity-80">{formatDate(order.created_at)}</p>
-        <p className="mt-1">{SEP}</p>
+      <div className="mb-2">
+        <p className="text-[16px] leading-tight font-black">GLORIOSO BROWNIE</p>
+        <p className="text-[12px] mt-1 font-bold">PEDIDO: #{order.id.slice(-6).toUpperCase()}</p>
+        <p className="text-[12px] font-bold">{formatDate(order.created_at)}</p>
+        <p className="mt-1 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Dados do Cliente */}
-      <div className="space-y-0.5 mb-1 text-[11px]">
+      <div className="space-y-1 mb-2 text-[13px] font-bold">
         <p>CLIENTE: {order.customer_name.toUpperCase()}</p>
         <p>TEL: {order.customer_phone}</p>
         <p>TIPO: {order.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
@@ -65,57 +65,57 @@ export function InvoicePrint({ order }: { order: Order }) {
             {order.address_reference && <p>REF: {order.address_reference}</p>}
           </div>
         )}
-        <p className="mt-1">{SEP}</p>
+        <p className="mt-1 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Itens do Pedido */}
-      <div className="mb-1">
-        <p className="text-center mb-1 text-[12px]">RESUMO DO PEDIDO</p>
+      <div className="mb-2">
+        <p className="text-center mb-1 text-[14px] font-black underline">RESUMO DO PEDIDO</p>
         <div className="space-y-2">
           {order.items.map((item, idx) => (
-            <div key={idx} className="text-[11px]">
-              <div className="item-row">
-                <span className="flex-1">{item.quantity}x {item.name.toUpperCase()}</span>
-                <span className="whitespace-nowrap ml-2">R${(item.price * item.quantity).toFixed(2)}</span>
+            <div key={idx} className="text-[13px] font-bold">
+              <div className="flex flex-col items-center">
+                <span className="leading-tight">{item.quantity}x {item.name.toUpperCase()}</span>
+                <span className="font-black">R${(item.price * item.quantity).toFixed(2)}</span>
               </div>
-              {item.variant && <p className="text-[10px] ml-4 opacity-80">• {item.variant}</p>}
+              {item.variant && <p className="text-[11px] opacity-90">• {item.variant}</p>}
               {item.addons?.map(a => (
-                <p key={a.name} className="text-[10px] ml-4 opacity-80">+ {a.name}</p>
+                <p key={a.name} className="text-[11px] opacity-90">+ {a.name}</p>
               ))}
             </div>
           ))}
         </div>
-        <p className="mt-2">{SEP}</p>
+        <p className="mt-2 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Totais */}
-      <div className="space-y-1 mb-1">
-        <div className="item-row text-[11px]">
+      <div className="space-y-1 mb-2">
+        <div className="flex flex-col items-center text-[13px] font-bold">
           <span>SUBTOTAL:</span>
-          <span>R${order.total_price.toFixed(2)}</span>
+          <span className="font-black text-[15px]">R${order.total_price.toFixed(2)}</span>
         </div>
-        <div className="item-row text-[14px]">
-          <span>TOTAL:</span>
-          <span>R${order.total_price.toFixed(2)}</span>
+        <div className="flex flex-col items-center text-[16px] font-black mt-1">
+          <span className="underline">TOTAL:</span>
+          <span className="text-[18px]">R${order.total_price.toFixed(2)}</span>
         </div>
-        <p className="mt-1">{SEP}</p>
+        <p className="mt-1 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Pagamento e Observações */}
-      <div className="mb-2 text-[11px]">
-        <p>PAGAMENTO: {order.payment_method.toUpperCase()}</p>
+      <div className="mb-3 text-[13px] font-bold">
+        <p className="uppercase">PAGAMENTO: {order.payment_method}</p>
         {order.observation && (
-          <div className="mt-2 p-1 border border-black/10 rounded">
-            <p className="text-[10px]">OBS: {order.observation}</p>
+          <div className="mt-2 p-1 border-2 border-black rounded-lg">
+            <p className="text-[12px] leading-tight">OBS: {order.observation}</p>
           </div>
         )}
       </div>
 
       {/* Rodapé */}
-      <div className="text-center mt-2 pb-6">
-        <p className="text-[10px] uppercase">Obrigado pela preferência!</p>
-        <p className="text-[9px] mt-1">gloriosobrownie.com.br</p>
-        <p className="text-[11px] mt-2">. . . . . . . . . . . .</p>
+      <div className="text-center mt-3 pb-8">
+        <p className="text-[12px] font-black uppercase tracking-wider">Obrigado pela preferência!</p>
+        <p className="text-[11px] font-bold mt-1">gloriosobrownie.com.br</p>
+        <p className="text-[14px] mt-2 font-bold">. . . . . . . . . . . .</p>
       </div>
     </div>
   );
