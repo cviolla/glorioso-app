@@ -343,7 +343,7 @@ export default function AdminHistoryPage() {
       <AnimatePresence>
         {selectedDay && (
           <div 
-            className="lg:hidden fixed inset-0 z-[100] bg-[#381010]/60 backdrop-blur-sm"
+            className="lg:hidden fixed inset-0 z-[100] flex items-end justify-center bg-[#381010]/60 backdrop-blur-md"
             onClick={(e) => { if (e.target === e.currentTarget) setSelectedDay(null); }}
           >
             <motion.div 
@@ -352,7 +352,8 @@ export default function AdminHistoryPage() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="bg-white rounded-t-[2.5rem] w-full shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-white/20 h-[92dvh] fixed bottom-0 left-0 right-0 flex flex-col overflow-hidden"
+              style={{ height: '94dvh', maxHeight: '94dvh' }}
+              className="bg-white rounded-t-[2.5rem] w-full shadow-[0_-10px_60px_rgba(0,0,0,0.3)] border-t border-white/20 flex flex-col overflow-hidden"
             >
               {/* Mobile Drag Handle Area */}
               <div className="flex justify-center pt-4 pb-2 shrink-0 bg-[var(--color-brand-dark)]">
@@ -373,7 +374,7 @@ export default function AdminHistoryPage() {
                 <div className="flex justify-between items-end relative z-10 pt-2">
                   <div>
                     <h2 className="text-3xl font-black tracking-tight">{selectedDay.date}</h2>
-                    <p className="text-[var(--color-brand-accent)] font-black text-xs uppercase tracking-widest mt-1">Detalhamento das Vendas</p>
+                    <p className="text-[var(--color-brand-accent)] font-black text-[10px] uppercase tracking-[0.2em] mt-1">DETALHAMENTO DE VENDAS [V3]</p>
                     <button 
                       onClick={() => window.open(`/admin/cash-report/print?date=${selectedDay.date}`, '_blank')}
                       className="mt-4 flex items-center gap-2 bg-[#ff914a] text-[#381010] px-5 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#ff914a]/20"
@@ -390,7 +391,7 @@ export default function AdminHistoryPage() {
 
               {/* Orders List Container */}
               <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50/50">
-                <div className="p-6 space-y-4 pb-32"> {/* pb-32 garante visibilidade acima da nav bar do celular */}
+                <div className="p-6 space-y-4 pb-40"> {/* pb-40 garante visibilidade total */}
                   {selectedDay.orders.length > 0 ? (
                     selectedDay.orders.map((order) => (
                       <motion.div 
