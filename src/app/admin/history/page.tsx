@@ -163,8 +163,8 @@ export default function AdminHistoryPage() {
           <h1 className="text-xl md:text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">Histórico de Vendas</h1>
           <p className="text-gray-400 font-medium text-[10px] md:text-sm uppercase tracking-wider">Gestão financeira diária</p>
         </div>
-        <div className="flex items-center justify-end gap-2">
-          <div className="relative w-[35%] md:w-64">
+        <div className="flex items-center justify-end gap-2 px-1">
+          <div className="relative w-[42%] md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <input 
               type="text" 
@@ -174,7 +174,7 @@ export default function AdminHistoryPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="relative w-[30%] md:w-48">
+          <div className="relative w-[38%] md:w-48">
             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <select 
               className="w-full pl-9 pr-6 py-2 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-[10px] md:text-sm font-bold appearance-none cursor-pointer uppercase"
