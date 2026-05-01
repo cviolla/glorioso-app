@@ -155,7 +155,6 @@ export default function AdminHistoryPage() {
   };
 
   return (
-  return (
     <div className="space-y-4 md:space-y-6">
       {/* Header Section - Refined for Mobile */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1 md:px-0">
@@ -168,7 +167,7 @@ export default function AdminHistoryPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <input 
               type="text" 
-              placeholder="Buscar..." 
+              placeholder="BUSCAR" 
               className="w-full pl-8 pr-2 py-2.5 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-[11px] md:text-sm font-bold"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -181,7 +180,7 @@ export default function AdminHistoryPage() {
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
             >
-              <option value="all">MÉTODO</option>
+              <option value="all">FILTRAR</option>
               {availableMethods.map(method => (
                 <option key={method} value={method}>{method.toUpperCase()}</option>
               ))}
