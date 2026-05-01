@@ -232,37 +232,19 @@ export default function AdminHistoryPage() {
           )}
         </div>
 
-        {/* Day Details */}
-        <div className="lg:col-span-2">
+        {/* Day Details (Desktop) */}
+        <div className="hidden lg:block lg:col-span-2">
           <AnimatePresence mode="wait">
             {selectedDay ? (
-              <div 
-                className="fixed inset-0 z-[100] flex items-end lg:items-start justify-center lg:p-0 bg-[#381010]/40 lg:bg-transparent backdrop-blur-md lg:backdrop-blur-none lg:static lg:block"
-                onClick={(e) => { if (e.target === e.currentTarget && typeof window !== 'undefined' && window.innerWidth < 1024) setSelectedDay(null); }}
+              <motion.div 
+                key={selectedDay.date}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="bg-white rounded-[2rem] border border-gray-100 shadow-xl overflow-hidden sticky top-24"
               >
-                <motion.div 
-                  key={selectedDay.date}
-                  initial={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { opacity: 0, x: 20 }}
-                  animate={{ y: 0, opacity: 1, x: 0 }}
-                  exit={typeof window !== 'undefined' && window.innerWidth < 1024 ? { y: "100%" } : { opacity: 0, x: -20 }}
-                  transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                  className="bg-white rounded-t-[2rem] lg:rounded-[2rem] w-full lg:max-w-none overflow-hidden shadow-xl border border-gray-100 lg:sticky lg:top-24 h-[92dvh] lg:h-auto lg:max-h-none flex flex-col lg:block"
-                >
-                  {/* Mobile Drag Handle */}
-                  <div className="flex justify-center pt-3 pb-1 lg:hidden shrink-0">
-                    <div className="w-10 h-1 rounded-full bg-gray-200" />
-                  </div>
-                <div className="bg-[var(--color-brand-dark)] p-8 text-white relative shrink-0">
+                <div className="bg-[var(--color-brand-dark)] p-8 text-white relative">
                   <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-brand-accent)]/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-                  
-                  {/* Mobile Close Button */}
-                  <button 
-                    onClick={() => setSelectedDay(null)}
-                    className="absolute right-6 top-6 p-2 text-white/30 hover:text-white transition-colors rounded-full hover:bg-white/10 lg:hidden z-20"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-
                   <div className="flex justify-between items-start relative z-10">
                     <div>
                       <h2 className="text-3xl font-black tracking-tight">{selectedDay.date}</h2>
@@ -281,7 +263,7 @@ export default function AdminHistoryPage() {
                   </div>
                 </div>
 
-                <div className="p-8 overflow-y-auto no-scrollbar flex-1">
+                <div className="p-8">
                   <div className="space-y-4">
                     {selectedDay.orders.map((order) => (
                       <motion.div 
@@ -330,7 +312,7 @@ export default function AdminHistoryPage() {
                     ))}
                   </div>
 
-                  <div className="mt-8 pt-8 border-t border-dashed border-gray-200 pb-10 lg:pb-0">
+                  <div className="mt-8 pt-8 border-t border-dashed border-gray-200">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 bg-[var(--color-brand-accent)]/5 rounded-2xl border border-[var(--color-brand-accent)]/10">
                         <p className="text-[10px] font-black text-[var(--color-brand-accent)] uppercase tracking-widest mb-1">Média por Pedido</p>
@@ -344,8 +326,7 @@ export default function AdminHistoryPage() {
                   </div>
                 </div>
               </motion.div>
-            </div>
-          ) : (
+            ) : (
               <div className="h-[60vh] flex flex-col items-center justify-center bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-200 p-8 text-center">
                 <div className="p-6 rounded-3xl bg-white shadow-sm mb-6">
                   <TrendingUp className="w-12 h-12 text-[var(--color-brand-accent)] opacity-20" />
@@ -357,6 +338,114 @@ export default function AdminHistoryPage() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Mobile Day Detail Modal */}
+      <AnimatePresence>
+        {selectedDay && (
+          <div 
+            className="lg:hidden fixed inset-0 z-[100] flex items-end justify-center bg-[#381010]/40 backdrop-blur-md"
+            onClick={(e) => { if (e.target === e.currentTarget) setSelectedDay(null); }}
+          >
+            <motion.div 
+              key={`mobile-${selectedDay.date}`}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="bg-white rounded-t-[2rem] w-full overflow-hidden shadow-xl border border-gray-100 h-[92dvh] flex flex-col"
+            >
+              {/* Mobile Drag Handle */}
+              <div className="flex justify-center pt-3 pb-1 shrink-0">
+                <div className="w-10 h-1 rounded-full bg-gray-200" />
+              </div>
+              
+              <div className="bg-[var(--color-brand-dark)] p-8 text-white relative shrink-0">
+                <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-brand-accent)]/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                
+                <button 
+                  onClick={() => setSelectedDay(null)}
+                  className="absolute right-6 top-6 p-2 text-white/30 hover:text-white transition-colors rounded-full hover:bg-white/10 z-20"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                <div className="flex justify-between items-start relative z-10">
+                  <div>
+                    <h2 className="text-3xl font-black tracking-tight">{selectedDay.date}</h2>
+                    <p className="text-[var(--color-brand-accent)] font-black text-xs uppercase tracking-widest mt-1">Detalhamento das Vendas</p>
+                    <button 
+                      onClick={() => window.open(`/admin/cash-report/print?date=${selectedDay.date}`, '_blank')}
+                      className="mt-4 flex items-center gap-2 bg-[#ff914a] text-[#381010] px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[#ff914a]/20"
+                    >
+                      <Printer className="w-4 h-4" /> Imprimir Relatório
+                    </button>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mb-1">FATURAMENTO</p>
+                    <p className="text-3xl font-black text-[#ff914a]">R$ {selectedDay.total.toFixed(2).replace('.', ',')}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 overflow-y-auto no-scrollbar flex-1">
+                <div className="space-y-4">
+                  {selectedDay.orders.map((order) => (
+                    <motion.div 
+                      key={`mobile-order-${order.id}`}
+                      onClick={() => setSelectedOrder(order)}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                      className={`flex justify-between items-center p-4 rounded-2xl transition-all cursor-pointer group ${
+                        selectedOrder?.id === order.id
+                          ? 'bg-[var(--color-brand-accent)]/10 border-2 border-[var(--color-brand-accent)]/30 shadow-md'
+                          : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100 hover:border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shadow-sm transition-all ${
+                          selectedOrder?.id === order.id
+                            ? 'bg-[var(--color-brand-accent)] text-white border border-[var(--color-brand-accent)]'
+                            : 'bg-white border border-gray-100 text-[var(--color-brand-dark)] group-hover:border-[var(--color-brand-accent)]/30'
+                        }`}>
+                          {new Date(order.created_at).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <div>
+                          <p className="font-black text-[var(--color-brand-dark)] text-sm">{order.customer_name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{order.payment_method}</p>
+                            {order.delivery_type === 'delivery' && (
+                              <span className="text-[9px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-bold">DELIVERY</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <p className="font-black text-[var(--color-brand-dark)] text-sm">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                        <ChevronRight className={`w-4 h-4 transition-all ${
+                          selectedOrder?.id === order.id ? 'text-[var(--color-brand-accent)]' : 'text-gray-300'
+                        }`} />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-dashed border-gray-200 pb-10">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-[var(--color-brand-accent)]/5 rounded-2xl border border-[var(--color-brand-accent)]/10">
+                      <p className="text-[10px] font-black text-[var(--color-brand-accent)] uppercase tracking-widest mb-1">Média por Pedido</p>
+                      <p className="text-xl font-black text-[var(--color-brand-dark)]">R$ {(selectedDay.total / selectedDay.count).toFixed(2).replace('.', ',')}</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Volume de Vendas</p>
+                      <p className="text-xl font-black text-[var(--color-brand-dark)]">{selectedDay.count} Pedidos</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Order Detail Modal / Mobile Bottom Sheet */}
       <AnimatePresence>
