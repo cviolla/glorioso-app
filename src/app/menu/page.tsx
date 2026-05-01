@@ -21,7 +21,7 @@ export default function MenuPage() {
     try {
       const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
       const { data: subs } = await supabase.from('subcategories').select('*').order('sort_order');
-      const { data: prods } = await supabase.from('products').select('*').order('sort_order');
+      const { data: prods } = await supabase.from('products').select('*').eq('is_active', true).order('sort_order');
       const { data: vars } = await supabase.from('product_variants').select('*').order('sort_order');
       
       if (cats && prods) {
@@ -78,6 +78,7 @@ export default function MenuPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMenu();
   }, [fetchMenu]);
 
@@ -248,7 +249,7 @@ export default function MenuPage() {
         ) : searchQuery ? (
           <div className="pt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <h2 className="text-xl font-black text-[#381010] mb-6 flex items-center gap-2 border-b-2 border-[#954e3a] pb-2">
-              Resultados para "{searchQuery}"
+              Resultados para &quot;{searchQuery}&quot;
             </h2>
 
             {filteredItems.length > 0 ? (

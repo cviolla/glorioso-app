@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MenuItem, MenuCategory } from '@/data/menu';
-import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock, Power, Settings, Save, Trash2, Loader2, Upload } from 'lucide-react';
+import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock, Power, Settings, Save, Trash2, Loader2, Upload, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoreStatusStore } from '@/store/storeStatusStore';
 import { supabase } from '@/lib/supabase';
@@ -52,7 +52,8 @@ export default function AdminProductsPage() {
               price: p.price,
               imageUrl: p.image_url,
               category_id: p.category_id,
-              subcategory_id: p.subcategory_id
+              subcategory_id: p.subcategory_id,
+              is_active: p.is_active
             }))
           }));
 
@@ -66,6 +67,7 @@ export default function AdminProductsPage() {
               price: p.price,
               imageUrl: p.image_url,
               category_id: p.category_id,
+              is_active: p.is_active,
               variants: vars?.filter(v => v.product_id === p.id).map(v => ({
                 id: v.id,
                 name: v.name,
@@ -85,18 +87,12 @@ export default function AdminProductsPage() {
   }, []);
 
   useEffect(() => {
-    fetchMenu().then(() => {
-      // Abre a primeira categoria apenas no carregamento inicial
-      if (categories.length === 0) {
-        // O fetchMenu acima já vai atualizar o estado, 
-        // mas precisamos de um jeito de pegar o ID da primeira categoria
-      }
-    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMenu();
   }, [fetchMenu]);
 
   const initializedRef = useRef(false);
 
-  // Efeito separado para inicializar a primeira categoria aberta
   useEffect(() => {
     if (categories.length > 0 && !initializedRef.current) {
       setExpandedCategory(categories[0].id);
@@ -118,7 +114,7 @@ export default function AdminProductsPage() {
       price: 0,
       imageUrl: '',
       category_id: categories[0]?.id || ''
-    } as any);
+    });
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -149,6 +145,33 @@ export default function AdminProductsPage() {
       }
     });
   };
+  
+  const handleToggleVisibility = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ is_active: !currentStatus })
+        .eq('id', id);
+      if (error) throw error;
+      
+      setCategories(prev => prev.map(cat => ({
+        ...cat,
+        items: cat.items?.map(item => item.id === id ? { ...item, is_active: !currentStatus } : item),
+        subcategories: cat.subcategories?.map(sub => ({
+          ...sub,
+          items: sub.items.map(item => item.id === id ? { ...item, is_active: !currentStatus } : item)
+        }))
+      })));
+    } catch (err) {
+      console.error("Erro ao alternar visibilidade:", err);
+      setModalConfig({
+        isOpen: true,
+        title: "Erro",
+        message: "Houve um erro ao alterar a visibilidade do produto.",
+        type: "danger"
+      });
+    }
+  };
 
   const handleSaveProduct = async () => {
     if (!editingItem) return;
@@ -164,7 +187,7 @@ export default function AdminProductsPage() {
             description: editingItem.description,
             price: editingItem.price,
             image_url: editingItem.imageUrl,
-            category_id: (editingItem as any).category_id
+            category_id: editingItem.category_id
           })
           .select()
           .single();
@@ -183,10 +206,7 @@ export default function AdminProductsPage() {
         if (error) throw error;
       }
 
-      // SALVAR VARIANTES
       if (editingItem.variants) {
-        // Para simplificar, deletamos as antigas e inserimos as novas
-        // Em um sistema real, faríamos um diff (update/insert/delete)
         await supabase.from('product_variants').delete().eq('product_id', productId);
         
         if (editingItem.variants.length > 0) {
@@ -331,14 +351,26 @@ export default function AdminProductsPage() {
                           <h4 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">{sub.name}</h4>
                           <div className="space-y-3">
                             {sub.items.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
-                              <ProductListItem key={item.id} item={item} onEdit={() => handleEditClick(item)} onDelete={() => handleDeleteProduct(item.id)} />
+                              <ProductListItem 
+                                key={item.id} 
+                                item={item} 
+                                onEdit={() => handleEditClick(item)} 
+                                onDelete={() => handleDeleteProduct(item.id)} 
+                                onToggleVisibility={() => handleToggleVisibility(item.id, !!item.is_active)}
+                              />
                             ))}
                           </div>
                         </div>
                       ))}
 
                       {category.items?.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
-                        <ProductListItem key={item.id} item={item} onEdit={() => handleEditClick(item)} onDelete={() => handleDeleteProduct(item.id)} />
+                        <ProductListItem 
+                          key={item.id} 
+                          item={item} 
+                          onEdit={() => handleEditClick(item)} 
+                          onDelete={() => handleDeleteProduct(item.id)} 
+                          onToggleVisibility={() => handleToggleVisibility(item.id, !!item.is_active)}
+                        />
                       ))}
                     </div>
                   </motion.div>
@@ -404,8 +436,8 @@ export default function AdminProductsPage() {
                       <label className="text-sm font-black text-[var(--color-brand-dark)] mb-2 block uppercase tracking-wider">Categoria</label>
                       <select 
                         className="w-full border-2 border-gray-100 rounded-2xl p-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-gray-50/30 text-[16px] transition-all font-medium appearance-none"
-                        value={(editingItem as any).category_id}
-                        onChange={(e) => setEditingItem({...editingItem, category_id: e.target.value} as any)}
+                        value={editingItem.category_id}
+                        onChange={(e) => setEditingItem({...editingItem, category_id: e.target.value})}
                         disabled={saving}
                       >
                         {categories.map(cat => (
@@ -460,7 +492,7 @@ export default function AdminProductsPage() {
                         type="button"
                         onClick={() => {
                           const vars = [...(editingItem.variants || [])];
-                          vars.push({ name: '', price: 0 } as any);
+                          vars.push({ name: '', price: 0 });
                           setEditingItem({...editingItem, variants: vars});
                         }}
                         className="text-xs bg-[var(--color-brand-accent)] text-white px-4 py-2 rounded-xl font-bold hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shadow-[var(--color-brand-accent)]/10"
@@ -558,9 +590,9 @@ export default function AdminProductsPage() {
   );
 }
 
-function ProductListItem({ item, onEdit, onDelete }: { item: MenuItem, onEdit: () => void, onDelete: () => void }) {
+function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item: MenuItem, onEdit: () => void, onDelete: () => void, onToggleVisibility: () => void }) {
   return (
-    <div className="flex items-center justify-between p-3 bg-white hover:bg-[var(--color-brand-light)]/30 rounded-2xl transition-all group border border-gray-50 hover:border-[var(--color-brand-accent)]/10">
+    <div className={`flex items-center justify-between p-3 bg-white hover:bg-[var(--color-brand-light)]/30 rounded-2xl transition-all group border shadow-sm ${!item.is_active ? 'opacity-60 grayscale-[0.5]' : 'border-gray-50 hover:border-[var(--color-brand-accent)]/10'}`}>
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 bg-gray-50 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative shadow-inner">
           {item.imageUrl ? (
@@ -568,9 +600,17 @@ function ProductListItem({ item, onEdit, onDelete }: { item: MenuItem, onEdit: (
           ) : (
             <ImageIcon className="w-6 h-6 text-gray-300" />
           )}
+          {!item.is_active && (
+            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+              <EyeOff className="w-6 h-6 text-white drop-shadow-md" />
+            </div>
+          )}
         </div>
         <div>
-          <h4 className="font-bold text-[var(--color-brand-dark)] text-lg leading-tight">{item.name}</h4>
+          <h4 className={`font-bold text-[var(--color-brand-dark)] text-lg leading-tight flex items-center gap-2`}>
+            {item.name}
+            {!item.is_active && <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest font-black">Oculto</span>}
+          </h4>
           {item.price !== undefined && item.price > 0 ? (
             <p className="text-sm text-gray-500 font-semibold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
           ) : item.variants && item.variants.length > 0 ? (
@@ -580,17 +620,24 @@ function ProductListItem({ item, onEdit, onDelete }: { item: MenuItem, onEdit: (
           )}
         </div>
       </div>
-      <div className="flex items-center gap-2 pr-2">
+      <div className="flex items-center gap-1.5 pr-1">
+        <button 
+          onClick={onToggleVisibility}
+          className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${item.is_active ? 'bg-blue-50 text-blue-500 hover:bg-blue-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+          title={item.is_active ? "Esconder Produto" : "Mostrar Produto"}
+        >
+          {item.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+        </button>
         <button 
           onClick={onDelete}
-          className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+          className="w-9 h-9 rounded-lg flex items-center justify-center bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 transition-all"
           title="Excluir"
         >
           <Trash2 className="w-4 h-4" />
         </button>
         <button 
           onClick={onEdit}
-          className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-brand-accent)] text-white hover:scale-110 transition-all shadow-md shadow-[var(--color-brand-accent)]/20"
+          className="w-9 h-9 rounded-lg flex items-center justify-center bg-[var(--color-brand-accent)] text-white hover:scale-105 transition-all shadow-sm"
           title="Editar"
         >
           <Edit2 className="w-4 h-4" />

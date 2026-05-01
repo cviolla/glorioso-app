@@ -11,6 +11,9 @@ export type MenuItem = {
   variants?: MenuItemVariant[];
   addons?: MenuItemVariant[];
   imageUrl?: string;
+  is_active?: boolean;
+  category_id?: string;
+  subcategory_id?: string;
 };
 
 export type MenuCategory = {
