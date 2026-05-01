@@ -281,10 +281,10 @@ export default function AdminProductsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
 
       {/* Header Actions */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+      <div className="flex flex-col md:flex-row gap-2 items-start md:items-center justify-between">
         <div>
           <h2 className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tight">Gerenciar Produtos</h2>
           <p className="text-[13px] text-gray-500 mt-0.5">Altere preços, nomes e descrições do cardápio.</p>
@@ -317,9 +317,9 @@ export default function AdminProductsPage() {
           <p className="font-medium">Carregando cardápio...</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-1">
           {categories.map((category) => (
-            <div key={category.id} className="bg-white rounded-3xl overflow-hidden shadow-sm border border-white hover:shadow-md transition-shadow">
+            <div key={category.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-white hover:shadow-md transition-shadow">
               <button 
                 className="w-full px-6 py-4 flex items-center justify-between bg-white transition-colors"
                 onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
@@ -345,11 +345,11 @@ export default function AdminProductsPage() {
                     exit={{ height: 0 }} 
                     className="overflow-hidden"
                   >
-                    <div className="px-5 pb-5 pt-2 flex flex-col gap-3">
+                    <div className="px-5 pb-5 pt-2 flex flex-col gap-1">
                       {category.subcategories?.map(sub => (
                         <div key={sub.name} className="mt-4 first:mt-0">
                           <h4 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">{sub.name}</h4>
-                          <div className="space-y-3">
+                          <div className="space-y-1">
                             {sub.items.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
                               <ProductListItem 
                                 key={item.id} 
