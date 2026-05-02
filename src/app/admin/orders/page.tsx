@@ -836,12 +836,12 @@ export default function AdminOrdersPage() {
     {/* Cash Closing Modal */}
     <AnimatePresence>
         {isCashModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#381010]/40 backdrop-blur-md">
+          <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 sm:items-center bg-[#381010]/40 backdrop-blur-md overflow-y-auto">
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-[0_20px_50px_rgba(56,16,16,0.15)] border border-white/20"
+              className="bg-white rounded-[2.5rem] w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_20px_50px_rgba(56,16,16,0.15)] border border-white/20 mt-4 sm:mt-0 flex flex-col"
             >
               <div className="bg-[#381010] p-8 text-white text-center relative">
                 <button 
