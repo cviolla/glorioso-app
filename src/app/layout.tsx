@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Glorioso Brownie | O Melhor Brownie Artesanal de Caxias",
+    default: "Glorioso Brownie | O Sabor Glorioso",
     template: "%s | Glorioso Brownie"
   },
   description: "Brownies artesanais, molhadinhos e com casquinha crocante. Peça agora pelo nosso cardápio online e receba em casa. O sabor que você merece!",

@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Glorioso Brownie',
     short_name: 'Glorioso',
-    description: 'O Melhor Brownie Artesanal de Caxias',
+    description: 'O Sabor Glorioso',
     start_url: '/',
     display: 'standalone',
     background_color: '#f8ece3',
