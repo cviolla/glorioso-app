@@ -350,18 +350,18 @@ export default function AdminOrdersPage() {
 
       {/* Sales Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-[var(--color-brand-dark)] rounded-[2rem] p-8 shadow-xl relative overflow-hidden group">
+        <div className="md:col-span-2 bg-[var(--color-brand-dark)] rounded-[2rem] p-5 sm:p-6 shadow-xl relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-48 h-48 bg-[var(--color-brand-accent)]/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-[var(--color-brand-accent)]/20 transition-all duration-700"></div>
-          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-[var(--color-brand-accent)] text-[10px] font-black uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+              <p className="text-[var(--color-brand-accent)] text-[10px] font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" /> FATURAMENTO {salesPeriod === 'all' ? 'TOTAL' : `ÚLTIMOS ${salesPeriod} DIAS`}
               </p>
-              <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
                 R$ {calculateSales(salesPeriod).toFixed(2).replace('.', ',')}
               </h2>
             </div>
-            <div className="flex flex-wrap gap-1.5 bg-white/5 p-1 rounded-2xl backdrop-blur-sm border border-white/5">
+            <div className="flex flex-wrap gap-1 bg-white/5 p-1 rounded-2xl backdrop-blur-sm border border-white/5">
               {[
                 { id: '1', label: 'Hoje' },
                 { id: '3', label: '3d' },
@@ -372,7 +372,7 @@ export default function AdminOrdersPage() {
                 <button
                   key={p.id}
                   onClick={() => setSalesPeriod(p.id as '1' | '3' | '7' | '15' | 'all')}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${salesPeriod === p.id ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                  className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${salesPeriod === p.id ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
                 >
                   {p.label}
                 </button>
@@ -381,7 +381,7 @@ export default function AdminOrdersPage() {
           </div>
 
           {/* Mini Chart */}
-          <div className="mt-8 flex items-end justify-between gap-2 h-24">
+          <div className="mt-4 flex items-end justify-between gap-2 h-16">
             {getDailySalesData().map((day, idx) => {
               const maxVal = Math.max(...getDailySalesData().map(d => d.value), 1);
               const height = (day.value / maxVal) * 100;
@@ -405,13 +405,13 @@ export default function AdminOrdersPage() {
             })}
           </div>
         </div>
-        <div className="bg-white rounded-[2rem] p-8 border border-white shadow-sm flex flex-col justify-center gap-4 hover:shadow-md transition-all">
-          <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center border border-green-100">
-            <DollarSign className="w-7 h-7 text-green-600" />
+        <div className="bg-white rounded-[2rem] p-5 sm:p-6 border border-white shadow-sm flex flex-col justify-center gap-3 hover:shadow-md transition-all">
+          <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center border border-green-100">
+            <DollarSign className="w-6 h-6 text-green-600" />
           </div>
           <div>
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Ticket Médio</p>
-            <p className="text-3xl font-black text-[var(--color-brand-dark)] tracking-tight">
+            <p className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tight">
               R$ {(calculateSales('all') / (orders.filter(o => o.status !== 'cancelled').length || 1)).toFixed(2).replace('.', ',')}
             </p>
           </div>
