@@ -373,11 +373,11 @@ export default function AdminOrdersPage() {
             <div className="flex flex-wrap gap-1 bg-white/5 p-1 rounded-2xl backdrop-blur-sm border border-white/5">
               {[
                 { id: '1', label: 'Hoje' },
-                { id: '3', label: '3d' },
-                { id: '7', label: '7d' },
-                { id: '15', label: '15d' },
-                { id: '30', label: '30d' },
-                { id: 'all', label: 'Tudo' }
+                { id: '3', label: '3' },
+                { id: '7', label: '7' },
+                { id: '15', label: '15' },
+                { id: '30', label: '30' },
+                { id: 'all', label: 'All' }
               ].map((p: { id: string; label: string }) => (
                 <button
                   key={p.id}
