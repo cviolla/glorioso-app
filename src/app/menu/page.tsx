@@ -313,11 +313,11 @@ export default function MenuPage() {
                 <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
                   {category.name}
                   <Image 
-                    src="/logo glorioso brownie 3.png" 
+                    src="/glorioso-brownie.png" 
                     alt="Logo Glorioso Brownie" 
-                    width={40}
-                    height={18}
-                    className="h-[13px] w-auto sm:h-[18px] object-contain"
+                    width={60}
+                    height={20}
+                    className="h-[15px] w-auto object-contain block"
                   />
                 </h2>
 

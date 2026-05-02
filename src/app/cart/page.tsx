@@ -448,7 +448,7 @@ export default function CartPage() {
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-16 h-16 shrink-0 overflow-hidden relative rounded-xl border border-white/10">
                            <Image 
-                             src={item.imageUrl || "/logo glorioso brownie 3.png"} 
+                             src={item.imageUrl || "/glorioso-brownie.png"} 
                              alt={item.name} 
                              fill 
                              className="object-cover" 
