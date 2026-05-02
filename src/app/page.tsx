@@ -58,28 +58,55 @@ export default function Home() {
       <StoreStatus className="absolute top-4 right-4 z-40 scale-90 origin-top-right" />
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 w-full">
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
-          className="flex flex-col items-center text-center w-full max-w-md mt-10 sm:mt-0"
-        >
-          {/* Official Logo - Optimized Size and Spacing */}
-          <div className="relative w-64 h-64 sm:w-80 sm:h-80 mb-8 sm:mb-10 drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)]">
-            <Image 
-              src="/GloriosoBrownie_Logo_fuul.png" 
-              alt="Logo Glorioso Brownie" 
-              fill
-              className="object-contain"
-              priority
-            />
-          </div>
+        <div className="flex flex-col items-center text-center w-full max-w-md mt-10 sm:mt-0">
+          {/* Official Logo - Optimized Size and Floating Animation */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+            }}
+            transition={{ 
+              duration: 1.2, 
+              ease: [0.22, 1, 0.36, 1], // easeOutExpo
+            }}
+            className="relative w-64 h-64 sm:w-80 sm:h-80 mb-8 sm:mb-10 drop-shadow-[0_25px_50px_rgba(0,0,0,0.4)]"
+          >
+            <motion.div
+              animate={{ 
+                y: [0, -12, 0],
+              }}
+              transition={{ 
+                duration: 5, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              className="w-full h-full relative"
+            >
+              <Image 
+                src="/GloriosoBrownie_Logo_fuul.png" 
+                alt="Logo Glorioso Brownie" 
+                fill
+                className="object-contain"
+                priority
+              />
+            </motion.div>
+          </motion.div>
           
-          <h1 className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight uppercase tracking-tighter">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight uppercase tracking-tighter"
+          >
             O Sabor <span className="text-[#ff914a]">GLORIOSO.</span>
-          </h1>
+          </motion.h1>
           
-          <a 
+          <motion.a 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
             href="https://www.instagram.com/gloriosobrownie/"
             target="_blank"
             rel="noopener noreferrer"
@@ -91,17 +118,40 @@ export default function Home() {
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
             </svg>
             <span className="font-medium">@gloriosobrownie</span>
-          </a>
+          </motion.a>
 
-          <Link 
-            href="/menu"
-            className="w-full sm:w-3/4 max-w-[280px] sm:max-w-none bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_20px_rgba(255,145,74,0.3)] hover:scale-105 hover:bg-[#ff9f61] transition-all flex items-center justify-center gap-3 mb-8 sm:mb-10"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full flex justify-center"
           >
-            Peça seu Lanche
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+            <Link 
+              href="/menu"
+              className="w-full sm:w-3/4 max-w-[280px] sm:max-w-none bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_25px_rgba(255,145,74,0.4)] hover:scale-105 hover:bg-[#ff9f61] active:scale-95 transition-all flex items-center justify-center gap-3 mb-8 sm:mb-10 group"
+            >
+              <motion.span
+                animate={{ 
+                  color: ["#381010", "#ffffff", "#381010"],
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity, 
+                  ease: "easeInOut" 
+                }}
+              >
+                Peça seu Lanche
+              </motion.span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </motion.div>
 
-          <div className="flex flex-col items-center gap-4 sm:gap-5 w-full">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1 }}
+            className="flex flex-col items-center gap-4 sm:gap-5 w-full"
+          >
             <div className="flex flex-col items-center gap-3 text-xs sm:text-sm text-[#f8ece3]/80">
               <a 
                 href={`https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent('Olá!')}`} 
@@ -133,13 +183,13 @@ export default function Home() {
 
             <button 
               onClick={handleShare}
-              className="bg-[#532120] text-[#ff914a] p-3 rounded-full shadow-md hover:bg-[#954e3a] hover:text-[#f8ece3] transition-colors mt-2"
+              className="bg-[#532120] text-[#ff914a] p-3 rounded-full shadow-md hover:bg-[#954e3a] hover:text-[#f8ece3] transition-colors mt-2 active:scale-90"
               aria-label="Compartilhar"
             >
               <Share2 className="w-5 h-5" />
             </button>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </main>
 
       {/* Footer */}
