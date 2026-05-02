@@ -286,25 +286,25 @@ export default function AdminProductsPage() {
       {/* Header Actions */}
       <div className="flex flex-col md:flex-row gap-2 items-start md:items-center justify-between">
         <div>
-          <h2 className="text-2xl font-black text-[var(--color-brand-dark)] tracking-tight">Gerenciar Produtos</h2>
-          <p className="text-[13px] text-gray-500 mt-0.5">Altere preços, nomes e descrições do cardápio.</p>
+          <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Produtos</h2>
+          <p className="text-[11.5px] text-gray-500 mt-0.5 font-medium">Gerencie os itens do cardápio.</p>
         </div>
         <button 
           onClick={handleNewClick}
-          className="bg-[var(--color-brand-accent)] text-white px-6 py-3.5 rounded-2xl font-bold flex items-center gap-2 w-full md:w-auto shadow-lg shadow-[var(--color-brand-accent)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="bg-[var(--color-brand-accent)] text-white px-4 h-10 rounded-xl text-[13px] font-bold flex justify-center items-center gap-2 w-full md:w-auto shadow-md shadow-[var(--color-brand-accent)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4" />
           Novo Produto
         </button>
       </div>
 
       {/* Search Filter */}
       <div className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
         <input 
           type="text" 
           placeholder="Buscar produto por nome..." 
-          className="w-full bg-white border-2 border-transparent rounded-2xl py-3 pl-12 pr-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] text-sm shadow-sm transition-all placeholder:text-gray-400"
+          className="w-full bg-white border border-gray-100 rounded-xl h-10 pl-9 pr-3 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] text-[13px] font-bold shadow-sm transition-all placeholder:text-gray-400 placeholder:font-medium"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -319,20 +319,20 @@ export default function AdminProductsPage() {
       ) : (
         <div className="space-y-1">
           {categories.map((category) => (
-            <div key={category.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-white hover:shadow-md transition-shadow">
+            <div key={category.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-50 hover:border-gray-100 transition-colors">
               <button 
-                className="w-full px-6 py-4 flex items-center justify-between bg-white transition-colors"
+                className="w-full px-4 py-3 flex items-center justify-between bg-white transition-colors"
                 onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-1.5 h-7 rounded-full transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]' : 'bg-gray-100'}`} />
-                  <h3 className="font-black text-[var(--color-brand-dark)] text-lg tracking-tight">{category.name}</h3>
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-1 h-5 rounded-full transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]' : 'bg-gray-100'}`} />
+                  <h3 className="font-black text-[var(--color-brand-dark)] text-[15px] tracking-tight">{category.name}</h3>
                 </div>
-                <div className={`p-2 rounded-xl transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]/10 text-[var(--color-brand-accent)]' : 'bg-gray-50 text-gray-400'}`}>
+                <div className={`p-1.5 rounded-lg transition-colors ${expandedCategory === category.id ? 'bg-[var(--color-brand-accent)]/10 text-[var(--color-brand-accent)]' : 'bg-gray-50 text-gray-400'}`}>
                   {expandedCategory === category.id ? (
-                    <ChevronUp className="w-5 h-5" />
+                    <ChevronUp className="w-4 h-4" />
                   ) : (
-                    <ChevronDown className="w-5 h-5" />
+                    <ChevronDown className="w-4 h-4" />
                   )}
                 </div>
               </button>
@@ -397,35 +397,35 @@ export default function AdminProductsPage() {
               animate={{ y: 0 }} 
               exit={{ y: '100%' }} 
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-white w-full md:w-full md:max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
+              className="bg-white w-full md:max-w-md rounded-t-2xl md:rounded-2xl shadow-2xl relative z-10 flex flex-col max-h-[90vh]"
             >
-              <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 md:rounded-t-3xl">
-                <h3 className="font-black text-2xl text-[var(--color-brand-dark)] tracking-tight">{isNewProduct ? 'Novo Produto' : 'Editar Produto'}</h3>
+              <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50 md:rounded-t-2xl shrink-0">
+                <h3 className="font-black text-[16px] text-[var(--color-brand-dark)] tracking-tight">{isNewProduct ? 'Novo Produto' : 'Editar Produto'}</h3>
                 <button 
                   onClick={() => setEditingItem(null)} 
                   disabled={saving}
-                  className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all shadow-sm"
+                  className="w-8 h-8 flex items-center justify-center bg-white border border-gray-100 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all shadow-sm text-xs font-bold"
                 >
                   ✕
                 </button>
               </div>
               
-              <div className="p-6 overflow-y-auto">
-                <div className="space-y-5">
+              <div className="p-4 overflow-y-auto no-scrollbar flex-1">
+                <div className="space-y-4">
                   {/* Image Uploader */}
                   <div className="relative group">
-                    <div className="h-40 w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 overflow-hidden relative">
+                    <div className="h-28 w-full bg-gray-50 border border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 overflow-hidden relative">
                       {editingItem.imageUrl ? (
                         <img src={editingItem.imageUrl} alt={editingItem.name} className="w-full h-full object-cover" />
                       ) : (
                         <>
-                          <ImageIcon className="w-8 h-8" />
-                          <span className="text-sm font-medium">Sem imagem</span>
+                          <ImageIcon className="w-6 h-6 mb-1" />
+                          <span className="text-[11.5px] font-bold">Sem imagem</span>
                         </>
                       )}
                       <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity cursor-pointer">
-                        <Upload className="w-6 h-6 mb-2" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Alterar Foto</span>
+                        <Upload className="w-5 h-5 mb-1" />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Alterar Foto</span>
                         <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={saving} />
                       </label>
                     </div>
@@ -433,9 +433,9 @@ export default function AdminProductsPage() {
 
                   {isNewProduct && (
                     <div>
-                      <label className="text-sm font-black text-[var(--color-brand-dark)] mb-2 block uppercase tracking-wider">Categoria</label>
+                      <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Categoria</label>
                       <select 
-                        className="w-full border-2 border-gray-100 rounded-2xl p-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-gray-50/30 text-[16px] transition-all font-medium appearance-none"
+                        className="w-full border border-gray-100 rounded-xl px-3 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-bold appearance-none"
                         value={editingItem.category_id}
                         onChange={(e) => setEditingItem({...editingItem, category_id: e.target.value})}
                         disabled={saving}
@@ -448,10 +448,10 @@ export default function AdminProductsPage() {
                   )}
 
                   <div>
-                    <label className="text-sm font-black text-[var(--color-brand-dark)] mb-2 block uppercase tracking-wider">Nome do Produto</label>
+                    <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Nome do Produto</label>
                     <input 
                       type="text" 
-                      className="w-full border-2 border-gray-100 rounded-2xl p-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-gray-50/30 text-[16px] transition-all font-medium"
+                      className="w-full border border-gray-100 rounded-xl px-3 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-bold"
                       value={editingItem.name} 
                       onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
                       disabled={saving}
@@ -459,9 +459,9 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-black text-[var(--color-brand-dark)] mb-2 block uppercase tracking-wider">Descrição</label>
+                    <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Descrição</label>
                     <textarea 
-                      className="w-full border-2 border-gray-100 rounded-2xl p-4 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-gray-50/30 text-[16px] transition-all font-medium resize-none h-28"
+                      className="w-full border border-gray-100 rounded-xl p-3 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-medium resize-none h-20"
                       value={editingItem.description || ''} 
                       onChange={(e) => setEditingItem({...editingItem, description: e.target.value})}
                       placeholder="Ex: chocolate belga, pedaços de nozes..."
@@ -470,24 +470,24 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-black text-[var(--color-brand-dark)] mb-2 block uppercase tracking-wider">Preço Base (R$)</label>
+                    <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Preço Base (R$)</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-gray-400">R$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-400 text-xs">R$</span>
                       <input 
                         type="number" 
                         step="0.01"
-                        className="w-full border-2 border-gray-100 rounded-2xl p-4 pl-12 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-gray-50/30 text-[16px] transition-all font-bold"
+                        className="w-full border border-gray-100 rounded-xl pl-8 pr-3 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-black"
                         value={editingItem.price || 0} 
                         onChange={(e) => setEditingItem({...editingItem, price: parseFloat(e.target.value)})}
                         disabled={saving}
                       />
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-2 uppercase font-black tracking-widest">Use 0 se o produto tiver variações abaixo</p>
+                    <p className="text-[9px] text-gray-400 mt-1.5 uppercase font-black tracking-widest">Use 0 se o produto tiver variações abaixo</p>
                   </div>
 
-                  <div className="pt-6 border-t border-gray-100">
-                    <div className="flex items-center justify-between mb-4">
-                      <label className="text-sm font-black text-[var(--color-brand-dark)] uppercase tracking-wider">Variações</label>
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="text-[10px] font-black text-[var(--color-brand-dark)] uppercase tracking-widest">Variações</label>
                       <button 
                         type="button"
                         onClick={() => {
@@ -495,43 +495,41 @@ export default function AdminProductsPage() {
                           vars.push({ name: '', price: 0 });
                           setEditingItem({...editingItem, variants: vars});
                         }}
-                        className="text-xs bg-[var(--color-brand-accent)] text-white px-4 py-2 rounded-xl font-bold hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm shadow-[var(--color-brand-accent)]/10"
+                        className="text-[10px] bg-[var(--color-brand-accent)] text-white px-3 py-1.5 rounded-lg font-black hover:scale-105 active:scale-95 transition-all flex items-center gap-1 shadow-sm uppercase tracking-widest"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        Novo Tamanho
+                        <Plus className="w-3 h-3" />
+                        Tamanho
                       </button>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {editingItem.variants?.map((v, idx) => (
-                        <div key={idx} className="flex gap-2 items-start bg-gray-50 p-3 rounded-xl border border-gray-100">
-                          <div className="flex-1 space-y-2">
+                        <div key={idx} className="flex gap-2 items-center bg-gray-50/50 p-2 rounded-xl border border-gray-100">
+                          <input 
+                            type="text" 
+                            placeholder="Ex: 30CM"
+                            className="flex-1 min-w-0 text-[11.5px] border-none bg-white rounded-lg h-8 px-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
+                            value={v.name}
+                            onChange={(e) => {
+                              const vars = [...(editingItem.variants || [])];
+                              vars[idx].name = e.target.value;
+                              setEditingItem({...editingItem, variants: vars});
+                            }}
+                          />
+                          <div className="relative w-24 shrink-0">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-400">R$</span>
                             <input 
-                              type="text" 
-                              placeholder="Nome (Ex: 30CM)"
-                              className="w-full text-xs border-none bg-white rounded-lg p-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
-                              value={v.name}
+                              type="number" 
+                              step="0.01"
+                              placeholder="0,00"
+                              className="w-full text-[11.5px] border-none bg-white rounded-lg h-8 pl-6 pr-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-black"
+                              value={v.price}
                               onChange={(e) => {
                                 const vars = [...(editingItem.variants || [])];
-                                vars[idx].name = e.target.value;
+                                vars[idx].price = parseFloat(e.target.value);
                                 setEditingItem({...editingItem, variants: vars});
                               }}
                             />
-                            <div className="relative">
-                              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">R$</span>
-                              <input 
-                                type="number" 
-                                step="0.01"
-                                placeholder="0,00"
-                                className="w-full text-xs border-none bg-white rounded-lg py-2 pl-7 pr-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
-                                value={v.price}
-                                onChange={(e) => {
-                                  const vars = [...(editingItem.variants || [])];
-                                  vars[idx].price = parseFloat(e.target.value);
-                                  setEditingItem({...editingItem, variants: vars});
-                                }}
-                              />
-                            </div>
                           </div>
                           <button 
                             type="button"
@@ -539,7 +537,7 @@ export default function AdminProductsPage() {
                               const vars = editingItem.variants?.filter((_, i) => i !== idx);
                               setEditingItem({...editingItem, variants: vars});
                             }}
-                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors shrink-0"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -547,27 +545,27 @@ export default function AdminProductsPage() {
                       ))}
                       
                       {(!editingItem.variants || editingItem.variants.length === 0) && (
-                        <p className="text-center py-4 text-xs text-gray-400 italic">Nenhum tamanho adicional configurado.</p>
+                        <p className="text-center py-2 text-[11px] text-gray-400 font-medium italic">Sem variações extras.</p>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 border-t border-gray-100 bg-gray-50/50 md:rounded-b-3xl">
+              <div className="p-4 border-t border-gray-100 bg-gray-50/50 md:rounded-b-2xl shrink-0">
                 <button 
-                  className="w-full bg-[var(--color-brand-accent)] text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-[var(--color-brand-accent)]/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="w-full bg-[var(--color-brand-accent)] text-white h-12 rounded-xl font-black text-[13px] shadow-md shadow-[var(--color-brand-accent)]/20 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   onClick={handleSaveProduct}
                   disabled={saving}
                 >
                   {saving ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       SALVANDO...
                     </>
                   ) : (
                     <>
-                      <Save className="w-6 h-6" />
+                      <Save className="w-5 h-5" />
                       {isNewProduct ? 'CRIAR PRODUTO' : 'SALVAR ALTERAÇÕES'}
                     </>
                   )}
@@ -592,52 +590,52 @@ export default function AdminProductsPage() {
 
 function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item: MenuItem, onEdit: () => void, onDelete: () => void, onToggleVisibility: () => void }) {
   return (
-    <div className={`flex items-center justify-between p-3 bg-white hover:bg-[var(--color-brand-light)]/30 rounded-2xl transition-all group border shadow-sm ${!item.is_active ? 'opacity-60 grayscale-[0.5]' : 'border-gray-50 hover:border-[var(--color-brand-accent)]/10'}`}>
-      <div className="flex items-center gap-4">
-        <div className="w-14 h-14 bg-gray-50 rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative shadow-inner">
+    <div className={`flex items-center justify-between p-2.5 bg-white hover:bg-[var(--color-brand-light)]/30 rounded-xl transition-all group border shadow-sm ${!item.is_active ? 'opacity-60 grayscale-[0.5]' : 'border-gray-50 hover:border-gray-100'}`}>
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative border border-gray-100">
           {item.imageUrl ? (
             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
           ) : (
-            <ImageIcon className="w-6 h-6 text-gray-300" />
+            <ImageIcon className="w-5 h-5 text-gray-300" />
           )}
           {!item.is_active && (
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-              <EyeOff className="w-6 h-6 text-white drop-shadow-md" />
+              <EyeOff className="w-5 h-5 text-white drop-shadow-md" />
             </div>
           )}
         </div>
         <div>
-          <h4 className={`font-bold text-[var(--color-brand-dark)] text-[14.5px] leading-tight flex items-center gap-2`}>
+          <h4 className={`font-black text-[var(--color-brand-dark)] text-[13px] leading-tight flex items-center gap-2`}>
             {item.name}
-            {!item.is_active && <span className="text-[8px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md uppercase tracking-widest font-black">Oculto</span>}
+            {!item.is_active && <span className="text-[9px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase tracking-widest font-black">Oculto</span>}
           </h4>
           {item.price !== undefined && item.price > 0 ? (
-            <p className="text-[12.5px] text-gray-500 font-semibold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+            <p className="text-[11.5px] text-gray-500 font-bold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
           ) : item.variants && item.variants.length > 0 ? (
-            <p className="text-[12.5px] text-[var(--color-brand-accent)] font-bold mt-0.5">Várias opções</p>
+            <p className="text-[11.5px] text-[var(--color-brand-accent)] font-black mt-0.5 uppercase tracking-wide">Várias opções</p>
           ) : (
-            <p className="text-[12.5px] text-gray-400 mt-0.5 italic">Consulte as opções</p>
+            <p className="text-[11.5px] text-gray-400 mt-0.5 font-medium italic">Consulte as opções</p>
           )}
         </div>
       </div>
       <div className="flex items-center gap-1.5 pr-1">
         <button 
           onClick={onToggleVisibility}
-          className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${item.is_active ? 'bg-blue-50 text-blue-500 hover:bg-blue-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${item.is_active ? 'bg-blue-50 text-blue-500 hover:bg-blue-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
           title={item.is_active ? "Esconder Produto" : "Mostrar Produto"}
         >
           {item.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
         </button>
         <button 
           onClick={onDelete}
-          className="w-9 h-9 rounded-lg flex items-center justify-center bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 transition-all"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100 transition-all"
           title="Excluir"
         >
           <Trash2 className="w-4 h-4" />
         </button>
         <button 
           onClick={onEdit}
-          className="w-9 h-9 rounded-lg flex items-center justify-center bg-[var(--color-brand-accent)] text-white hover:scale-105 transition-all shadow-sm"
+          className="w-8 h-8 rounded-lg flex items-center justify-center bg-[var(--color-brand-accent)] text-white hover:scale-105 transition-all shadow-sm"
           title="Editar"
         >
           <Edit2 className="w-4 h-4" />
