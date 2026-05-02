@@ -11,6 +11,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CustomModal } from "@/components/CustomModal";
 
 export default function AdminSettingsPage() {
@@ -107,158 +108,119 @@ export default function AdminSettingsPage() {
         <p className="text-gray-500 text-sm">Gerencie o funcionamento da sua loja e canais de contato.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Status da Loja */}
-        <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
-          <div className="flex items-center gap-4 mb-2">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all ${isManualOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
-              <RefreshCw className={`w-6 h-6 ${isManualOpen ? 'animate-spin-slow' : ''}`} />
+      <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
+        {/* Top bar: Status & Contact */}
+        <div className="p-4 border-b border-gray-50 bg-gray-50/30 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all ${isManualOpen ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+              <RefreshCw className={`w-5 h-5 ${isManualOpen ? 'animate-spin-slow' : ''}`} />
             </div>
-            <div>
-              <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Status da Loja</h2>
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Controle Direto</p>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className={`p-8 rounded-[2.5rem] border-2 transition-all flex flex-col items-center text-center gap-6 ${isManualOpen ? 'bg-emerald-50/50 border-emerald-100' : 'bg-rose-50/50 border-rose-100'}`}>
-              <div>
-                <p className={`text-sm font-black uppercase tracking-widest mb-1 ${isManualOpen ? 'text-emerald-900' : 'text-rose-900'}`}>
-                  Sua loja está atualmente:
-                </p>
-                <h3 className={`text-4xl font-black ${isManualOpen ? 'text-emerald-600' : 'text-rose-600'}`}>
+            <div className="flex items-center gap-3">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={isManualOpen ? 'aberta' : 'fechada'}
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: 10, opacity: 0 }}
+                  className={`text-xl font-black ${isManualOpen ? 'text-emerald-600' : 'text-rose-600'}`}
+                >
                   {isManualOpen ? 'ABERTA' : 'FECHADA'}
-                </h3>
-              </div>
-
+                </motion.span>
+              </AnimatePresence>
               <button 
                 onClick={async () => {
                   if (isSaving) return;
                   setIsSaving(true);
                   try {
                     await setManualOpen(!isManualOpen);
-                  } catch (err: unknown) {
-                    const error = err as Error;
+                  } catch (error: any) {
                     setModalConfig({
                       isOpen: true,
-                      title: "Erro de Permissão",
-                      message: `Não foi possível atualizar o status no banco de dados. Verifique se você rodou o SQL de permissão de UPDATE no Supabase.\n\nErro: ${error.message || 'Desconhecido'}`,
+                      title: "Erro",
+                      message: error.message || "Erro ao atualizar status",
                       type: "danger"
                     });
                   } finally {
                     setIsSaving(false);
                   }
                 }}
-                disabled={isSaving}
-                className={`w-full py-6 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 flex items-center justify-center gap-3 ${
-                  isManualOpen 
-                    ? 'bg-rose-500 text-white shadow-rose-500/20 hover:bg-rose-600' 
-                    : 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-600'
-                } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isManualOpen ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-emerald-500 text-white hover:bg-emerald-600'}`}
               >
-                {isSaving ? (
-                  <RefreshCw className="w-5 h-5 animate-spin" />
-                ) : (
-                  isManualOpen ? 'Fechar Loja Agora' : 'Abrir Loja Agora'
-                )}
+                {isManualOpen ? 'Fechar' : 'Abrir'}
               </button>
-
-              <p className="text-[10px] text-gray-400 font-medium max-w-[200px]">
-                * Esta alteração é imediata e afetará o que os clientes veem no site.
-              </p>
             </div>
           </div>
-        </section>
 
-        {/* Contato e Delivery */}
-        <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100">
-              <Phone className="w-6 h-6" />
+          <div className="flex-1 max-w-sm relative group">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
+            <input 
+              type="text" 
+              value={localWhatsapp}
+              onChange={(e) => setLocalWhatsapp(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl focus:border-[var(--color-brand-accent)]/30 outline-none transition-all font-bold text-sm text-[var(--color-brand-dark)]"
+              placeholder="WhatsApp"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-gray-50">
+          {/* Payment Methods - Left Column */}
+          <div className="p-4 space-y-4">
+            <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <CreditCard className="w-3.5 h-3.5" /> Pagamento
+            </h2>
+            <div className="grid grid-cols-1 gap-2">
+              {allPossibleMethods.map((method) => {
+                const isActive = localMethods.includes(method);
+                return (
+                  <div 
+                    key={method} 
+                    onClick={() => toggleMethod(method)}
+                    className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${isActive ? 'bg-indigo-50/50 border-indigo-100' : 'bg-gray-50/30 border-transparent opacity-60'}`}
+                  >
+                    <span className={`text-[10px] font-black uppercase tracking-tight ${isActive ? 'text-indigo-900' : 'text-gray-400'}`}>{method}</span>
+                    {isActive ? <ToggleRight className="w-5 h-5 text-emerald-500" /> : <ToggleLeft className="w-5 h-5 text-gray-300" />}
+                  </div>
+                );
+              })}
             </div>
-            <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Contato e Taxas</h2>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block">WhatsApp de Recebimento</label>
-              <div className="relative group">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
-                <input 
-                  type="text" 
-                  value={localWhatsapp}
-                  onChange={(e) => setLocalWhatsapp(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 outline-none transition-all font-bold text-[var(--color-brand-dark)]"
-                  placeholder="Ex: 5521999999999"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Delivery Fees - Right Columns */}
+          <div className="lg:col-span-2 p-4 space-y-4">
+            <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5" /> Taxas de Entrega
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {Object.entries(localFees).map(([neighborhood, fee]) => (
-                <div key={neighborhood}>
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 block truncate">
+                <div key={neighborhood} className="bg-gray-50/30 p-2.5 rounded-xl border border-gray-50 hover:border-[var(--color-brand-accent)]/20 transition-all group shadow-xs">
+                  <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider mb-1 block truncate">
                     {neighborhood}
                   </label>
-                  <div className="relative group">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 font-black group-focus-within:text-[var(--color-brand-accent)] transition-colors">R$</span>
+                  <div className="relative flex items-center gap-1">
+                    <span className="text-[10px] font-black text-gray-300">R$</span>
                     <input 
                       type="number" 
                       value={fee}
                       onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parseFloat(e.target.value) || 0 })}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50/50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 outline-none transition-all font-black text-[var(--color-brand-dark)]"
+                      className="w-full bg-transparent outline-none transition-all font-black text-sm text-[var(--color-brand-dark)]"
                     />
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Métodos de Pagamento */}
-        <section className="bg-white p-8 rounded-[2rem] border border-white shadow-sm space-y-8 hover:shadow-md transition-all">
-          <div className="flex items-center gap-4 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100">
-              <CreditCard className="w-6 h-6" />
-            </div>
-            <h2 className="text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Pagamento</h2>
-          </div>
-
-          <div className="space-y-3">
-            {allPossibleMethods.map((method) => {
-              const isActive = localMethods.includes(method);
-              const subLabel = methodSubLabels[method];
-              return (
-                <div 
-                  key={method} 
-                  onClick={() => toggleMethod(method)}
-                  className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive ? 'bg-indigo-50 border-indigo-100 shadow-sm' : 'bg-gray-50 border-transparent hover:border-gray-200 opacity-60'}`}
-                >
-                  <div className="flex flex-col min-w-0">
-                    <span className={`text-sm font-black uppercase tracking-tight ${isActive ? 'text-indigo-900' : 'text-gray-400'}`}>{method}</span>
-                    {subLabel && (
-                      <span className={`text-[10px] font-bold tracking-wide mt-0.5 ${isActive ? 'text-indigo-500' : 'text-gray-400'}`}>{subLabel}</span>
-                    )}
-                  </div>
-                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shrink-0 ${isActive ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-200 text-gray-400'}`}>
-                    {isActive ? 'Ativo' : 'Inativo'}
-                    {isActive ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Botão Salvar */}
-        <div className="lg:col-span-2 flex justify-center pt-8">
+        {/* Action Footer */}
+        <div className="p-4 bg-gray-50/30 border-t border-gray-50 flex justify-end">
           <button 
             onClick={handleSave}
             disabled={isSaving}
-            className="bg-[var(--color-brand-accent)] text-white font-black px-16 py-5 rounded-2xl shadow-xl shadow-[var(--color-brand-accent)]/20 flex items-center gap-3 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:scale-100 uppercase tracking-widest text-sm"
+            className="bg-[var(--color-brand-accent)] text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-[var(--color-brand-accent)]/20 flex items-center gap-2 hover:scale-105 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest text-[10px]"
           >
-            {isSaving ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
-            Salvar Alterações
+            {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Salvar Configurações
           </button>
         </div>
       </div>
