@@ -151,7 +151,7 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const [salesPeriod, setSalesPeriod] = useState<'1' | '3' | '7' | '15' | 'all'>('1');
+  const [salesPeriod, setSalesPeriod] = useState<'1' | '3' | '7' | '15' | '30' | 'all'>('1');
 
   const deleteOrder = async (orderId: string) => {
     setModalConfig({
@@ -198,7 +198,7 @@ export default function AdminOrdersPage() {
     });
   };
 
-  const calculateSales = (days: '1' | '3' | '7' | '15' | 'all') => {
+  const calculateSales = (days: '1' | '3' | '7' | '15' | '30' | 'all') => {
     const now = new Date();
     const filtered = orders.filter(order => {
       if (order.status === 'cancelled') return false;
@@ -376,11 +376,12 @@ export default function AdminOrdersPage() {
                 { id: '3', label: '3d' },
                 { id: '7', label: '7d' },
                 { id: '15', label: '15d' },
+                { id: '30', label: '30d' },
                 { id: 'all', label: 'Tudo' }
               ].map((p: { id: string; label: string }) => (
                 <button
                   key={p.id}
-                  onClick={() => setSalesPeriod(p.id as '1' | '3' | '7' | '15' | 'all')}
+                  onClick={() => setSalesPeriod(p.id as '1' | '3' | '7' | '15' | '30' | 'all')}
                   className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${salesPeriod === p.id ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
                 >
                   {p.label}
