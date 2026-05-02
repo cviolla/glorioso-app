@@ -366,7 +366,7 @@ export default function CartPage() {
       <header className={`p-5 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${step === 'cart' ? 'border-white/5 bg-[#1a0808]/95' : 'border-[#532120]/10 bg-[#fff5e9]/95'}`}>
         <div className="flex items-center gap-3">
           {step === 'cart' ? (
-            <Link href="/" className="hover:bg-white/10 p-2 -ml-2 rounded-full transition-colors">
+            <Link href="/menu" className="hover:bg-white/10 p-2 -ml-2 rounded-full transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
           ) : (
