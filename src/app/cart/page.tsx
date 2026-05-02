@@ -427,11 +427,11 @@ export default function CartPage() {
                           <p className="font-bold mt-2 text-[#ff914a]">R$ {itemTotal.toFixed(2).replace('.', ',')}</p>
                         </div>
                         <div className="flex flex-col items-end justify-between">
-                          <button onClick={() => removeItem(item.cartItemId)} className="p-2 text-white/40 hover:text-red-400"><Trash2 className="w-4 h-4" /></button>
+                          <button onClick={() => removeItem(item.cartItemId)} className="p-2 text-white/40 hover:text-red-400" title="Remover" aria-label={`Remover ${item.name} do carrinho`}><Trash2 className="w-4 h-4" /></button>
                           <div className="flex items-center gap-3 bg-white/10 rounded-full px-2 py-1">
-                            <button onClick={() => updateQuantity(item.cartItemId, -1)} className="p-1 text-[#ff914a] hover:bg-white/10 rounded-full"><Minus className="w-4 h-4" /></button>
+                            <button onClick={() => updateQuantity(item.cartItemId, -1)} className="p-1 text-[#ff914a] hover:bg-white/10 rounded-full" title="Diminuir" aria-label={`Diminuir quantidade de ${item.name}`}><Minus className="w-4 h-4" /></button>
                             <span className="font-semibold text-sm w-4 text-center">{item.quantity}</span>
-                            <button onClick={() => updateQuantity(item.cartItemId, 1)} className="p-1 text-[#ff914a] hover:bg-white/10 rounded-full"><Plus className="w-4 h-4" /></button>
+                            <button onClick={() => updateQuantity(item.cartItemId, 1)} className="p-1 text-[#ff914a] hover:bg-white/10 rounded-full" title="Aumentar" aria-label={`Aumentar quantidade de ${item.name}`}><Plus className="w-4 h-4" /></button>
                           </div>
                         </div>
                       </div>

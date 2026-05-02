@@ -556,6 +556,8 @@ export default function AdminOrdersPage() {
                       <button 
                         onClick={() => setSelectedOrder(null)}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Fechar Detalhes"
+                        aria-label="Fechar Detalhes do Pedido"
                       >
                         <XCircle className="w-6 h-6" />
                       </button>
