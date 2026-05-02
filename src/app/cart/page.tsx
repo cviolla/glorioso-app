@@ -7,6 +7,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 import { ArrowLeft, ArrowRight, Trash2, Plus, Minus, MapPin, CreditCard, Motorbike, Store, User, Phone, Loader2, X, Banknote } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { CustomModal } from "@/components/CustomModal";
@@ -162,6 +163,39 @@ export default function CartPage() {
       return;
     }
     
+    // Zod Validation
+    const userValidation = z.object({
+      name: z.string().trim().min(2, "Por favor, informe seu nome completo."),
+      phone: z.string().refine(val => val.replace(/\D/g, '').length >= 10, "Informe um WhatsApp válido com DDD.")
+    }).safeParse(userInfo);
+
+    if (!userValidation.success) {
+      setModalConfig({
+        isOpen: true,
+        title: "Dados Incompletos",
+        message: userValidation.error.issues[0].message,
+        type: "warning"
+      });
+      return;
+    }
+
+    if (deliveryType === 'delivery') {
+      const addressValidation = z.object({
+        street: z.string().trim().min(3, "Por favor, digite o nome da rua corretamente."),
+        number: z.string().trim().min(1, "O número da residência é obrigatório.")
+      }).safeParse(address);
+
+      if (!addressValidation.success) {
+        setModalConfig({
+          isOpen: true,
+          title: "Endereço Incompleto",
+          message: addressValidation.error.issues[0].message,
+          type: "warning"
+        });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     
     try {
