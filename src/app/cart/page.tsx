@@ -609,11 +609,12 @@ export default function CartPage() {
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">R$</span>
                             <input 
                               type="text"
-                              inputMode="decimal"
+                              inputMode="numeric"
                               className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg outline-none focus:border-[#ff914a] font-mono text-[15px]"
                               value={payment.value}
                               onChange={(e) => {
-                                const val = e.target.value.replace(/[^0-9,\.]/g, '');
+                                const digits = e.target.value.replace(/\D/g, '');
+                                const val = digits ? (parseInt(digits, 10) / 100).toFixed(2).replace('.', ',') : '';
                                 const newPayments = [...splitPayments];
                                 newPayments[index].value = val;
                                 setSplitPayments(newPayments);
@@ -759,12 +760,13 @@ export default function CartPage() {
                                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#381010]/40 font-bold text-sm">R$</span>
                                   <input
                                     type="text"
-                                    inputMode="decimal"
+                                    inputMode="numeric"
                                     placeholder={`Ex: 50,00`}
                                     className="w-full border border-gray-300 rounded-lg py-2.5 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all"
                                     value={changeFor}
                                     onChange={e => {
-                                      const val = e.target.value.replace(/[^0-9,\.]/g, '');
+                                      const digits = e.target.value.replace(/\D/g, '');
+                                      const val = digits ? (parseInt(digits, 10) / 100).toFixed(2).replace('.', ',') : '';
                                       setChangeFor(val);
                                     }}
                                   />
