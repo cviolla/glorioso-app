@@ -475,12 +475,13 @@ export default function AdminOrdersPage() {
             filteredOrders.map((order) => {
               const StatusIcon = statusConfig[order.status].icon;
               
-              const cardStatusStyles = {
+              const cardStatusStyles: Record<OrderStatus, string> = {
                 pending: 'bg-amber-50/80 border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.3)] animate-pulse',
                 preparing: 'bg-blue-50/40 border-blue-200',
                 shipped: 'bg-purple-50/40 border-purple-200',
                 delivered: 'bg-green-50/40 border-green-200',
                 cancelled: 'bg-red-50/40 border-red-200',
+                archived: 'bg-gray-50/40 border-gray-200 grayscale opacity-80',
               };
               
               const baseCardStyle = cardStatusStyles[order.status];
