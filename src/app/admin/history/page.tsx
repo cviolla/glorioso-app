@@ -151,7 +151,7 @@ export default function AdminHistoryPage() {
       month: '2-digit',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }).replace(/[\u202f\u00a0]/g, ' ');
   };
 
   return (

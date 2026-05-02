@@ -37,7 +37,7 @@ export function InvoicePrint({ order }: { order: Order }) {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }).replace(/[\u202f\u00a0]/g, ' ');
   };
 
   return (

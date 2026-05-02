@@ -238,7 +238,7 @@ export default function CartPage() {
         timeZone: 'America/Sao_Paulo',
         day: '2-digit', month: '2-digit', year: 'numeric', 
         hour: '2-digit', minute: '2-digit' 
-      }).replace(',', '');
+      }).replace(/[\u202f\u00a0]/g, ' ').replace(',', '');
 
       let text = `Venho do app *Glorioso Brownie*\n`;
       text += `BR-${orderId}\n`;
@@ -635,18 +635,38 @@ export default function CartPage() {
                     )}
 
                     {/* Resumo da Validação */}
-                    <div className={`p-3 rounded-xl border ${isTotalMatched ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700'} transition-all`}>
-                      <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider">
-                        <span>Total Inserido:</span>
-                        <span>R$ {currentSplitTotal.toFixed(2).replace('.', ',')}</span>
+                    <div className={`p-3.5 rounded-xl border ${isTotalMatched ? 'bg-green-50 border-green-200 text-green-700' : 'bg-[#fff5f5] border-red-200 text-red-700'} transition-all`}>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between items-center text-xs font-extrabold uppercase tracking-wider">
+                          <span>Total Inserido:</span>
+                          <span>R$ {currentSplitTotal.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                        
+                        {deliveryType === 'delivery' && (
+                          <div className="flex justify-between items-center text-[11px] opacity-80">
+                            <span>Entrega:</span>
+                            <span>R$ {deliveryFee.toFixed(2).replace('.', ',')}</span>
+                          </div>
+                        )}
+
+                        {!isTotalMatched && currentSplitTotal < finalTotal && (
+                          <div className="flex justify-between items-center text-[11px] opacity-80">
+                            <span>Faltando:</span>
+                            <span>R$ {(finalTotal - currentSplitTotal).toFixed(2).replace('.', ',')}</span>
+                          </div>
+                        )}
+                        
+                        {!isTotalMatched && currentSplitTotal > finalTotal && (
+                          <div className="flex justify-between items-center text-[11px] opacity-80">
+                            <span>Excedente:</span>
+                            <span>R$ {(currentSplitTotal - finalTotal).toFixed(2).replace('.', ',')}</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex justify-between items-center text-[10px] opacity-70 mt-1">
-                        <span>Entrega:</span>
-                        <span>R$ {Math.max(0, finalTotal - currentSplitTotal).toFixed(2).replace('.', ',')}</span>
-                      </div>
+                      
                       {!isTotalMatched && (
-                        <p className="text-[10px] mt-2 font-bold animate-pulse">
-                          ⚠️ O total inserido deve ser exatamente R$ {finalTotal.toFixed(2).replace('.', ',')}
+                        <p className="text-[11px] mt-2.5 font-bold flex items-center gap-1">
+                          <span className="text-[10px] leading-none">⚠️</span> O total inserido deve ser exatamente R$ {finalTotal.toFixed(2).replace('.', ',')}
                         </p>
                       )}
                     </div>
