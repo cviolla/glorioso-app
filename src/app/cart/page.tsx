@@ -641,7 +641,7 @@ export default function CartPage() {
                         <span>R$ {currentSplitTotal.toFixed(2).replace('.', ',')}</span>
                       </div>
                       <div className="flex justify-between items-center text-[10px] opacity-70 mt-1">
-                        <span>Faltando:</span>
+                        <span>Entrega:</span>
                         <span>R$ {Math.max(0, finalTotal - currentSplitTotal).toFixed(2).replace('.', ',')}</span>
                       </div>
                       {!isTotalMatched && (
