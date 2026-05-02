@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MenuItem, MenuCategory } from '@/data/menu';
 import { Search, Plus, Edit2, ChevronDown, ChevronUp, Image as ImageIcon, Clock, Power, Settings, Save, Trash2, Loader2, Upload, Eye, EyeOff } from 'lucide-react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStoreStatusStore } from '@/store/storeStatusStore';
 import { supabase } from '@/lib/supabase';
@@ -416,7 +417,7 @@ export default function AdminProductsPage() {
                   <div className="relative group">
                     <div className="h-28 w-full bg-gray-50 border border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 overflow-hidden relative">
                       {editingItem.imageUrl ? (
-                        <img src={editingItem.imageUrl} alt={editingItem.name} className="w-full h-full object-cover" />
+                        <Image src={editingItem.imageUrl} alt={editingItem.name} fill sizes="400px" className="object-cover" />
                       ) : (
                         <>
                           <ImageIcon className="w-6 h-6 mb-1" />
@@ -594,7 +595,7 @@ function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item:
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative border border-gray-100">
           {item.imageUrl ? (
-            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <Image src={item.imageUrl} alt={item.name} fill sizes="48px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
           ) : (
             <ImageIcon className="w-5 h-5 text-gray-300" />
           )}

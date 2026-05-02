@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { Search, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { StoreStatus } from "@/components/StoreStatus";
@@ -279,10 +280,12 @@ export default function MenuPage() {
               <div key={category.id} id={`category-${category.id}`} className="scroll-mt-24">
                 <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
                   {category.name}
-                  <img 
+                  <Image 
                     src="/logo glorioso brownie 3.png" 
                     alt="Logo Glorioso Brownie" 
-                    className="h-[13px] sm:h-[18px] object-contain"
+                    width={40}
+                    height={18}
+                    className="h-[13px] w-auto sm:h-[18px] object-contain"
                   />
                 </h2>
 
