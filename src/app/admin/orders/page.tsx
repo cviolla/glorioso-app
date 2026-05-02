@@ -350,7 +350,7 @@ export default function AdminOrdersPage() {
 
       {/* Sales Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-[var(--color-brand-dark)] rounded-[2rem] p-5 sm:p-6 shadow-xl relative overflow-hidden group">
+        <div className="md:col-span-2 bg-[var(--color-brand-dark)] rounded-[2rem] px-5 sm:px-6 py-4 sm:py-5 shadow-xl relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-48 h-48 bg-[var(--color-brand-accent)]/10 rounded-full -mr-20 -mt-20 blur-3xl group-hover:bg-[var(--color-brand-accent)]/20 transition-all duration-700"></div>
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -381,7 +381,7 @@ export default function AdminOrdersPage() {
           </div>
 
           {/* Mini Chart */}
-          <div className="mt-4 flex items-end justify-between gap-2 h-16">
+          <div className="mt-3 flex items-end justify-between gap-2 h-14">
             {getDailySalesData().map((day, idx) => {
               const maxVal = Math.max(...getDailySalesData().map(d => d.value), 1);
               const height = (day.value / maxVal) * 100;
@@ -405,9 +405,9 @@ export default function AdminOrdersPage() {
             })}
           </div>
         </div>
-        <div className="bg-white rounded-[2rem] p-5 sm:p-6 border border-white shadow-sm flex flex-col justify-center gap-3 hover:shadow-md transition-all">
-          <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center border border-green-100">
-            <DollarSign className="w-6 h-6 text-green-600" />
+        <div className="bg-white rounded-[2rem] px-5 sm:px-6 py-4 sm:py-5 border border-white shadow-sm flex flex-col justify-center gap-2 hover:shadow-md transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-green-50 flex items-center justify-center border border-green-100">
+            <DollarSign className="w-5 h-5 text-green-600" />
           </div>
           <div>
             <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Ticket Médio</p>
