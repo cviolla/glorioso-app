@@ -620,11 +620,10 @@ export default function AdminOrdersPage() {
                       </button>
                       {['delivered', 'cancelled', 'archived'].includes(selectedOrder.status) && (
                         <button 
-                          onClick={() => updateOrderStatus(selectedOrder.id, 'archived')}
-                          disabled={selectedOrder.status === 'archived'}
-                          className={`text-xs font-bold py-2 px-3 rounded-lg border transition-all col-span-2 ${selectedOrder.status === 'archived' ? 'bg-gray-600 text-white border-gray-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                          onClick={() => updateOrderStatus(selectedOrder.id, selectedOrder.status === 'archived' ? 'delivered' : 'archived')}
+                          className={`text-xs font-bold py-2 px-3 rounded-lg border transition-all col-span-2 ${selectedOrder.status === 'archived' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
                         >
-                          <span className="flex items-center justify-center gap-2"><Archive className="w-3.5 h-3.5"/> Arquivar Pedido</span>
+                          <span className="flex items-center justify-center gap-2"><Archive className="w-3.5 h-3.5"/> {selectedOrder.status === 'archived' ? 'Desarquivar Pedido' : 'Arquivar Pedido'}</span>
                         </button>
                       )}
                     </div>
@@ -785,6 +784,14 @@ export default function AdminOrdersPage() {
                   >
                     Cancelar
                   </button>
+                  {['delivered', 'cancelled', 'archived'].includes(selectedOrder.status) && (
+                    <button 
+                      onClick={() => updateOrderStatus(selectedOrder.id, selectedOrder.status === 'archived' ? 'delivered' : 'archived')}
+                      className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all col-span-2 ${selectedOrder.status === 'archived' ? 'bg-amber-600 text-white border-amber-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                    >
+                      <span className="flex items-center justify-center gap-2"><Archive className="w-3.5 h-3.5"/> {selectedOrder.status === 'archived' ? 'Desarquivar Pedido' : 'Arquivar Pedido'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
