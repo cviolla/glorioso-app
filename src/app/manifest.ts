@@ -11,17 +11,17 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#381010',
     icons: [
       {
-        src: '/GloriosoBrownie_Logo_fuul.png',
+        src: '/admin-icon.png',
         sizes: 'any',
         type: 'image/png',
       },
       {
-        src: '/GloriosoBrownie_Logo_fuul.png',
+        src: '/admin-icon.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/GloriosoBrownie_Logo_fuul.png',
+        src: '/admin-icon.png',
         sizes: '512x512',
         type: 'image/png',
       },

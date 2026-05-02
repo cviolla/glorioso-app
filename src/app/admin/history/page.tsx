@@ -62,6 +62,25 @@ export default function AdminHistoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data } = await supabase.from('categories').select('id, name').order('sort_order');
+      if (data) setCategories(data);
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentPlaceholderIndex((prev) => (prev + 1) % categories.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [categories]);
 
   const fetchHistory = useCallback(async (isInitial = false) => {
     if (!isInitial) setLoading(true);
@@ -163,11 +182,29 @@ export default function AdminHistoryPage() {
           <p className="text-gray-400 font-medium text-[9px] md:text-[11px] uppercase tracking-wider">Gestão financeira diária</p>
         </div>
         <div className="grid grid-cols-2 gap-2 px-1">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <div className="relative group">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 z-10" />
+            
+            <div className="absolute left-8 top-1/2 -translate-y-1/2 pointer-events-none h-4 overflow-hidden w-full">
+              <AnimatePresence mode="wait">
+                {!searchQuery && categories.length > 0 && (
+                  <motion.span
+                    key={categories[currentPlaceholderIndex]?.id}
+                    initial={{ y: 15, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -15, opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute left-0 text-gray-400 font-bold text-[10px] md:text-[11.5px] uppercase"
+                  >
+                    {categories[currentPlaceholderIndex]?.name}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+
             <input 
               type="text" 
-              placeholder="BUSCAR" 
+              placeholder="" 
               className="w-full h-9 pl-8 pr-2 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-[10px] md:text-[11.5px] font-bold"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

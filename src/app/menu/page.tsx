@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { Search, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { StoreStatus } from "@/components/StoreStatus";
@@ -14,6 +15,7 @@ export default function MenuPage() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -82,6 +84,17 @@ export default function MenuPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMenu();
   }, [fetchMenu]);
+
+  // Timer para o placeholder dinâmico
+  useEffect(() => {
+    if (categories.length === 0) return;
+    
+    const timer = setInterval(() => {
+      setCurrentPlaceholderIndex((prev) => (prev + 1) % categories.length);
+    }, 3000);
+
+    return () => clearInterval(timer);
+  }, [categories.length]);
 
   // Intersection Observer for scroll spy
   useEffect(() => {
@@ -162,7 +175,7 @@ export default function MenuPage() {
       <div 
         className="fixed inset-0 z-0 opacity-25 pointer-events-none"
         style={{ 
-          backgroundImage: "url('/GB1.png?v=2')",
+          backgroundImage: "url('/background_home.jpg')",
           backgroundRepeat: 'repeat',
           backgroundSize: '320px',
           backgroundAttachment: 'fixed'
@@ -220,21 +233,40 @@ export default function MenuPage() {
           <StoreStatus className="!justify-end" />
         </div>
 
-        {/* Search Bar */}
+        {/* Dynamic Animated Placeholder Search Bar */}
         <div className="relative mb-6 shadow-lg rounded-2xl overflow-hidden bg-white/90 backdrop-blur-md border-2 border-[#f8ece3] focus-within:border-[#ff914a] transition-all group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5 group-focus-within:text-[#ff914a] transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#532120]/40 w-5 h-5 group-focus-within:text-[#ff914a] transition-colors z-10" />
+          
+          <div className="absolute left-12 top-0 bottom-0 right-12 flex items-center pointer-events-none overflow-hidden">
+            {!searchQuery && (
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentPlaceholderIndex}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="text-[#532120]/30 font-bold text-sm whitespace-nowrap"
+                >
+                  {categories.length > 0 
+                    ? categories[currentPlaceholderIndex]?.name 
+                    : "Carregando opções..."}
+                </motion.span>
+              </AnimatePresence>
+            )}
+          </div>
+
           <input 
             ref={searchInputRef}
             type="text"
-            placeholder="O que você deseja hoje?"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full py-4 pl-12 pr-12 bg-transparent outline-none text-[#381010] placeholder:text-[#532120]/30 font-bold text-sm"
+            className="w-full py-4 pl-12 pr-12 bg-transparent outline-none text-[#381010] placeholder:text-transparent font-bold text-sm relative z-0"
           />
           {searchQuery && (
             <button 
               onClick={() => setSearchQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-all"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-all z-10"
             >
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>

@@ -50,7 +50,7 @@ export default function Home() {
   return (
     <div 
       className="flex flex-col min-h-[100dvh] text-[#f8ece3] font-sans selection:bg-[#ff914a] selection:text-[#381010] overflow-hidden relative bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/GB1.png?v=2')" }}
+      style={{ backgroundImage: "url('/background_home.jpg')" }}
     >
       {/* Overlay removido para máxima fidelidade da imagem de fundo */}
       <div className="absolute inset-0 bg-transparent z-0 pointer-events-none"></div>

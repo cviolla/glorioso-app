@@ -56,8 +56,8 @@ export const metadata: Metadata = {
     images: ['/GloriosoBrownie_Logo_fuul.png'],
   },
   icons: {
-    icon: "/GloriosoBrownie_Logo_fuul.png",
-    apple: "/GloriosoBrownie_Logo_fuul.png",
+    icon: "/admin-icon.png",
+    apple: "/admin-icon.png",
   },
   appleWebApp: {
     capable: true,
