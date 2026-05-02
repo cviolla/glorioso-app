@@ -278,7 +278,7 @@ export default function AdminOrdersPage() {
       month: '2-digit',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    }).replace(/[\u202f\u00a0]/g, ' ');
   };
 
   return (
@@ -463,12 +463,24 @@ export default function AdminOrdersPage() {
           ) : (
             filteredOrders.map((order) => {
               const StatusIcon = statusConfig[order.status].icon;
+              
+              const cardStatusStyles = {
+                pending: 'bg-amber-50/80 border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.3)] animate-pulse',
+                preparing: 'bg-blue-50/40 border-blue-200',
+                shipped: 'bg-purple-50/40 border-purple-200',
+                delivered: 'bg-green-50/40 border-green-200',
+                cancelled: 'bg-red-50/40 border-red-200',
+              };
+              
+              const baseCardStyle = cardStatusStyles[order.status];
+              const isSelected = selectedOrder?.id === order.id;
+              
               return (
                 <motion.div 
                   layoutId={order.id}
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`group p-5 sm:p-6 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl ${selectedOrder?.id === order.id ? 'bg-white border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10' : 'bg-white border-white hover:border-gray-100 shadow-sm'}`}
+                  className={`group p-5 sm:p-6 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl ${isSelected ? 'border-[var(--color-brand-accent)] shadow-[var(--color-brand-accent)]/10 scale-[1.01]' : 'hover:scale-[1.01] shadow-sm'} ${baseCardStyle}`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
                     {/* Top Section / Left Section */}
