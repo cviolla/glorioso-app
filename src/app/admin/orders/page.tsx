@@ -20,12 +20,13 @@ import {
   DollarSign,
   Receipt,
   X,
-  RefreshCw
+  RefreshCw,
+  Archive
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
 
-type OrderStatus = 'pending' | 'preparing' | 'shipped' | 'delivered' | 'cancelled';
+type OrderStatus = 'pending' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'archived';
 
 interface OrderItem {
   name: string;
@@ -60,13 +61,14 @@ const statusConfig = {
   shipped: { label: 'Saiu p/ Entrega', color: 'text-purple-600 bg-purple-50 border-purple-200', icon: Truck },
   delivered: { label: 'Entregue', color: 'text-green-600 bg-green-50 border-green-200', icon: CheckCircle2 },
   cancelled: { label: 'Cancelado', color: 'text-red-600 bg-red-50 border-red-200', icon: XCircle },
+  archived: { label: 'Arquivado', color: 'text-gray-600 bg-gray-100 border-gray-300', icon: Archive },
 };
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [filterStatus, setFilterStatus] = useState<OrderStatus | 'all'>('all');
+  const [filterStatus, setFilterStatus] = useState<OrderStatus | 'all' | 'active'>('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
@@ -265,7 +267,14 @@ export default function AdminOrdersPage() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesStatus = filterStatus === 'all' || order.status === filterStatus;
+    let matchesStatus = false;
+    if (filterStatus === 'all') {
+      matchesStatus = order.status !== 'archived';
+    } else if (filterStatus === 'active') {
+      matchesStatus = ['pending', 'preparing', 'shipped'].includes(order.status);
+    } else {
+      matchesStatus = order.status === filterStatus;
+    }
     const matchesSearch = order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           order.id.slice(-4).includes(searchQuery);
     return matchesStatus && matchesSearch;
@@ -435,14 +444,16 @@ export default function AdminOrdersPage() {
           <select 
             className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-black appearance-none"
             value={filterStatus}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value as OrderStatus | 'all')}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilterStatus(e.target.value as OrderStatus | 'all' | 'active')}
           >
-            <option value="all">TODOS STATUS</option>
+            <option value="active">PEDIDOS ATIVOS</option>
+            <option value="all">TODOS VISÍVEIS</option>
             <option value="pending">PENDENTES</option>
             <option value="preparing">EM PREPARO</option>
             <option value="shipped">EM ENTREGA</option>
             <option value="delivered">ENTREGUES</option>
             <option value="cancelled">CANCELADOS</option>
+            <option value="archived">ARQUIVADOS</option>
           </select>
         </div>
       </div>
@@ -603,6 +614,15 @@ export default function AdminOrdersPage() {
                       >
                         Cancelar
                       </button>
+                      {['delivered', 'cancelled', 'archived'].includes(selectedOrder.status) && (
+                        <button 
+                          onClick={() => updateOrderStatus(selectedOrder.id, 'archived')}
+                          disabled={selectedOrder.status === 'archived'}
+                          className={`text-xs font-bold py-2 px-3 rounded-lg border transition-all col-span-2 ${selectedOrder.status === 'archived' ? 'bg-gray-600 text-white border-gray-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                        >
+                          <span className="flex items-center justify-center gap-2"><Archive className="w-3.5 h-3.5"/> Arquivar Pedido</span>
+                        </button>
+                      )}
                     </div>
                   </div>
 
