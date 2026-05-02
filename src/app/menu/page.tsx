@@ -3,12 +3,21 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Star, Flame, Award } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { StoreStatus } from "@/components/StoreStatus";
 import { ProductCard } from "@/components/ProductCard";
 import { MenuItem, MenuCategory, artesanalAddons, traditionalAddons } from "@/data/menu";
 import { supabase } from "@/lib/supabase";
+
+interface TrendingProduct {
+  id: string;
+  name: string;
+  sales_count?: number;
+  rating_avg?: number;
+  imageUrl?: string;
+  price?: number;
+}
 
 export default function MenuPage() {
   const [categories, setCategories] = useState<MenuCategory[]>([]);
@@ -80,9 +89,27 @@ export default function MenuPage() {
     }
   }, []);
 
+  const [bestSellers, setBestSellers] = useState<TrendingProduct[]>([]);
+  const [topRated, setTopRated] = useState<TrendingProduct[]>([]);
+
+  const fetchRankings = async () => {
+    try {
+      // Buscar do Supabase (tabela product_stats que criamos no SQL)
+      const { data: sellers } = await supabase.from('product_stats').select('*').order('sales_count', { ascending: false }).limit(5);
+      const { data: rated } = await supabase.from('product_stats').select('*').order('rating_avg', { ascending: false }).limit(5);
+      
+      // Mapear para incluir preços e imagens se necessário (ou buscar do menuData)
+      // Por simplicidade agora, se não houver dados, mostramos nada ou mock.
+      if (sellers) setBestSellers(sellers.map(s => ({ id: s.product_id, name: s.product_name, sales_count: s.sales_count })));
+      if (rated) setTopRated(rated.map(r => ({ id: r.product_id, name: r.product_name, rating_avg: r.rating_avg })));
+    } catch (err) {
+      console.error("Erro ao carregar rankings:", err);
+    }
+  };
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMenu();
+    fetchRankings();
   }, [fetchMenu]);
 
   // Timer para o placeholder dinâmico

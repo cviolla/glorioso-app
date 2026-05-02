@@ -648,6 +648,17 @@ export default function AdminOrdersPage() {
                       >
                         {selectedOrder.delivery_type === 'pickup' ? 'Retirado' : 'Entregue'}
                       </button>
+                      {selectedOrder.status === 'delivered' && (
+                        <button 
+                          onClick={() => {
+                            const text = encodeURIComponent(`Olá ${selectedOrder.customer_name}! Seu pedido da Glorioso Brownie foi entregue. 😋\n\nO que achou? Avalie seu pedido aqui e veja seu histórico: ${window.location.origin}/orders`);
+                            window.open(`https://wa.me/${selectedOrder.customer_phone.replace(/\D/g, '')}?text=${text}`, '_blank');
+                          }}
+                          className="text-xs font-bold py-2 px-3 rounded-lg border bg-amber-500 text-white border-amber-600 hover:bg-amber-600 shadow-sm animate-pulse"
+                        >
+                          Pedir Avaliação ⭐
+                        </button>
+                      )}
                       <button 
                         onClick={() => updateOrderStatus(selectedOrder.id, 'cancelled')}
                         disabled={selectedOrder.status === 'cancelled'}
