@@ -423,15 +423,15 @@ export const menuData: MenuCategory[] = [
             "name": "CAMARÃO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -441,15 +441,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -459,15 +459,15 @@ export const menuData: MenuCategory[] = [
             "name": "FRANGO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -482,15 +482,15 @@ export const menuData: MenuCategory[] = [
             "name": "CAMARÃO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -500,15 +500,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -518,15 +518,15 @@ export const menuData: MenuCategory[] = [
             "name": "FRANGO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -536,15 +536,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE SECA",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -559,15 +559,15 @@ export const menuData: MenuCategory[] = [
             "name": "CAMARÃO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -577,15 +577,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -595,15 +595,15 @@ export const menuData: MenuCategory[] = [
             "name": "FRANGO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -613,15 +613,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE SECA",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -636,15 +636,15 @@ export const menuData: MenuCategory[] = [
             "name": "CAMARÃO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -654,15 +654,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -672,15 +672,15 @@ export const menuData: MenuCategory[] = [
             "name": "FRANGO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -690,15 +690,15 @@ export const menuData: MenuCategory[] = [
             "name": "QUEIJO COM PRESUNTO",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]
@@ -708,15 +708,15 @@ export const menuData: MenuCategory[] = [
             "name": "CARNE SECA",
             "variants": [
               {
-                "name": "PEQUENA",
+                "name": "PEQ.",
                 "price": 10
               },
               {
-                "name": "MÉDIA",
+                "name": "MED.",
                 "price": 25
               },
               {
-                "name": "GRANDE",
+                "name": "GRD.",
                 "price": 45
               }
             ]

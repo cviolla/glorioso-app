@@ -9,6 +9,32 @@ import { useStoreStatusStore } from '@/store/storeStatusStore';
 import { supabase } from '@/lib/supabase';
 import { CustomModal } from '@/components/CustomModal';
 
+// Brazilian price formatting helpers
+function formatPriceBR(value: number): string {
+  return value.toFixed(2).replace('.', ',');
+}
+
+function parsePriceBR(value: string): number {
+  const cleaned = value.replace(/[^\d,]/g, '').replace(',', '.');
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+// Map full variant names to short labels
+const VARIANT_SHORT_LABELS: Record<string, string> = {
+  'PEQUENA': 'PEQ.',
+  'MÉDIA': 'MED.',
+  'MEDIA': 'MED.',
+  'GRANDE': 'GRD.',
+  'PEQ.': 'PEQ.',
+  'MED.': 'MED.',
+  'GRD.': 'GRD.',
+};
+
+function getShortLabel(name: string): string {
+  return VARIANT_SHORT_LABELS[name.toUpperCase()] || name;
+}
+
 export default function AdminProductsPage() {
   const [search, setSearch] = useState('');
   const [categories, setCategories] = useState<MenuCategory[]>([]);
@@ -55,7 +81,12 @@ export default function AdminProductsPage() {
               imageUrl: p.image_url,
               category_id: p.category_id,
               subcategory_id: p.subcategory_id,
-              is_active: p.is_active
+              is_active: p.is_active,
+              variants: vars?.filter(v => v.product_id === p.id).map(v => ({
+                id: v.id,
+                name: v.name,
+                price: v.price
+              }))
             }))
           }));
 
@@ -503,15 +534,15 @@ export default function AdminProductsPage() {
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-400 text-xs">R$</span>
                       <input 
-                        type="number" 
-                        step="0.01"
+                        type="text" 
+                        inputMode="decimal"
                         className="w-full border border-gray-100 rounded-xl pl-8 pr-3 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-black"
-                        value={editingItem.price || 0} 
-                        onChange={(e) => setEditingItem({...editingItem, price: parseFloat(e.target.value)})}
+                        value={formatPriceBR(editingItem.price || 0)} 
+                        onChange={(e) => setEditingItem({...editingItem, price: parsePriceBR(e.target.value)})}
                         disabled={saving}
                       />
                     </div>
-                    <p className="text-[9px] text-gray-400 mt-1.5 uppercase font-black tracking-widest">Use 0 se o produto tiver variações abaixo</p>
+                    <p className="text-[9px] text-gray-400 mt-1.5 uppercase font-black tracking-widest">Use 0,00 se o produto tiver variações abaixo</p>
                   </div>
 
                   <div className="pt-4 border-t border-gray-100">
@@ -536,7 +567,7 @@ export default function AdminProductsPage() {
                         <div key={idx} className="flex gap-2 items-center bg-gray-50/50 p-2 rounded-xl border border-gray-100">
                           <input 
                             type="text" 
-                            placeholder="Ex: 30CM"
+                            placeholder="Ex: PEQ."
                             className="flex-1 min-w-0 text-[11.5px] border-none bg-white rounded-lg h-8 px-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
                             value={v.name}
                             onChange={(e) => {
@@ -548,14 +579,14 @@ export default function AdminProductsPage() {
                           <div className="relative w-24 shrink-0">
                             <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-400">R$</span>
                             <input 
-                              type="number" 
-                              step="0.01"
+                              type="text" 
+                              inputMode="decimal"
                               placeholder="0,00"
                               className="w-full text-[11.5px] border-none bg-white rounded-lg h-8 pl-6 pr-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-black"
-                              value={v.price}
+                              value={formatPriceBR(v.price)}
                               onChange={(e) => {
                                 const vars = [...(editingItem.variants || [])];
-                                vars[idx].price = parseFloat(e.target.value);
+                                vars[idx].price = parsePriceBR(e.target.value);
                                 setEditingItem({...editingItem, variants: vars});
                               }}
                             />
@@ -639,9 +670,15 @@ function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item:
             {!item.is_active && <span className="text-[9px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded uppercase tracking-widest font-black">Oculto</span>}
           </h4>
           {item.price !== undefined && item.price > 0 ? (
-            <p className="text-[11.5px] text-gray-500 font-bold mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+            <p className="text-[11.5px] text-gray-500 font-bold mt-0.5">R$ {formatPriceBR(item.price)}</p>
           ) : item.variants && item.variants.length > 0 ? (
-            <p className="text-[11.5px] text-[var(--color-brand-accent)] font-black mt-0.5 uppercase tracking-wide">Várias opções</p>
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              {item.variants.map((v, i) => (
+                <span key={i} className="text-[9px] font-black bg-[var(--color-brand-accent)]/10 text-[var(--color-brand-accent)] px-1.5 py-0.5 rounded-md uppercase tracking-wide">
+                  {getShortLabel(v.name)} R${formatPriceBR(v.price)}
+                </span>
+              ))}
+            </div>
           ) : (
             <p className="text-[11.5px] text-gray-400 mt-0.5 font-medium italic">Consulte as opções</p>
           )}

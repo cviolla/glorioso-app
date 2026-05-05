@@ -14,6 +14,17 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CustomModal } from "@/components/CustomModal";
 
+// Brazilian price formatting helpers
+function formatPriceBR(value: number): string {
+  return value.toFixed(2).replace('.', ',');
+}
+
+function parsePriceBR(value: string): number {
+  const cleaned = value.replace(/[^\d,]/g, '').replace(',', '.');
+  const parsed = parseFloat(cleaned);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
 export default function AdminSettingsPage() {
   const { isManualOpen, setManualOpen, fetchStatus } = useStoreStatusStore();
   const { 
@@ -200,9 +211,10 @@ export default function AdminSettingsPage() {
                   <div className="relative flex items-center gap-1">
                     <span className="text-[10px] font-black text-gray-300">R$</span>
                     <input 
-                      type="number" 
-                      value={fee}
-                      onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parseFloat(e.target.value) || 0 })}
+                      type="text" 
+                      inputMode="decimal"
+                      value={formatPriceBR(fee as number)}
+                      onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parsePriceBR(e.target.value) })}
                       className="w-full bg-transparent outline-none transition-all font-black text-sm text-[var(--color-brand-dark)]"
                     />
                   </div>
