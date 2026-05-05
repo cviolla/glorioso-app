@@ -650,10 +650,9 @@ export default function AdminProductsPage() {
                       </div>
                     </div>
                   </div>
-                    </div>
-                  </div>
                 </div>
               </div>
+
 
               <div className="p-4 border-t border-gray-100 bg-gray-50/50 md:rounded-b-2xl shrink-0">
                 <button 
