@@ -10,6 +10,7 @@ interface SettingsState {
   fetchSettings: () => Promise<void>;
   setWhatsappNumber: (val: string) => Promise<void>;
   setDeliveryFee: (neighborhood: string, fee: number) => Promise<void>;
+  removeDeliveryFee: (neighborhood: string) => Promise<void>;
   setPaymentMethods: (methods: string[]) => Promise<void>;
   updateAllFees: (fees: { [key: string]: number }) => Promise<void>;
 }
@@ -77,21 +78,52 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       await supabase
         .from('delivery_fees')
-        .upsert({ neighborhood, fee })
-        .eq('neighborhood', neighborhood);
+        .upsert({ neighborhood, fee }, { onConflict: 'neighborhood' });
     } catch (err) {
       console.error('Erro ao atualizar taxa:', err);
+    }
+  },
+
+  removeDeliveryFee: async (neighborhood) => {
+    set((state) => {
+      const newFees = { ...state.deliveryFees };
+      delete newFees[neighborhood];
+      return { deliveryFees: newFees };
+    });
+    try {
+      await supabase
+        .from('delivery_fees')
+        .delete()
+        .eq('neighborhood', neighborhood);
+    } catch (err) {
+      console.error('Erro ao remover taxa:', err);
     }
   },
 
   updateAllFees: async (fees) => {
     set({ deliveryFees: fees });
     try {
+      // 1. Get current fees in DB
+      const { data: currentDbFees } = await supabase.from('delivery_fees').select('neighborhood');
+      const dbNeighborhoods = currentDbFees?.map(f => f.neighborhood) || [];
+      
+      // 2. Identify which ones to delete
+      const neighborhoodsToKeep = Object.keys(fees);
+      const neighborhoodsToDelete = dbNeighborhoods.filter(n => !neighborhoodsToKeep.includes(n));
+
+      // 3. Perform deletions if any
+      if (neighborhoodsToDelete.length > 0) {
+        await supabase.from('delivery_fees').delete().in('neighborhood', neighborhoodsToDelete);
+      }
+
+      // 4. Perform upserts
       const updates = Object.entries(fees).map(([neighborhood, fee]) => ({
         neighborhood,
         fee
       }));
-      await supabase.from('delivery_fees').upsert(updates);
+      if (updates.length > 0) {
+        await supabase.from('delivery_fees').upsert(updates, { onConflict: 'neighborhood' });
+      }
     } catch (err) {
       console.error('Erro ao atualizar todas as taxas:', err);
     }

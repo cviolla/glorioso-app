@@ -9,6 +9,9 @@ import {
   RefreshCw,
   ToggleLeft,
   ToggleRight,
+  Truck,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -199,28 +202,72 @@ export default function AdminSettingsPage() {
 
           {/* Delivery Fees - Right Columns */}
           <div className="lg:col-span-2 p-4 space-y-4">
-            <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
-              <Phone className="w-3.5 h-3.5" /> Taxas de Entrega
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Truck className="w-3.5 h-3.5" /> Taxas de Entrega
+              </h2>
+              <button 
+                onClick={() => {
+                  const newName = `Bairro ${Object.keys(localFees).length + 1}`;
+                  setLocalFees({ ...localFees, [newName]: 7.00 });
+                }}
+                className="text-[9px] bg-white border border-gray-100 text-[var(--color-brand-dark)] px-3 py-1.5 rounded-lg font-black hover:bg-gray-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm uppercase tracking-widest"
+              >
+                <Plus className="w-3 h-3 text-[var(--color-brand-accent)]" />
+                Adicionar Bairro
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {Object.entries(localFees).map(([neighborhood, fee]) => (
-                <div key={neighborhood} className="bg-gray-50/30 p-2.5 rounded-xl border border-gray-50 hover:border-[var(--color-brand-accent)]/20 transition-all group shadow-xs">
-                  <label className="text-[8px] font-black text-gray-400 uppercase tracking-wider mb-1 block truncate">
-                    {neighborhood}
-                  </label>
-                  <div className="relative flex items-center gap-1">
-                    <span className="text-[10px] font-black text-gray-300">R$</span>
+                <div key={neighborhood} className="bg-gray-50/30 p-3 rounded-2xl border border-gray-50 hover:border-[var(--color-brand-accent)]/20 transition-all group shadow-xs flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
                     <input 
-                      type="text" 
-                      inputMode="decimal"
-                      value={formatPriceBR(fee as number)}
-                      onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parsePriceBR(e.target.value) })}
-                      className="w-full bg-transparent outline-none transition-all font-black text-sm text-[var(--color-brand-dark)]"
+                      type="text"
+                      value={neighborhood}
+                      placeholder="Nome do Bairro"
+                      onChange={(e) => {
+                        const newName = e.target.value;
+                        if (!newName || localFees[newName] !== undefined) return;
+                        const newFees = { ...localFees };
+                        const val = newFees[neighborhood];
+                        delete newFees[neighborhood];
+                        newFees[newName] = val;
+                        setLocalFees(newFees);
+                      }}
+                      className="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-1 block w-full bg-transparent outline-none focus:text-[var(--color-brand-accent)]"
                     />
+                    <div className="relative flex items-center gap-1">
+                      <span className="text-[10px] font-black text-gray-300">R$</span>
+                      <input 
+                        type="text" 
+                        inputMode="decimal"
+                        value={formatPriceBR(fee as number)}
+                        onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parsePriceBR(e.target.value) })}
+                        className="w-full bg-transparent outline-none transition-all font-black text-sm text-[var(--color-brand-dark)]"
+                      />
+                    </div>
                   </div>
+                  <button 
+                    onClick={() => {
+                      const newFees = { ...localFees };
+                      delete newFees[neighborhood];
+                      setLocalFees(newFees);
+                    }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
             </div>
+            
+            {Object.keys(localFees).length === 0 && (
+              <div className="py-10 flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-[2rem] bg-gray-50/20">
+                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Nenhum bairro cadastrado</p>
+                <p className="text-[9px] text-gray-300 font-bold uppercase">Clique em "Adicionar Bairro" para começar</p>
+              </div>
+            )}
           </div>
         </div>
 
