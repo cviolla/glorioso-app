@@ -40,6 +40,17 @@ export function InvoicePrint({ order }: { order: Order }) {
     }).replace(/[\u202f\u00a0]/g, ' ');
   };
 
+  const fmt = (val: number) => val.toFixed(2).replace('.', ',');
+
+  // Calculate subtotal from items
+  const subtotal = order.items.reduce((sum, item) => {
+    const itemTotal = item.price + (item.addons?.reduce((s, a) => s + a.price, 0) || 0);
+    return sum + (itemTotal * item.quantity);
+  }, 0);
+
+  // Delivery fee = total_price - subtotal (if delivery)
+  const deliveryFee = order.delivery_type === 'delivery' ? Math.max(0, order.total_price - subtotal) : 0;
+
   return (
     <div id="thermal-receipt" className="thermal-receipt">
       {/* Cabeçalho */}
@@ -71,42 +82,50 @@ export function InvoicePrint({ order }: { order: Order }) {
       {/* Itens do Pedido */}
       <div className="mb-2">
         <p className="text-center mb-1 text-[14px] font-black underline">RESUMO DO PEDIDO</p>
-        <div className="space-y-2">
-          {order.items.map((item, idx) => (
-            <div key={idx} className="text-[13px] font-bold">
-              <div className="flex flex-col items-center">
-                <span className="leading-tight">{item.quantity}x {item.name.toUpperCase()}</span>
-                <span className="font-black">R${(item.price * item.quantity).toFixed(2)}</span>
+        <div className="space-y-1">
+          {order.items.map((item, idx) => {
+            const itemTotal = (item.price + (item.addons?.reduce((s, a) => s + a.price, 0) || 0)) * item.quantity;
+            return (
+              <div key={idx} className="text-[13px] font-bold">
+                <div className="item-row">
+                  <span className="leading-tight text-left">{item.quantity}x {item.name.toUpperCase()}{item.variant ? ` (${item.variant})` : ''}</span>
+                  <span className="font-black whitespace-nowrap">R${fmt(itemTotal)}</span>
+                </div>
+                {item.addons?.map(a => (
+                  <p key={a.name} className="text-[11px] opacity-90 text-left">  + {a.name}</p>
+                ))}
               </div>
-              {item.variant && <p className="text-[11px] opacity-90">• {item.variant}</p>}
-              {item.addons?.map(a => (
-                <p key={a.name} className="text-[11px] opacity-90">+ {a.name}</p>
-              ))}
-            </div>
-          ))}
+            );
+          })}
         </div>
         <p className="mt-2 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Totais */}
       <div className="space-y-1 mb-2">
-        <div className="flex flex-col items-center text-[13px] font-bold">
+        <div className="item-row text-[13px] font-bold">
           <span>SUBTOTAL:</span>
-          <span className="font-black text-[15px]">R${order.total_price.toFixed(2)}</span>
+          <span className="font-black">R${fmt(subtotal)}</span>
         </div>
-        <div className="flex flex-col items-center text-[16px] font-black mt-1">
+        {deliveryFee > 0 && (
+          <div className="item-row text-[13px] font-bold">
+            <span>ENTREGA:</span>
+            <span className="font-black">R${fmt(deliveryFee)}</span>
+          </div>
+        )}
+        <div className="item-row text-[16px] font-black mt-1">
           <span className="underline">TOTAL:</span>
-          <span className="text-[18px]">R${order.total_price.toFixed(2)}</span>
+          <span>R${fmt(order.total_price)}</span>
         </div>
         <p className="mt-1 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Pagamento e Observações */}
-      <div className="mb-3 text-[13px] font-bold">
-        <p className="uppercase">PAGAMENTO: {order.payment_method}</p>
+      <div className="mb-3 text-[12px] font-bold">
+        <p className="uppercase leading-snug">PAGAMENTO: {order.payment_method}</p>
         {order.observation && (
           <div className="mt-2 p-1 border-2 border-black rounded-lg">
-            <p className="text-[12px] leading-tight">OBS: {order.observation}</p>
+            <p className="text-[12px] leading-tight text-left">OBS: {order.observation}</p>
           </div>
         )}
       </div>

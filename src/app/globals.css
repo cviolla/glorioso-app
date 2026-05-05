@@ -66,17 +66,17 @@ img {
 
 .thermal-receipt {
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 13.5px !important; /* Aumentado conforme solicitado */
+  font-size: 13.5px !important;
   font-weight: 700 !important;
   line-height: 1.3;
   color: black;
   background: white;
-  width: 56mm; /* Preenche melhor a largura de 58mm */
-  padding: 0;
+  width: 56mm;
+  padding: 0 1mm; /* Margem de segurança lateral */
   margin: 0 auto !important;
   box-sizing: border-box;
   overflow: hidden;
-  text-align: center; /* Centraliza todo o texto por padrão */
+  text-align: center;
 }
 
 .thermal-receipt * {
@@ -85,10 +85,12 @@ img {
 }
 
 .thermal-receipt .item-row {
-  display: flex;
-  justify-content: space-between;
+  display: flex !important;
+  justify-content: space-between !important;
   gap: 4px;
-  align-items: flex-start;
+  align-items: baseline;
+  text-align: left;
+  width: 100%;
 }
 
 @media print {
@@ -128,8 +130,15 @@ img {
     transform: translateX(-50%) !important;
     top: 0 !important;
     width: 56mm !important;
-    padding: 0 !important;
+    padding: 0 1mm !important; /* Margem de segurança lateral */
     text-align: center !important;
+  }
+
+  /* Força o flex layout no print */
+  .thermal-receipt .item-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    visibility: visible !important;
   }
 
   /* Esconde elementos de UI */
@@ -143,3 +152,4 @@ img {
     display: block !important;
   }
 }
+

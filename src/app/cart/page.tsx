@@ -113,11 +113,20 @@ export default function CartPage() {
   }, [isHydrated, userInfo.phone]);
 
   useEffect(() => {
-    if (isHydrated && paymentMethods.length > 0 && splitPayments.length === 0) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSplitPayments([{ method: paymentMethods[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
+    if (isHydrated && paymentMethods.length > 0) {
+      if (splitPayments.length === 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSplitPayments([{ method: paymentMethods[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
+      } else if (splitPayments.length === 1) {
+        // Auto-update the single payment value when total changes (delivery fee, neighborhood, etc.)
+        const currentVal = parseFloat(splitPayments[0].value.replace(',', '.')) || 0;
+        if (Math.abs(currentVal - finalTotal) > 0.001) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setSplitPayments([{ ...splitPayments[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
+        }
+      }
     }
-  }, [isHydrated, paymentMethods, finalTotal, splitPayments.length]);
+  }, [isHydrated, paymentMethods, finalTotal, splitPayments]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -325,10 +334,10 @@ export default function CartPage() {
         if (needsChange && changeFor) {
           const changeAmount = parseFloat(changeFor.replace(',', '.'));
           if (!isNaN(changeAmount) && changeAmount > cashValue) {
-            text += `💰 *Troco para:* R$ ${changeFor} (troco de R$ ${(changeAmount - cashValue).toFixed(2).replace('.', ',')})\n`;
+            text += `*Troco para:* R$ ${changeFor} (troco de R$ ${(changeAmount - cashValue).toFixed(2).replace('.', ',')})\n`;
           }
         } else {
-          text += `💰 *Não precisa de troco*\n`;
+          text += `*Não precisa de troco*\n`;
         }
       }
       
