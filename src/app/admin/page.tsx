@@ -529,84 +529,127 @@ export default function AdminProductsPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Preço Base (R$)</label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-gray-400 text-xs">R$</span>
-                      <input 
-                        type="text" 
-                        inputMode="decimal"
-                        className="w-full border border-gray-100 rounded-xl pl-8 pr-3 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-black"
-                        value={formatPriceBR(editingItem.price || 0)} 
-                        onChange={(e) => setEditingItem({...editingItem, price: parsePriceBR(e.target.value)})}
-                        disabled={saving}
-                      />
-                    </div>
-                    <p className="text-[9px] text-gray-400 mt-1.5 uppercase font-black tracking-widest">Use 0,00 se o produto tiver variações abaixo</p>
-                  </div>
+                  {/* Price Section */}
+                  <div className="pt-2">
+                    <div className="bg-gray-50/80 rounded-2xl p-4 border border-gray-100 shadow-inner">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <label className="text-[11px] font-black text-[var(--color-brand-dark)] uppercase tracking-widest block">Gestão de Preços</label>
+                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tight">Defina valores únicos ou por tamanho</p>
+                        </div>
+                        <div className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${(!editingItem.variants || editingItem.variants.length === 0) ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'}`}>
+                          {(!editingItem.variants || editingItem.variants.length === 0) ? 'Preço Único' : 'Múltiplos Tamanhos'}
+                        </div>
+                      </div>
 
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-center justify-between mb-3">
-                      <label className="text-[10px] font-black text-[var(--color-brand-dark)] uppercase tracking-widest">Variações</label>
-                      <button 
-                        type="button"
-                        onClick={() => {
-                          const vars = [...(editingItem.variants || [])];
-                          vars.push({ name: '', price: 0 });
-                          setEditingItem({...editingItem, variants: vars});
-                        }}
-                        className="text-[10px] bg-[var(--color-brand-accent)] text-white px-3 py-1.5 rounded-lg font-black hover:scale-105 active:scale-95 transition-all flex items-center gap-1 shadow-sm uppercase tracking-widest"
-                      >
-                        <Plus className="w-3 h-3" />
-                        Tamanho
-                      </button>
-                    </div>
-
-                    <div className="space-y-2">
-                      {editingItem.variants?.map((v, idx) => (
-                        <div key={idx} className="flex gap-2 items-center bg-gray-50/50 p-2 rounded-xl border border-gray-100">
-                          <input 
-                            type="text" 
-                            placeholder="Ex: PEQ."
-                            className="flex-1 min-w-0 text-[11.5px] border-none bg-white rounded-lg h-8 px-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-bold"
-                            value={v.name}
-                            onChange={(e) => {
-                              const vars = [...(editingItem.variants || [])];
-                              vars[idx].name = e.target.value;
-                              setEditingItem({...editingItem, variants: vars});
-                            }}
-                          />
-                          <div className="relative w-24 shrink-0">
-                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-400">R$</span>
+                      {/* Base Price - Only show prominently if no variants */}
+                      {(!editingItem.variants || editingItem.variants.length === 0) ? (
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Preço do Produto</label>
+                          <div className="relative group">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[var(--color-brand-accent)] text-[13px]">R$</span>
                             <input 
                               type="text" 
                               inputMode="decimal"
-                              placeholder="0,00"
-                              className="w-full text-[11.5px] border-none bg-white rounded-lg h-8 pl-6 pr-2 outline-none focus:ring-1 focus:ring-[#ff914a] font-black"
-                              value={formatPriceBR(v.price)}
-                              onChange={(e) => {
-                                const vars = [...(editingItem.variants || [])];
-                                vars[idx].price = parsePriceBR(e.target.value);
-                                setEditingItem({...editingItem, variants: vars});
-                              }}
+                              className="w-full border-2 border-white rounded-xl pl-10 pr-4 h-12 outline-none focus:border-[var(--color-brand-accent)]/30 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-white text-[16px] transition-all font-black shadow-sm"
+                              value={formatPriceBR(editingItem.price || 0)} 
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => setEditingItem({...editingItem, price: parsePriceBR(e.target.value)})}
+                              disabled={saving}
                             />
                           </div>
+                        </div>
+                      ) : (
+                        <div className="bg-white/60 p-3 rounded-xl border border-dashed border-gray-200 mb-4">
+                          <div className="flex justify-between items-center opacity-60">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preço Base (Inativo)</span>
+                            <span className="text-[12px] font-black text-gray-400">R$ 0,00</span>
+                          </div>
+                          <p className="text-[8px] text-gray-400 mt-1 uppercase font-bold">O preço será calculado com base nas variações abaixo</p>
+                        </div>
+                      )}
+
+                      {/* Variations Section */}
+                      <div className="mt-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Variações de Tamanho</span>
                           <button 
                             type="button"
                             onClick={() => {
-                              const vars = editingItem.variants?.filter((_, i) => i !== idx);
-                              setEditingItem({...editingItem, variants: vars});
+                              const vars = [...(editingItem.variants || [])];
+                              vars.push({ name: '', price: 0 });
+                              setEditingItem({...editingItem, variants: vars, price: 0});
                             }}
-                            className="p-1.5 text-gray-400 hover:text-red-500 transition-colors shrink-0"
+                            className="text-[9px] bg-white border border-gray-200 text-[var(--color-brand-dark)] px-3 py-1.5 rounded-lg font-black hover:bg-gray-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm uppercase tracking-widest"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Plus className="w-3 h-3 text-[var(--color-brand-accent)]" />
+                            Novo Tamanho
                           </button>
                         </div>
-                      ))}
-                      
-                      {(!editingItem.variants || editingItem.variants.length === 0) && (
-                        <p className="text-center py-2 text-[11px] text-gray-400 font-medium italic">Sem variações extras.</p>
-                      )}
+
+                        <div className="space-y-2.5">
+                          <AnimatePresence initial={false}>
+                            {editingItem.variants?.map((v, idx) => (
+                              <motion.div 
+                                key={idx}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="flex gap-2 items-center bg-white p-2.5 rounded-xl border border-gray-100 shadow-sm relative group"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <input 
+                                    type="text" 
+                                    placeholder="Ex: PEQ."
+                                    className="w-full text-[12px] border-none bg-gray-50/50 rounded-lg h-9 px-3 outline-none focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-accent)]/20 font-bold transition-all"
+                                    value={v.name}
+                                    onChange={(e) => {
+                                      const vars = [...(editingItem.variants || [])];
+                                      vars[idx].name = e.target.value;
+                                      setEditingItem({...editingItem, variants: vars});
+                                    }}
+                                  />
+                                </div>
+                                <div className="relative w-28 shrink-0">
+                                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-[var(--color-brand-accent)]">R$</span>
+                                  <input 
+                                    type="text" 
+                                    inputMode="decimal"
+                                    placeholder="0,00"
+                                    className="w-full text-[14px] border-none bg-gray-50/50 rounded-lg h-9 pl-8 pr-3 outline-none focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-accent)]/20 font-black transition-all"
+                                    value={formatPriceBR(v.price)}
+                                    onFocus={(e) => e.target.select()}
+                                    onChange={(e) => {
+                                      const vars = [...(editingItem.variants || [])];
+                                      vars[idx].price = parsePriceBR(e.target.value);
+                                      setEditingItem({...editingItem, variants: vars});
+                                    }}
+                                  />
+                                </div>
+                                <button 
+                                  type="button"
+                                  onClick={() => {
+                                    const vars = editingItem.variants?.filter((_, i) => i !== idx);
+                                    setEditingItem({...editingItem, variants: vars});
+                                  }}
+                                  className="w-8 h-9 flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </motion.div>
+                            ))}
+                          </AnimatePresence>
+                          
+                          {(!editingItem.variants || editingItem.variants.length === 0) && (
+                            <div className="py-6 flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-2xl bg-white/40">
+                              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Preço único ativo</p>
+                              <p className="text-[9px] text-gray-300 font-bold">Adicione tamanhos se houver variações</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                     </div>
                   </div>
                 </div>
