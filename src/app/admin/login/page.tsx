@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Lock, Mail, LogIn, AlertCircle } from "lucide-react";
+import { Lock, Mail, LogIn, AlertCircle, ShieldCheck } from "lucide-react";
 import PWAInstall from "@/components/PWAInstall";
 
 export default function AdminLoginPage() {
@@ -49,7 +49,10 @@ export default function AdminLoginPage() {
         className="w-full max-w-md relative z-10"
       >
         <div className="bg-white rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(56,16,16,0.1)] overflow-hidden border border-white">
-          <div className="p-12 text-center">
+          <div className="p-12 text-center relative">
+            <div className="absolute top-8 right-12">
+               <ShieldCheck className="w-5 h-5 text-[var(--color-brand-accent)]/30" />
+            </div>
             <div className="w-[80px] h-[80px] mx-auto mb-8 flex items-center justify-center relative">
               <Image 
                 src="/admin-icon.png" 
@@ -60,7 +63,7 @@ export default function AdminLoginPage() {
               />
             </div>
             <h1 className="text-[var(--color-brand-dark)] font-black text-3xl tracking-tight">Painel <span className="text-[var(--color-brand-accent)]">Admin</span></h1>
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mt-3">Acesso Administrativo</p>
+            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mt-3">Acesso Administrativo Restrito</p>
           </div>
 
           <form onSubmit={handleLogin} className="px-12 pb-12 space-y-6">
