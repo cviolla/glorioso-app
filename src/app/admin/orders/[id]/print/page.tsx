@@ -7,8 +7,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function OrderPrintPage({ params }: PageProps) {
+export default async function OrderPrintPage({ params, searchParams }: PageProps & { searchParams: Promise<{ mode?: string }> }) {
   const { id } = await params;
+  const { mode } = await searchParams;
 
   const { data: order, error } = await supabase
     .from('orders')
@@ -20,6 +21,8 @@ export default async function OrderPrintPage({ params }: PageProps) {
     notFound();
   }
 
+  const printMode = mode === 'kitchen' ? 'kitchen' : 'customer';
+
   return (
     <div className="min-h-screen bg-gray-100">
       <PrintHeader />
@@ -27,7 +30,7 @@ export default async function OrderPrintPage({ params }: PageProps) {
       {/* Preview do recibo térmico */}
       <div className="py-8 flex justify-center print:p-0 print:m-0 print:block">
         <div className="bg-white shadow-2xl rounded-lg overflow-hidden print:shadow-none print:rounded-none">
-          <InvoicePrint order={order} />
+          <InvoicePrint order={order} mode={printMode as any} />
         </div>
       </div>
     </div>

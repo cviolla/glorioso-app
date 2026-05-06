@@ -21,7 +21,8 @@ import {
   Receipt,
   X,
   RefreshCw,
-  Archive
+  Archive,
+  ChefHat
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
@@ -259,6 +260,12 @@ export default function AdminOrdersPage() {
   const handlePrint = () => {
     if (!selectedOrder) return;
     window.open(`/admin/orders/${selectedOrder.id}/print`, '_blank');
+  };
+
+  const handlePrintKitchen = (orderId?: string) => {
+    const id = orderId || selectedOrder?.id;
+    if (!id) return;
+    window.open(`/admin/orders/${id}/print?mode=kitchen`, '_blank');
   };
 
   const getCashClosingData = () => {
@@ -564,6 +571,16 @@ export default function AdminOrdersPage() {
                         >
                           <Printer className="w-4 h-4" />
                         </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePrintKitchen(order.id);
+                          }}
+                          className="p-2.5 bg-gray-50 text-blue-600 border border-gray-100 rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-all shadow-sm"
+                          title="Imprimir p/ Cozinha"
+                        >
+                          <ChefHat className="w-4 h-4" />
+                        </button>
                         <span className={`text-[8px] sm:text-[9px] font-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl uppercase tracking-[0.15em] ${statusConfig[order.status].color} border shadow-sm`}>
                           {order.status === 'delivered' && order.delivery_type === 'pickup' ? 'Retirado' : statusConfig[order.status].label}
                         </span>
@@ -603,6 +620,12 @@ export default function AdminOrdersPage() {
                         className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest"
                       >
                         <Printer className="w-5 h-5" /> Imprimir
+                      </button>
+                      <button 
+                        onClick={() => handlePrintKitchen()}
+                        className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest ml-4"
+                      >
+                        <ChefHat className="w-5 h-5" /> Cozinha
                       </button>
                       <button 
                         onClick={() => deleteOrder(selectedOrder.id)}
@@ -770,6 +793,12 @@ export default function AdminOrdersPage() {
                     className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                   >
                     <Printer className="w-4 h-4" /> Imprimir
+                  </button>
+                  <button 
+                    onClick={() => handlePrintKitchen()}
+                    className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
+                  >
+                    <ChefHat className="w-4 h-4" /> Cozinha
                   </button>
                   <button 
                     onClick={() => deleteOrder(selectedOrder.id)}

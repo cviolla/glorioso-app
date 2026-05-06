@@ -92,6 +92,15 @@ img {
   width: 100%;
 }
 
+.kitchen-mode .item-row {
+  align-items: flex-start !important;
+}
+
+.kitchen-mode * {
+  /* No modo cozinha, priorizamos contraste máximo */
+  color: black !important;
+}
+
 @media print {
   @page {
     margin: 0;
