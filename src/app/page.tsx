@@ -98,10 +98,10 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight tracking-tighter"
+            className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight tracking-tighter flex items-baseline justify-center gap-x-3 flex-wrap"
           >
-            <span className="uppercase">O Sabor</span>{" "}
-            <span className="text-[#ff914a] font-georgia italic font-normal text-[1.18em] leading-none inline-block overflow-hidden">
+            <span className="uppercase">O Sabor</span>
+            <span className="text-[#ff914a] font-georgia italic font-normal text-[1.18em] leading-none inline-flex overflow-hidden">
               {"Glorioso.".split("").map((char, index) => (
                 <motion.span
                   key={index}
@@ -113,7 +113,7 @@ export default function Home() {
                     ease: "easeIn",
                   }}
                 >
-                  {char}
+                  {char === " " ? "\u00A0" : char}
                 </motion.span>
               ))}
             </span>
