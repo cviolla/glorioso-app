@@ -62,11 +62,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Proteção extra além do middleware
-  if (!user) {
-    redirect('/admin/login');
-  }
-
   return (
     <AdminSidebar>
       <CopyProtection />

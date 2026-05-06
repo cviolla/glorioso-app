@@ -21,6 +21,11 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
     router.refresh();
   };
 
+  // Se estiver na tela de login, renderiza apenas o conteúdo sem o menu/sidebar
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   return (
     <div className="min-h-screen bg-[var(--color-brand-light)] flex flex-col pb-20 md:pb-0 md:flex-row">
       <NotificationListener />
