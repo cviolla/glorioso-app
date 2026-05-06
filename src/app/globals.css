@@ -114,28 +114,23 @@ img {
     font-size: 18pt !important;
   }
 
-  body > *:not(#thermal-receipt-container) {
-    display: none !important;
-  }
-
-  #thermal-receipt-container {
-    display: block !important;
-    width: 100% !important;
+  html, body {
     margin: 0 !important;
     padding: 0 !important;
-  }
-
-  .thermal-receipt {
-    display: block !important;
     width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    padding: 0 15px !important;
-    visibility: visible !important;
+    background: white !important;
   }
 
-  .thermal-receipt * {
+  /* Garante que o recibo e seus pais sejam visíveis */
+  .thermal-receipt, .thermal-receipt * {
     visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Esconde elementos de UI padrão */
+  footer, nav, aside, header, 
+  .print\:hidden {
+    display: none !important;
   }
 
   /* Força o flex layout no print */
