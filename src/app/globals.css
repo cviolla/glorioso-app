@@ -127,7 +127,6 @@ img {
   .thermal-receipt * {
     visibility: visible !important;
   }
-}
 
   /* Força o flex layout no print */
   .thermal-receipt .item-row {
