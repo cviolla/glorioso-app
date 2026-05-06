@@ -556,7 +556,7 @@ export default function AdminOrdersPage() {
               >
                 <div className="p-6 border-b border-gray-100">
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
                       <button 
                         onClick={() => setSelectedOrder(null)}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -567,22 +567,22 @@ export default function AdminOrdersPage() {
                       </button>
                       <button 
                         onClick={handlePrint}
-                        className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest"
+                        className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                       >
-                        <Printer className="w-5 h-5" /> Imprimir
+                        <Printer className="w-4 h-4" /> IMPRIMIR
                       </button>
                       <button 
                         onClick={() => handlePrintKitchen()}
-                        className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest ml-4"
+                        className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                       >
-                        <ChefHat className="w-5 h-5" /> Cozinha
+                        <ChefHat className="w-4 h-4" /> COZINHA
                       </button>
                       <button 
                         onClick={() => deleteOrder(selectedOrder.id)}
-                        className="text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-2 font-black text-xs uppercase tracking-widest ml-4"
+                        className="text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                         title="Apagar Pedido"
                       >
-                        <Trash2 className="w-5 h-5" /> Apagar
+                        <Trash2 className="w-4 h-4" /> APAGAR
                       </button>
                     </div>
                     <span className="font-black text-[10px] text-gray-300 tracking-widest uppercase">ID: {selectedOrder.id.slice(-6).toUpperCase()}</span>
@@ -730,8 +730,8 @@ export default function AdminOrdersPage() {
 
             {/* Header */}
             <div className="px-5 pb-4 border-b border-gray-100 shrink-0">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-between mb-4 gap-3">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <button 
                     onClick={() => setSelectedOrder(null)}
                     className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
@@ -742,20 +742,20 @@ export default function AdminOrdersPage() {
                     onClick={handlePrint}
                     className="text-[var(--color-brand-accent)] hover:text-[var(--color-brand-accent)]/80 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                   >
-                    <Printer className="w-4 h-4" /> Imprimir
+                    <Printer className="w-4 h-4" /> IMPRIMIR
                   </button>
                   <button 
                     onClick={() => handlePrintKitchen()}
                     className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                   >
-                    <ChefHat className="w-4 h-4" /> Cozinha
+                    <ChefHat className="w-4 h-4" /> COZINHA
                   </button>
                   <button 
                     onClick={() => deleteOrder(selectedOrder.id)}
                     className="text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                     title="Apagar Pedido"
                   >
-                    <Trash2 className="w-4 h-4" /> Apagar
+                    <Trash2 className="w-4 h-4" /> APAGAR
                   </button>
                 </div>
                 <span className="font-black text-[10px] text-gray-300 tracking-widest uppercase">ID: {selectedOrder.id.slice(-6).toUpperCase()}</span>
