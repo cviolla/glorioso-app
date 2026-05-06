@@ -187,7 +187,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
             )}
           </div>
           
-          <div className="w-20 h-20 shrink-0 overflow-hidden relative">
+          <div className="w-24 h-24 shrink-0 overflow-hidden relative rounded-2xl border-2 border-[#f8ece3] shadow-inner bg-[#f8ece3]">
             <motion.div
               animate={isZooming ? { scale: 1.15 } : { scale: 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -197,8 +197,8 @@ export function ProductCard({ item }: { item: MenuItem }) {
                 src={item.imageUrl || "/glorioso-brownie.png"} 
                 alt={item.name}
                 fill
-                className="object-contain opacity-80"
-                sizes="80px"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                sizes="96px"
               />
             </motion.div>
             <AnimatePresence>
