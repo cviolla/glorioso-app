@@ -151,12 +151,12 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
 
       {/* Rodapé */}
       {!isKitchen ? (
-        <div className="text-center mt-2 pb-2">
+        <div className="text-center mt-2 pb-12">
           <p className="text-[9pt] uppercase">OBRIGADO PELA PREFERÊNCIA!</p>
           <p className="text-[8pt] mt-1 italic">gloriosobrownie.com.br</p>
         </div>
       ) : (
-        <div className="text-center mt-2 pb-2">
+        <div className="text-center mt-2 pb-12">
           <p className="text-[11pt] uppercase border-t-2 border-black pt-1">BOM TRABALHO!</p>
         </div>
       )}

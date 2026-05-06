@@ -77,7 +77,7 @@ export function CashReportPrint({ data }: { data: CashReportData }) {
       </div>
 
       {/* Assinatura */}
-      <div className="text-center mt-4 pb-2">
+      <div className="text-center mt-4 pb-12">
         <p className="text-[8pt]">________________________________</p>
         <p className="text-[8pt] mt-1 uppercase">Assinatura do Responsável</p>
       </div>
