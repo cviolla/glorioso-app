@@ -112,21 +112,23 @@ export default function CartPage() {
     }
   }, [isHydrated, userInfo.phone]);
 
+  const [prevTotal, setPrevTotal] = useState(finalTotal);
+
   useEffect(() => {
     if (isHydrated && paymentMethods.length > 0) {
       if (splitPayments.length === 0) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSplitPayments([{ method: paymentMethods[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
+        setPrevTotal(finalTotal);
       } else if (splitPayments.length === 1) {
-        // Auto-update the single payment value when total changes (delivery fee, neighborhood, etc.)
-        const currentVal = parseFloat(splitPayments[0].value.replace(',', '.')) || 0;
-        if (Math.abs(currentVal - finalTotal) > 0.001) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
+        // Sincroniza apenas se o total da conta mudou (ex: mudou taxa de entrega)
+        // Se o usuário estiver apenas editando o input, o finalTotal será igual ao prevTotal e não haverá reset.
+        if (Math.abs(prevTotal - finalTotal) > 0.001) {
           setSplitPayments([{ ...splitPayments[0], value: finalTotal.toFixed(2).replace('.', ',') }]);
+          setPrevTotal(finalTotal);
         }
       }
     }
-  }, [isHydrated, paymentMethods, finalTotal, splitPayments]);
+  }, [isHydrated, paymentMethods, finalTotal, splitPayments, prevTotal]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
