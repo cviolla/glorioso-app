@@ -101,7 +101,7 @@ export default function Home() {
             className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight tracking-tighter flex items-baseline justify-center gap-x-3 flex-wrap"
           >
             <span className="uppercase">O Sabor</span>
-            <span className="text-[#ff914a] font-georgia italic font-normal text-[1.18em] leading-none inline-flex overflow-hidden">
+            <span className="text-[#ff914a] font-georgia italic font-normal text-[1.26em] leading-none inline-flex overflow-hidden">
               {"Glorioso.".split("").map((char, index) => (
                 <motion.span
                   key={index}
