@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Lock, Mail, LogIn, AlertCircle } from "lucide-react";
+import PWAInstall from "@/components/PWAInstall";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -120,6 +121,7 @@ export default function AdminLoginPage() {
           </form>
         </div>
       </motion.div>
+      <PWAInstall />
     </div>
   );
 }
