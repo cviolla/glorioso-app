@@ -36,13 +36,11 @@ function getShortLabel(name: string): string {
 }
 
 export default function AdminProductsPage() {
-  const [search, setSearch] = useState('');
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isNewProduct, setIsNewProduct] = useState(false);
-  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -124,14 +122,6 @@ export default function AdminProductsPage() {
     fetchMenu();
   }, [fetchMenu]);
 
-  useEffect(() => {
-    if (categories.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentPlaceholderIndex((prev) => (prev + 1) % categories.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [categories]);
 
   const initializedRef = useRef(false);
 
@@ -340,35 +330,6 @@ export default function AdminProductsPage() {
         </button>
       </div>
 
-      {/* Search Filter */}
-      <div className="relative group">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors z-10" />
-        
-        <div className="absolute left-9 top-1/2 -translate-y-1/2 pointer-events-none h-4 overflow-hidden w-full">
-          <AnimatePresence mode="wait">
-            {!search && categories.length > 0 && (
-              <motion.span
-                key={categories[currentPlaceholderIndex]?.id}
-                initial={{ y: 15, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -15, opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="absolute left-0 text-gray-400 font-medium text-[13px] whitespace-nowrap"
-              >
-                {categories[currentPlaceholderIndex]?.name}
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <input 
-          type="text" 
-          placeholder="" 
-          className="w-full bg-white border border-gray-100 rounded-xl h-10 pl-9 pr-3 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] text-[13px] font-bold shadow-sm transition-all placeholder:text-gray-400 placeholder:font-medium"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
 
       {/* Categories & Products List */}
       {loading ? (
@@ -410,7 +371,7 @@ export default function AdminProductsPage() {
                         <div key={sub.name} className="mt-4 first:mt-0">
                           <h4 className="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">{sub.name}</h4>
                           <div className="space-y-1">
-                            {sub.items.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
+                            {sub.items.map(item => (
                               <ProductListItem 
                                 key={item.id} 
                                 item={item} 
@@ -423,7 +384,7 @@ export default function AdminProductsPage() {
                         </div>
                       ))}
 
-                      {category.items?.filter(item => item.name.toLowerCase().includes(search.toLowerCase())).map(item => (
+                      {category.items?.map(item => (
                         <ProductListItem 
                           key={item.id} 
                           item={item} 
