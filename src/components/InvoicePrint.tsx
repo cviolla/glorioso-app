@@ -26,7 +26,7 @@ interface Order {
   items: OrderItem[];
 }
 
-const SEP = '================================';
+const SEP = '------------------------------------------'; // Mais longo para 80mm
 
 export function InvoicePrint({ order }: { order: Order }) {
   const formatDate = (dateStr: string) => {
@@ -54,87 +54,84 @@ export function InvoicePrint({ order }: { order: Order }) {
   return (
     <div id="thermal-receipt" className="thermal-receipt">
       {/* Cabeçalho */}
-      <div className="mb-2">
-        <p className="text-[16px] leading-tight font-black">GLORIOSO BROWNIE</p>
-        <p className="text-[12px] mt-1 font-bold">PEDIDO: #{order.id.slice(-6).toUpperCase()}</p>
-        <p className="text-[12px] font-bold">{formatDate(order.created_at)}</p>
-        <p className="mt-1 font-bold text-[14px]">{SEP}</p>
+      <div className="mb-6 border-b-4 border-double border-black pb-4 text-center">
+        <p className="text-[28pt] leading-none font-black mb-1">GLORIOSO BROWNIE</p>
+        <p className="text-[18pt] font-black">PEDIDO: #{order.id.slice(-6).toUpperCase()}</p>
+        <p className="text-[16pt] font-bold">{formatDate(order.created_at)}</p>
       </div>
 
       {/* Dados do Cliente */}
-      <div className="space-y-1 mb-2 text-[13px] font-bold">
-        <p>CLIENTE: {order.customer_name.toUpperCase()}</p>
-        <p>TEL: {order.customer_phone}</p>
-        <p>TIPO: {order.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
-        <p>PREVISÃO: {order.order_time}</p>
+      <div className="space-y-3 mb-6 text-[18pt] font-bold border-b-4 border-double border-black pb-4 text-left">
+        <p><span className="font-black text-[15pt]">CLIENTE:</span> {order.customer_name.toUpperCase()}</p>
+        <p><span className="font-black text-[15pt]">TEL:</span> {order.customer_phone}</p>
+        <p><span className="font-black text-[15pt]">TIPO:</span> {order.delivery_type === 'delivery' ? 'DELIVERY' : 'RETIRADA'}</p>
+        <p><span className="font-black text-[15pt]">PREVISÃO:</span> {order.order_time}</p>
         
         {order.delivery_type === 'delivery' && (
-          <div className="mt-1">
-            <p>END: {order.address_street}, {order.address_number}</p>
-            <p>BAIRRO: {order.address_neighborhood}</p>
-            {order.address_complement && <p>COMPL: {order.address_complement}</p>}
-            {order.address_reference && <p>REF: {order.address_reference}</p>}
+          <div className="mt-3 pt-3 border-t-2 border-black/40">
+            <p><span className="font-black text-[15pt]">END:</span> {order.address_street}, {order.address_number}</p>
+            <p><span className="font-black text-[15pt]">BAIRRO:</span> {order.address_neighborhood}</p>
+            {order.address_complement && <p><span className="font-black text-[15pt]">COMPL:</span> {order.address_complement}</p>}
+            {order.address_reference && <p><span className="font-black text-[15pt]">REF:</span> {order.address_reference}</p>}
           </div>
         )}
-        <p className="mt-1 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Itens do Pedido */}
-      <div className="mb-2">
-        <p className="text-center mb-1 text-[14px] font-black underline">RESUMO DO PEDIDO</p>
-        <div className="space-y-1">
+      <div className="mb-6 border-b-4 border-double border-black pb-4">
+        <p className="text-center mb-4 text-[20pt] font-black underline uppercase tracking-tight">Resumo do Pedido</p>
+        <div className="space-y-4">
           {order.items.map((item, idx) => {
             const itemTotal = (item.price + (item.addons?.reduce((s, a) => s + a.price, 0) || 0)) * item.quantity;
             return (
-              <div key={idx} className="text-[13px] font-bold">
+              <div key={idx} className="text-[18pt] font-bold">
                 <div className="item-row">
-                  <span className="leading-tight text-left">{item.quantity}x {item.name.toUpperCase()}{item.variant ? ` (${item.variant})` : ''}</span>
-                  <span className="font-black whitespace-nowrap">R${fmt(itemTotal)}</span>
+                  <span className="leading-tight text-left flex-1">{item.quantity}x {item.name.toUpperCase()}{item.variant ? ` (${item.variant})` : ''}</span>
+                  <span className="font-black whitespace-nowrap ml-6">R${fmt(itemTotal)}</span>
                 </div>
                 {item.addons?.map(a => (
-                  <p key={a.name} className="text-[11px] opacity-90 text-left">  + {a.name}</p>
+                  <p key={a.name} className="text-[15pt] opacity-90 text-left pl-8 font-bold italic">  + {a.name}</p>
                 ))}
               </div>
             );
           })}
         </div>
-        <p className="mt-2 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Totais */}
-      <div className="space-y-1 mb-2">
-        <div className="item-row text-[13px] font-bold">
+      <div className="space-y-3 mb-6 border-b-4 border-double border-black pb-4">
+        <div className="item-row text-[18pt] font-bold">
           <span>SUBTOTAL:</span>
           <span className="font-black">R${fmt(subtotal)}</span>
         </div>
         {deliveryFee > 0 && (
-          <div className="item-row text-[13px] font-bold">
+          <div className="item-row text-[18pt] font-bold">
             <span>ENTREGA:</span>
             <span className="font-black">R${fmt(deliveryFee)}</span>
           </div>
         )}
-        <div className="item-row text-[16px] font-black mt-1">
-          <span className="underline">TOTAL:</span>
+        <div className="item-row text-[26pt] font-black mt-4 pt-3 border-t-4 border-black/30">
+          <span className="underline italic">TOTAL:</span>
           <span>R${fmt(order.total_price)}</span>
         </div>
-        <p className="mt-1 font-bold text-[14px]">{SEP}</p>
       </div>
 
       {/* Pagamento e Observações */}
-      <div className="mb-3 text-[12px] font-bold">
-        <p className="uppercase leading-snug">PAGAMENTO: {order.payment_method}</p>
+      <div className="mb-8 text-[17pt] font-bold text-left">
+        <p className="uppercase leading-snug border-l-[12px] border-black pl-4 py-3 bg-black/15">PAGAMENTO: {order.payment_method}</p>
         {order.observation && (
-          <div className="mt-2 p-1 border-2 border-black rounded-lg">
-            <p className="text-[12px] leading-tight text-left">OBS: {order.observation}</p>
+          <div className="mt-5 p-4 border-[6px] border-black rounded-2xl">
+            <p className="text-[17pt] leading-tight font-black underline mb-3">OBSERVAÇÕES:</p>
+            <p className="text-[19pt] leading-tight font-black">{order.observation}</p>
           </div>
         )}
       </div>
 
       {/* Rodapé */}
-      <div className="text-center mt-3 pb-8">
-        <p className="text-[12px] font-black uppercase tracking-wider">Obrigado pela preferência!</p>
-        <p className="text-[11px] font-bold mt-1">gloriosobrownie.com.br</p>
-        <p className="text-[14px] mt-2 font-bold">. . . . . . . . . . . .</p>
+      <div className="text-center mt-8 pb-20">
+        <p className="text-[20pt] font-black uppercase tracking-[0.2em]">Obrigado pela preferência!</p>
+        <p className="text-[16pt] font-bold mt-4 italic">gloriosobrownie.com.br</p>
+        <p className="text-[26pt] mt-8 font-black tracking-tighter">. . . . . . . . . . . .</p>
       </div>
     </div>
   );
