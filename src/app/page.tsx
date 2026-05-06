@@ -100,7 +100,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight tracking-tighter"
           >
-            <span className="uppercase">O Sabor</span> <span className="text-[#ff914a] font-georgia italic font-normal">Glorioso.</span>
+            <span className="uppercase">O Sabor</span> <span className="text-[#ff914a] font-georgia italic font-normal text-[1.18em] leading-none inline-block">Glorioso.</span>
           </motion.h1>
           
           <motion.a 
