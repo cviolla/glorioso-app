@@ -66,16 +66,16 @@ img {
 /* ===== ESTILOS PARA IMPRESSORA TÉRMICA (80mm) ===== */
 
 .thermal-receipt {
-  font-family: 'Courier New', Courier, monospace !important; /* Fontes mono costumam imprimir melhor em térmicas */
-  font-size: 18pt !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  font-size: 12pt !important;
   font-weight: 900 !important;
-  line-height: 1.1;
+  line-height: 1.2;
   color: black;
   background: white;
   width: 100%;
-  max-width: 500px; /* Compatível com 80mm */
+  max-width: 400px; /* Mais próximo de 80mm */
   margin: 0 auto !important;
-  padding: 0 10px;
+  padding: 0 5px;
   box-sizing: border-box;
   text-align: center;
 }
@@ -88,7 +88,7 @@ img {
 .thermal-receipt .item-row {
   display: flex !important;
   justify-content: space-between !important;
-  gap: 10px;
+  gap: 5px;
   width: 100%;
 }
 
@@ -97,7 +97,6 @@ img {
 }
 
 .kitchen-mode * {
-  /* No modo cozinha, priorizamos contraste máximo */
   color: black !important;
 }
 
@@ -111,7 +110,7 @@ img {
     padding: 0 !important;
     width: 100% !important;
     background: white !important;
-    font-size: 18pt !important;
+    font-size: 12pt !important;
   }
 
   html, body {
