@@ -98,9 +98,9 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight uppercase tracking-tighter"
+            className="text-3xl sm:text-4xl font-black mb-2 sm:mb-3 leading-tight tracking-tighter"
           >
-            O Sabor <span className="text-[#ff914a]">GLORIOSO.</span>
+            <span className="uppercase">O Sabor</span> <span className="text-[#ff914a] font-georgia italic font-normal">Glorioso.</span>
           </motion.h1>
           
           <motion.a 
