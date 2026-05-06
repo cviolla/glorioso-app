@@ -106,7 +106,7 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
                   {!isKitchen && <span className="whitespace-nowrap ml-2">R${fmt(itemTotal)}</span>}
                 </div>
                 {item.addons?.map(a => (
-                  <p key={a.name} className={`${isKitchen ? 'text-[9pt]' : 'text-[7.5pt]'} text-left pl-4 italic`}>  + {a.name}</p>
+                  <p key={a.name} className={`${isKitchen ? 'text-[9pt]' : 'text-[7.5pt]'} text-left pl-4`}>  + {a.name}</p>
                 ))}
               </div>
             );
@@ -130,7 +130,7 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
               </div>
             )}
             <div className="item-row text-[11pt] mt-1 pt-1 border-t border-black/30">
-              <span className="underline italic uppercase">TOTAL: R${fmt(order.total_price)}</span>
+              <span className="underline uppercase">TOTAL: R${fmt(order.total_price)}</span>
             </div>
           </div>
 
@@ -153,7 +153,7 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
       {!isKitchen ? (
         <div className="text-center mt-2 pb-12">
           <p className="text-[9pt] uppercase">OBRIGADO PELA PREFERÊNCIA!</p>
-          <p className="text-[8pt] mt-1 italic">gloriosobrownie.com.br</p>
+          <p className="text-[8pt] mt-1">gloriosobrownie.com.br</p>
         </div>
       ) : (
         <div className="text-center mt-2 pb-12">
