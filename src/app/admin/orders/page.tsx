@@ -70,7 +70,6 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [filterStatus, setFilterStatus] = useState<OrderStatus | 'all' | 'active'>('active');
-  const [searchQuery, setSearchQuery] = useState('');
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -87,25 +86,6 @@ export default function AdminOrdersPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [showRefreshSuccess, setShowRefreshSuccess] = useState(false);
-  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
-  const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data } = await supabase.from('categories').select('id, name').order('sort_order');
-      if (data) setCategories(data);
-    };
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
-    if (categories.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentPlaceholderIndex((prev) => (prev + 1) % categories.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [categories]);
 
   const fetchOrders = useCallback(async (isInitial = false) => {
     if (!isInitial) setLoading(true);
@@ -301,9 +281,7 @@ export default function AdminOrdersPage() {
     } else {
       matchesStatus = order.status === filterStatus;
     }
-    const matchesSearch = order.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          order.id.slice(-4).includes(searchQuery);
-    return matchesStatus && matchesSearch;
+    return matchesStatus;
   });
 
   const formatDate = (dateStr: string) => {
@@ -454,37 +432,9 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="md:col-span-2 relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors z-10" />
-          
-          <div className="absolute left-12 top-1/2 -translate-y-1/2 pointer-events-none h-5 overflow-hidden w-full">
-            <AnimatePresence mode="wait">
-              {!searchQuery && categories.length > 0 && (
-                <motion.span
-                  key={categories[currentPlaceholderIndex]?.id}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute left-0 text-gray-400 font-medium text-base"
-                >
-                  {categories[currentPlaceholderIndex]?.name}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <input 
-            type="text" 
-            placeholder="" 
-            className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-medium"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="relative group">
+      {/* Filters */}
+      <div className="flex justify-end">
+        <div className="relative group w-full md:w-64">
           <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-brand-accent)] transition-colors" />
           <select 
             className="w-full pl-12 pr-4 py-4 bg-white border-2 border-transparent rounded-2xl outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 transition-all shadow-sm text-[var(--color-brand-dark)] font-black appearance-none"
