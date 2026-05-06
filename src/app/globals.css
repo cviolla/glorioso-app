@@ -66,21 +66,23 @@ img {
 /* ===== ESTILOS PARA IMPRESSORA TÉRMICA (80mm) ===== */
 
 .thermal-receipt {
-  font-family: 'Courier New', Courier, monospace !important;
-  font-size: 12pt !important;
+  font-family: monospace !important;
+  font-size: 8.5pt !important;
   font-weight: 900 !important;
-  line-height: 1.2;
+  line-height: 1.0;
   color: black;
   background: white;
   width: 100%;
-  max-width: 400px; /* Mais próximo de 80mm */
+  max-width: 280px; /* Otimizado para 58mm */
   margin: 0 auto !important;
-  padding: 0 5px;
+  padding: 0;
   box-sizing: border-box;
   text-align: center;
+  letter-spacing: -0.2px;
 }
 
 .thermal-receipt * {
+  font-family: monospace !important;
   font-weight: 900 !important;
   color: black !important;
 }
@@ -88,7 +90,7 @@ img {
 .thermal-receipt .item-row {
   display: flex !important;
   justify-content: space-between !important;
-  gap: 5px;
+  gap: 2px;
   width: 100%;
 }
 
@@ -110,7 +112,7 @@ img {
     padding: 0 !important;
     width: 100% !important;
     background: white !important;
-    font-size: 12pt !important;
+    font-size: 8.5pt !important;
   }
 
   html, body {
