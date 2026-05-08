@@ -49,6 +49,7 @@ export default function AdminSettingsPage() {
 
   const [localWhatsapp, setLocalWhatsapp] = useState(whatsappNumber);
   const [localFees, setLocalFees] = useState<{ [key: string]: DeliveryFeeEntry }>(deliveryFees);
+  const [editingNames, setEditingNames] = useState<{ [key: string]: string }>({});
   const [isSaving, setIsSaving] = useState(false);
   const [localMethods, setLocalMethods] = useState(paymentMethods);
   const [modalConfig, setModalConfig] = useState<{
@@ -231,11 +232,12 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {Object.entries(localFees).map(([neighborhood, entry]) => {
+              {Object.entries(localFees).map(([neighborhood, entry], idx) => {
                 const isActive = entry.is_active;
+                const displayName = editingNames[neighborhood] ?? neighborhood;
                 return (
                   <div 
-                    key={neighborhood} 
+                    key={idx} 
                     className={`p-3 rounded-2xl border transition-all shadow-xs flex items-center gap-2 ${
                       isActive 
                         ? 'bg-gray-50/30 border-gray-50 hover:border-[var(--color-brand-accent)]/20' 
@@ -245,16 +247,27 @@ export default function AdminSettingsPage() {
                     <div className="flex-1 min-w-0">
                       <input 
                         type="text"
-                        value={neighborhood}
+                        value={displayName}
                         placeholder="Nome do Bairro"
                         onChange={(e) => {
-                          const newName = e.target.value;
-                          if (!newName || localFees[newName] !== undefined) return;
-                          const newFees = { ...localFees };
-                          const val = newFees[neighborhood];
-                          delete newFees[neighborhood];
-                          newFees[newName] = val;
+                          setEditingNames(prev => ({ ...prev, [neighborhood]: e.target.value }));
+                        }}
+                        onBlur={() => {
+                          const newName = editingNames[neighborhood];
+                          if (newName === undefined || newName === neighborhood) {
+                            setEditingNames(prev => { const n = { ...prev }; delete n[neighborhood]; return n; });
+                            return;
+                          }
+                          if (!newName.trim() || (localFees[newName] !== undefined && newName !== neighborhood)) {
+                            setEditingNames(prev => { const n = { ...prev }; delete n[neighborhood]; return n; });
+                            return;
+                          }
+                          const newFees: { [key: string]: DeliveryFeeEntry } = {};
+                          for (const [key, val] of Object.entries(localFees)) {
+                            newFees[key === neighborhood ? newName.trim() : key] = val;
+                          }
                           setLocalFees(newFees);
+                          setEditingNames(prev => { const n = { ...prev }; delete n[neighborhood]; return n; });
                         }}
                         className="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-1 block w-full bg-transparent outline-none focus:text-[var(--color-brand-accent)]"
                       />
@@ -292,6 +305,7 @@ export default function AdminSettingsPage() {
                         const newFees = { ...localFees };
                         delete newFees[neighborhood];
                         setLocalFees(newFees);
+                        setEditingNames(prev => { const n = { ...prev }; delete n[neighborhood]; return n; });
                       }}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all shrink-0"
                     >
