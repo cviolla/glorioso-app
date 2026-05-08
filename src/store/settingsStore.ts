@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 
+export interface DeliveryFeeEntry {
+  fee: number;
+  is_active: boolean;
+}
+
 interface SettingsState {
   whatsappNumber: string;
-  deliveryFees: { [key: string]: number };
+  deliveryFees: { [key: string]: DeliveryFeeEntry };
   paymentMethods: string[];
   isLoading: boolean;
   
@@ -12,7 +17,7 @@ interface SettingsState {
   setDeliveryFee: (neighborhood: string, fee: number) => Promise<void>;
   removeDeliveryFee: (neighborhood: string) => Promise<void>;
   setPaymentMethods: (methods: string[]) => Promise<void>;
-  updateAllFees: (fees: { [key: string]: number }) => Promise<void>;
+  updateAllFees: (fees: { [key: string]: DeliveryFeeEntry }) => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -32,14 +37,17 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         .eq('id', 1)
         .single();
 
-      // Fetch delivery fees
+      // Fetch delivery fees (with optional is_active column)
       const { data: feesData } = await supabase
         .from('delivery_fees')
-        .select('neighborhood, fee');
+        .select('neighborhood, fee, is_active');
 
-      const feesObj: { [key: string]: number } = {};
+      const feesObj: { [key: string]: DeliveryFeeEntry } = {};
       feesData?.forEach(f => {
-        feesObj[f.neighborhood] = Number(f.fee);
+        feesObj[f.neighborhood] = {
+          fee: Number(f.fee),
+          is_active: f.is_active !== undefined ? Boolean(f.is_active) : true
+        };
       });
 
       let methods = generalData?.payment_methods || get().paymentMethods;
@@ -73,7 +81,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
   setDeliveryFee: async (neighborhood, fee) => {
     set((state) => ({
-      deliveryFees: { ...state.deliveryFees, [neighborhood]: fee }
+      deliveryFees: { 
+        ...state.deliveryFees, 
+        [neighborhood]: { fee, is_active: state.deliveryFees[neighborhood]?.is_active ?? true }
+      }
     }));
     try {
       await supabase
@@ -116,10 +127,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         await supabase.from('delivery_fees').delete().in('neighborhood', neighborhoodsToDelete);
       }
 
-      // 4. Perform upserts
-      const updates = Object.entries(fees).map(([neighborhood, fee]) => ({
+      // 4. Perform upserts with is_active
+      const updates = Object.entries(fees).map(([neighborhood, entry]) => ({
         neighborhood,
-        fee
+        fee: entry.fee,
+        is_active: entry.is_active
       }));
       if (updates.length > 0) {
         await supabase.from('delivery_fees').upsert(updates, { onConflict: 'neighborhood' });

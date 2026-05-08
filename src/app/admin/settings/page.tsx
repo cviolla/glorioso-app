@@ -1,7 +1,7 @@
 "use client";
 
 import { useStoreStatusStore } from "@/store/storeStatusStore";
-import { useSettingsStore } from "@/store/settingsStore";
+import { useSettingsStore, DeliveryFeeEntry } from "@/store/settingsStore";
 import { 
   Phone, 
   CreditCard, 
@@ -11,7 +11,9 @@ import {
   ToggleRight,
   Truck,
   Plus,
-  Trash2
+  Trash2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -46,7 +48,7 @@ export default function AdminSettingsPage() {
   }, [fetchStatus, fetchSettings]);
 
   const [localWhatsapp, setLocalWhatsapp] = useState(whatsappNumber);
-  const [localFees, setLocalFees] = useState(deliveryFees);
+  const [localFees, setLocalFees] = useState<{ [key: string]: DeliveryFeeEntry }>(deliveryFees);
   const [isSaving, setIsSaving] = useState(false);
   const [localMethods, setLocalMethods] = useState(paymentMethods);
   const [modalConfig, setModalConfig] = useState<{
@@ -82,6 +84,16 @@ export default function AdminSettingsPage() {
         ? prev.filter(m => m !== method) 
         : [...prev, method]
     );
+  };
+
+  const toggleNeighborhoodVisibility = (neighborhood: string) => {
+    setLocalFees(prev => ({
+      ...prev,
+      [neighborhood]: {
+        ...prev[neighborhood],
+        is_active: !prev[neighborhood].is_active
+      }
+    }));
   };
 
   const handleSave = async () => {
@@ -209,7 +221,7 @@ export default function AdminSettingsPage() {
               <button 
                 onClick={() => {
                   const newName = `Bairro ${Object.keys(localFees).length + 1}`;
-                  setLocalFees({ ...localFees, [newName]: 7.00 });
+                  setLocalFees({ ...localFees, [newName]: { fee: 7.00, is_active: true } });
                 }}
                 className="text-[9px] bg-white border border-gray-100 text-[var(--color-brand-dark)] px-3 py-1.5 rounded-lg font-black hover:bg-gray-50 active:scale-95 transition-all flex items-center gap-1.5 shadow-sm uppercase tracking-widest"
               >
@@ -219,47 +231,75 @@ export default function AdminSettingsPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {Object.entries(localFees).map(([neighborhood, fee]) => (
-                <div key={neighborhood} className="bg-gray-50/30 p-3 rounded-2xl border border-gray-50 hover:border-[var(--color-brand-accent)]/20 transition-all group shadow-xs flex items-center gap-3">
-                  <div className="flex-1 min-w-0">
-                    <input 
-                      type="text"
-                      value={neighborhood}
-                      placeholder="Nome do Bairro"
-                      onChange={(e) => {
-                        const newName = e.target.value;
-                        if (!newName || localFees[newName] !== undefined) return;
+              {Object.entries(localFees).map(([neighborhood, entry]) => {
+                const isActive = entry.is_active;
+                return (
+                  <div 
+                    key={neighborhood} 
+                    className={`p-3 rounded-2xl border transition-all shadow-xs flex items-center gap-2 ${
+                      isActive 
+                        ? 'bg-gray-50/30 border-gray-50 hover:border-[var(--color-brand-accent)]/20' 
+                        : 'bg-gray-100/40 border-gray-100 opacity-60'
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <input 
+                        type="text"
+                        value={neighborhood}
+                        placeholder="Nome do Bairro"
+                        onChange={(e) => {
+                          const newName = e.target.value;
+                          if (!newName || localFees[newName] !== undefined) return;
+                          const newFees = { ...localFees };
+                          const val = newFees[neighborhood];
+                          delete newFees[neighborhood];
+                          newFees[newName] = val;
+                          setLocalFees(newFees);
+                        }}
+                        className="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-1 block w-full bg-transparent outline-none focus:text-[var(--color-brand-accent)]"
+                      />
+                      <div className="relative flex items-center gap-1">
+                        <span className="text-[10px] font-black text-gray-300">R$</span>
+                        <input 
+                          type="text" 
+                          inputMode="decimal"
+                          value={formatPriceBR(entry.fee)}
+                          onChange={(e) => setLocalFees({ 
+                            ...localFees, 
+                            [neighborhood]: { ...entry, fee: parsePriceBR(e.target.value) } 
+                          })}
+                          className="w-full bg-transparent outline-none transition-all font-black text-sm text-[var(--color-brand-dark)]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Toggle visibility button */}
+                    <button 
+                      onClick={() => toggleNeighborhoodVisibility(neighborhood)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all shrink-0 ${
+                        isActive 
+                          ? 'bg-blue-50 text-blue-500 hover:bg-blue-100' 
+                          : 'bg-gray-200 text-gray-400 hover:bg-gray-300'
+                      }`}
+                      title={isActive ? "Esconder Bairro" : "Mostrar Bairro"}
+                    >
+                      {isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </button>
+
+                    {/* Delete button - always visible */}
+                    <button 
+                      onClick={() => {
                         const newFees = { ...localFees };
-                        const val = newFees[neighborhood];
                         delete newFees[neighborhood];
-                        newFees[newName] = val;
                         setLocalFees(newFees);
                       }}
-                      className="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-1 block w-full bg-transparent outline-none focus:text-[var(--color-brand-accent)]"
-                    />
-                    <div className="relative flex items-center gap-1">
-                      <span className="text-[10px] font-black text-gray-300">R$</span>
-                      <input 
-                        type="text" 
-                        inputMode="decimal"
-                        value={formatPriceBR(fee as number)}
-                        onChange={(e) => setLocalFees({ ...localFees, [neighborhood]: parsePriceBR(e.target.value) })}
-                        className="w-full bg-transparent outline-none transition-all font-black text-sm text-[var(--color-brand-dark)]"
-                      />
-                    </div>
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all shrink-0"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => {
-                      const newFees = { ...localFees };
-                      delete newFees[neighborhood];
-                      setLocalFees(newFees);
-                    }}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             {Object.keys(localFees).length === 0 && (

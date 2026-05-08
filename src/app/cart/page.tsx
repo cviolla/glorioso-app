@@ -91,7 +91,11 @@ export default function CartPage() {
   const getDeliveryFee = () => {
     if (deliveryType !== 'delivery') return 0;
     const neighborhood = address.neighborhood;
-    return deliveryFees[neighborhood] || deliveryFees['Outros'] || 7.00;
+    const entry = deliveryFees[neighborhood];
+    if (entry && typeof entry === 'object' && 'fee' in entry) return entry.fee;
+    const outrosEntry = deliveryFees['Outros'];
+    if (outrosEntry && typeof outrosEntry === 'object' && 'fee' in outrosEntry) return outrosEntry.fee;
+    return 7.00;
   };
   
   const deliveryFee = getDeliveryFee();
@@ -544,7 +548,11 @@ export default function CartPage() {
                     <div>
                       <label className="text-sm font-bold text-[#381010] mb-1 block">Bairro</label>
                       <select className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all" value={address.neighborhood} onChange={e => setAddress({...address, neighborhood: e.target.value})}>
-                        {Object.keys(deliveryFees).filter(n => n !== 'Outros').sort().map(neighborhood => (
+                        {Object.entries(deliveryFees)
+                          .filter(([n, entry]) => n !== 'Outros' && (typeof entry === 'object' && 'is_active' in entry ? entry.is_active : true))
+                          .map(([neighborhood]) => neighborhood)
+                          .sort()
+                          .map(neighborhood => (
                           <option key={neighborhood}>{neighborhood}</option>
                         ))}
                       </select>
