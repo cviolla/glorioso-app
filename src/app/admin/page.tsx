@@ -232,7 +232,8 @@ export default function AdminProductsPage() {
             name: editingItem.name,
             description: editingItem.description,
             price: editingItem.price,
-            image_url: editingItem.imageUrl
+            image_url: editingItem.imageUrl,
+            category_id: editingItem.category_id
           })
           .eq('id', editingItem.id);
         if (error) throw error;
@@ -452,11 +453,11 @@ export default function AdminProductsPage() {
                     </div>
                   </div>
 
-                  {isNewProduct && (
-                    <div>
-                      <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Categoria</label>
+                  <div>
+                    <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Categoria</label>
+                    <div className="relative">
                       <select 
-                        className="w-full border border-gray-100 rounded-xl px-3 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-bold appearance-none"
+                        className="w-full border border-gray-100 rounded-xl px-3 pr-9 h-10 outline-none focus:border-[var(--color-brand-accent)]/20 focus:ring-2 focus:ring-[var(--color-brand-accent)]/10 text-[var(--color-brand-dark)] bg-gray-50/50 text-[13px] transition-all font-bold appearance-none"
                         value={editingItem.category_id}
                         onChange={(e) => setEditingItem({...editingItem, category_id: e.target.value})}
                         disabled={saving}
@@ -465,8 +466,9 @@ export default function AdminProductsPage() {
                           <option key={cat.id} value={cat.id}>{cat.name}</option>
                         ))}
                       </select>
+                      <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
-                  )}
+                  </div>
 
                   <div>
                     <label className="text-[10px] font-black text-[var(--color-brand-dark)] mb-1.5 block uppercase tracking-widest">Nome do Produto</label>
