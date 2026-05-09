@@ -193,7 +193,7 @@ export default function Home() {
               
               <div className="text-center text-[#f8ece3]/60 inline-block">
                 <Clock className="w-4 h-4 text-[#ff914a] inline-block mr-1.5 -mt-0.5" />
-                <span className="font-medium">Terça a Domingo das 15h às 00h</span>
+                <span className="font-medium">seg. a sab. 18h às 0h30 - dom. 17h às 0h</span>
               </div>
             </div>
 
