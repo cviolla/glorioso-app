@@ -8,17 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStoreStatusStore } from '@/store/storeStatusStore';
 import { supabase } from '@/lib/supabase';
 import { CustomModal } from '@/components/CustomModal';
-
-// Brazilian price formatting helpers
-function formatPriceBR(value: number): string {
-  return value.toFixed(2).replace('.', ',');
-}
-
-function parsePriceBR(value: string): number {
-  const cleaned = value.replace(/[^\d,]/g, '').replace(',', '.');
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-}
+import { PriceInput, formatPriceBR } from '@/components/PriceInput';
 
 // Map full variant names to short labels
 const VARIANT_SHORT_LABELS: Record<string, string> = {
@@ -511,13 +501,10 @@ export default function AdminProductsPage() {
                           <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Preço do Produto</label>
                           <div className="relative group">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-[var(--color-brand-accent)] text-[13px]">R$</span>
-                            <input 
-                              type="text" 
-                              inputMode="decimal"
+                            <PriceInput 
                               className="w-full border-2 border-white rounded-xl pl-10 pr-4 h-12 outline-none focus:border-[var(--color-brand-accent)]/30 focus:ring-4 focus:ring-[var(--color-brand-accent)]/5 text-[var(--color-brand-dark)] bg-white text-[16px] transition-all font-black shadow-sm"
-                              value={formatPriceBR(editingItem.price || 0)} 
-                              onFocus={(e) => e.target.select()}
-                              onChange={(e) => setEditingItem({...editingItem, price: parsePriceBR(e.target.value)})}
+                              value={editingItem.price || 0}
+                              onChange={(val) => setEditingItem({...editingItem, price: val})}
                               disabled={saving}
                             />
                           </div>
@@ -575,16 +562,13 @@ export default function AdminProductsPage() {
                                 </div>
                                 <div className="relative w-28 shrink-0">
                                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-[var(--color-brand-accent)]">R$</span>
-                                  <input 
-                                    type="text" 
-                                    inputMode="decimal"
+                                  <PriceInput 
                                     placeholder="0,00"
                                     className="w-full text-[14px] border-none bg-gray-50/50 rounded-lg h-9 pl-8 pr-3 outline-none focus:bg-white focus:ring-2 focus:ring-[var(--color-brand-accent)]/20 font-black transition-all"
-                                    value={formatPriceBR(v.price)}
-                                    onFocus={(e) => e.target.select()}
-                                    onChange={(e) => {
+                                    value={v.price}
+                                    onChange={(val) => {
                                       const vars = [...(editingItem.variants || [])];
-                                      vars[idx].price = parsePriceBR(e.target.value);
+                                      vars[idx].price = val;
                                       setEditingItem({...editingItem, variants: vars});
                                     }}
                                   />
