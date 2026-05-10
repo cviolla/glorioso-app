@@ -31,6 +31,8 @@ export default function CartPage() {
     message: string;
     type: "info" | "success" | "warning" | "danger";
     onConfirm?: () => void;
+    confirmText?: string;
+    cancelText?: string;
   }>({
     isOpen: false,
     title: "",
@@ -275,7 +277,7 @@ export default function CartPage() {
           variant: item.variant,
           addons: item.addons
         })),
-        status: 'pending'
+        status: 'draft'
       }).select().single();
 
       if (error) throw error;
@@ -353,16 +355,29 @@ export default function CartPage() {
       
       text += `\nPor favor, envie-nos esta mensagem agora. Assim que recebermos estaremos atendendo você.`;
       
-      // 5. Abrir WhatsApp e limpar carrinho
+      // 5. Abrir WhatsApp e mostrar confirmação
       const cleanNumber = whatsappNumber.replace(/\D/g, '');
       const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
       
-      // Automatização: Limpar e voltar para o menu após um pequeno delay
-      setTimeout(() => {
-        clearCart();
-        router.push('/menu');
-      }, 500);
+      // Mostrar modal para confirmar se o cliente enviou o pedido no WhatsApp
+      setModalConfig({
+        isOpen: true,
+        title: "Confirmação de Envio",
+        message: "Para finalizar, confirme se você conseguiu enviar a mensagem com os detalhes do seu pedido no nosso WhatsApp.",
+        type: "success",
+        confirmText: "Sim, eu enviei",
+        cancelText: "Ainda não",
+        onConfirm: async () => {
+          try {
+            await supabase.from('orders').update({ status: 'pending' }).eq('id', savedOrder.id);
+            clearCart();
+            router.push('/menu');
+          } catch (e) {
+            console.error("Erro ao atualizar status do pedido:", e);
+          }
+        }
+      });
       
     } catch (err: unknown) {
       console.error("Erro ao salvar pedido:", err);
@@ -908,6 +923,8 @@ export default function CartPage() {
         title={modalConfig.title}
         message={modalConfig.message}
         type={modalConfig.type}
+        confirmText={modalConfig.confirmText}
+        cancelText={modalConfig.cancelText}
       />
     </div>
   );

@@ -14,20 +14,35 @@ export default function CashReportPrintPage() {
     const fetchData = async () => {
       try {
         const searchParams = new URLSearchParams(window.location.search);
+        const sessionStart = searchParams.get('session_start');
+        const sessionEnd = searchParams.get('session_end');
         const dateParam = searchParams.get('date');
         const today = dateParam || new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
-        const { data, error } = await supabase
+        let query = supabase
           .from('orders')
           .select('id, created_at, customer_name, total_price, payment_method, status')
           .eq('status', 'delivered')
           .order('created_at', { ascending: false });
 
+        if (sessionStart) {
+          query = query.gte('created_at', sessionStart);
+        }
+        if (sessionEnd) {
+          query = query.lte('created_at', sessionEnd);
+        }
+
+        const { data, error } = await query;
+
         if (error) throw error;
 
-        const filteredOrders = (data || []).filter(o =>
-          new Date(o.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) === today
-        );
+        let filteredOrders = data || [];
+        
+        if (!sessionStart) {
+          filteredOrders = filteredOrders.filter(o =>
+            new Date(o.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) === today
+          );
+        }
 
         const totals: Record<string, number> = {};
         let total = 0;
@@ -40,7 +55,9 @@ export default function CashReportPrintPage() {
         });
 
         setReportData({
-          date: today,
+          date: sessionStart 
+            ? `Caixa Aberto: ${new Date(sessionStart).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}` 
+            : today,
           totals,
           total,
           count: filteredOrders.length,

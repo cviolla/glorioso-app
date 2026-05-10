@@ -26,8 +26,9 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
+import { useCashStore } from '@/store/cashStore';
 
-type OrderStatus = 'pending' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'archived';
+type OrderStatus = 'draft' | 'pending' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'archived';
 
 interface OrderItem {
   name: string;
@@ -57,6 +58,7 @@ interface Order {
 }
 
 const statusConfig = {
+  draft: { label: 'Rascunho', color: 'text-gray-500 bg-gray-50 border-gray-200', icon: Clock },
   pending: { label: 'Pendente', color: 'text-amber-600 bg-amber-50 border-amber-200', icon: Clock },
   preparing: { label: 'Em Preparo', color: 'text-blue-600 bg-blue-50 border-blue-200', icon: ShoppingBag },
   shipped: { label: 'Saiu p/ Entrega', color: 'text-purple-600 bg-purple-50 border-purple-200', icon: Truck },
@@ -86,6 +88,7 @@ export default function AdminOrdersPage() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [showRefreshSuccess, setShowRefreshSuccess] = useState(false);
+  const { currentSession, fetchCurrentSession, openCashSession, closeCashSession } = useCashStore();
 
   const fetchOrders = useCallback(async (isInitial = false) => {
     if (!isInitial) setLoading(true);
@@ -114,6 +117,7 @@ export default function AdminOrdersPage() {
     queueMicrotask(() => {
       setIsMounted(true);
       fetchOrders(true);
+      fetchCurrentSession();
     });
 
     const channel = supabase
@@ -249,33 +253,64 @@ export default function AdminOrdersPage() {
   };
 
   const getCashClosingData = () => {
-    const today = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-    const todayOrders = orders.filter(o => 
-      new Date(o.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) === today && 
-      o.status === 'delivered'
-    );
+    let sessionOrders = [];
+    let isDayMode = false;
+    
+    if (currentSession) {
+      // Caixa por sessão
+      const openTime = new Date(currentSession.opened_at).getTime();
+      sessionOrders = orders.filter(o => 
+        new Date(o.created_at).getTime() >= openTime && 
+        o.status === 'delivered'
+      );
+    } else {
+      // Fallback para dia se não houver sessão ativa
+      isDayMode = true;
+      const today = new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      sessionOrders = orders.filter(o => 
+        new Date(o.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }) === today && 
+        o.status === 'delivered'
+      );
+    }
 
     const totals: Record<string, number> = {};
     let total = 0;
 
-    todayOrders.forEach(o => {
+    sessionOrders.forEach(o => {
       const method = o.payment_method || 'Outros';
       const value = Number(o.total_price) || 0;
       totals[method] = (totals[method] || 0) + value;
       total += value;
     });
 
-    return { totals, total, count: todayOrders.length, items: todayOrders };
+    return { totals, total, count: sessionOrders.length, items: sessionOrders, isDayMode };
   };
 
-  const handlePrintCashReport = () => {
-    window.open('/admin/cash-report/print', '_blank');
+  const handlePrintCashReport = async () => {
+    const data = getCashClosingData();
+    // Se há uma sessão atual, fechar ela no banco antes de imprimir
+    if (currentSession) {
+      try {
+        await closeCashSession();
+      } catch (err) {
+        console.error('Erro ao fechar caixa:', err);
+      }
+    }
+    
+    // Constrói a URL para a página de impressão
+    let url = '/admin/cash-report/print';
+    if (currentSession) {
+      url += `?session_start=${encodeURIComponent(currentSession.opened_at)}&session_end=${encodeURIComponent(new Date().toISOString())}`;
+    }
+    
+    window.open(url, '_blank');
+    setIsCashModalOpen(false);
   };
 
   const filteredOrders = orders.filter(order => {
     let matchesStatus = false;
     if (filterStatus === 'all') {
-      matchesStatus = order.status !== 'archived';
+      matchesStatus = order.status !== 'archived' && order.status !== 'draft';
     } else if (filterStatus === 'active') {
       matchesStatus = ['pending', 'preparing', 'shipped'].includes(order.status);
     } else {
@@ -352,12 +387,25 @@ export default function AdminOrdersPage() {
               </motion.div>
             )}
           </motion.button>
-          <button 
-            onClick={() => setIsCashModalOpen(true)}
-            className="flex items-center gap-2 bg-[var(--color-brand-accent)] text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-brand-accent)]/20"
-          >
-            <Receipt className="w-5 h-5" /> Fechar Caixa
-          </button>
+          {!currentSession ? (
+            <button 
+              onClick={async () => {
+                if (confirm("Deseja abrir o caixa neste momento? O relatório de fechamento contará a partir de agora.")) {
+                  await openCashSession();
+                }
+              }}
+              className="flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/20"
+            >
+              <Receipt className="w-5 h-5" /> Abrir Caixa
+            </button>
+          ) : (
+            <button 
+              onClick={() => setIsCashModalOpen(true)}
+              className="flex items-center gap-2 bg-[var(--color-brand-accent)] text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-brand-accent)]/20"
+            >
+              <Receipt className="w-5 h-5" /> Fechamento de Caixa
+            </button>
+          )}
         </div>
       </div>
 
@@ -902,11 +950,17 @@ export default function AdminOrdersPage() {
                 </div>
                 <h2 className="text-2xl font-black tracking-tight">Fechamento de Caixa</h2>
                 <p className="text-[#ff914a] font-bold text-xs uppercase tracking-widest mt-1">
-                  {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  {currentSession ? `Caixa Aberto em: ${new Date(currentSession.opened_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'Resumo do Dia'}
                 </p>
               </div>
 
               <div className="p-8 space-y-4">
+                {currentSession && (
+                  <div className="bg-orange-50 border border-orange-100 p-3 rounded-xl text-orange-800 text-xs text-center font-medium mb-4">
+                    Ao imprimir, a sessão de caixa atual será fechada e zerada.
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-1 gap-3">
                   {Object.entries(getCashClosingData().totals).map(([method, value]) => (
                     <div key={method} className="flex justify-between items-center p-4 bg-[#fff8f4] rounded-2xl border border-[#ff914a]/5 group hover:border-[#ff914a]/20 transition-all">
