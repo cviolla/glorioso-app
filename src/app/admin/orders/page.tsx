@@ -519,6 +519,7 @@ export default function AdminOrdersPage() {
               const StatusIcon = statusConfig[order.status].icon;
               
               const cardStatusStyles: Record<OrderStatus, string> = {
+                draft: 'bg-gray-50/40 border-gray-200 grayscale opacity-50',
                 pending: 'bg-amber-50/80 border-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.3)] animate-pulse',
                 preparing: 'bg-blue-50/40 border-blue-200',
                 shipped: 'bg-purple-50/40 border-purple-200',
