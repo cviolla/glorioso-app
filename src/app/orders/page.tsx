@@ -95,15 +95,41 @@ export default function OrdersPage() {
     }
   };
 
-  // Auto-refresh every 30 seconds if there are active orders
+  // Setup Realtime Subscription and Auto-refresh
   useEffect(() => {
+    if (!phone) return;
+
+    // Realtime Supabase
+    const channel = supabase
+      .channel('orders-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+          filter: `customer_phone=eq.${phone}`
+        },
+        () => {
+          // Atualiza a lista quando houver mudança num pedido em realtime
+          fetchOrders(phone);
+        }
+      )
+      .subscribe();
+
+    // Fallback polling
     const hasActiveOrders = orders.some(o => o.status === 'pending' || o.status === 'preparing');
-    if (hasActiveOrders && phone) {
-      const interval = setInterval(() => {
+    let interval: NodeJS.Timeout;
+    if (hasActiveOrders) {
+      interval = setInterval(() => {
         fetchOrders(phone);
       }, 30000);
-      return () => clearInterval(interval);
     }
+
+    return () => {
+      supabase.removeChannel(channel);
+      if (interval) clearInterval(interval);
+    };
   }, [orders, phone]);
 
   if (!isHydrated) return null;
@@ -186,13 +212,48 @@ export default function OrdersPage() {
                       {new Date(order.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
-                  <div className={`px-3 py-1.5 rounded-lg border flex items-center gap-1.5 ${statusConfig.bg} ${statusConfig.border} ${statusConfig.color}`}>
-                    <StatusIcon className="w-4 h-4" />
-                    <span className="text-xs font-bold uppercase tracking-wide">{statusConfig.label}</span>
-                  </div>
+                  {order.status === 'cancelled' && (
+                    <div className="px-3 py-1.5 rounded-lg border flex items-center gap-1.5 bg-red-100 border-red-200 text-red-600">
+                      <XCircle className="w-4 h-4" />
+                      <span className="text-xs font-bold uppercase tracking-wide">Cancelado</span>
+                    </div>
+                  )}
                 </div>
 
-                <div className="space-y-3 mb-4">
+                {order.status !== 'cancelled' && (
+                  <div className="mb-6 mt-2 relative">
+                    <div className="absolute top-3 left-0 w-full h-0.5 bg-gray-200"></div>
+                    <div 
+                      className="absolute top-3 left-0 h-0.5 bg-[#532120] transition-all duration-500"
+                      style={{ width: order.status === 'pending' ? '15%' : order.status === 'preparing' ? '50%' : '100%' }}
+                    ></div>
+                    
+                    <div className="relative flex justify-between">
+                      <div className="flex flex-col items-center gap-1 bg-white px-2">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['pending', 'preparing', 'completed'].includes(order.status) ? 'bg-[#532120] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                          <Clock className="w-3.5 h-3.5" />
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['pending', 'preparing', 'completed'].includes(order.status) ? 'text-[#532120]' : 'text-gray-400'}`}>Recebido</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center gap-1 bg-white px-2">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['preparing', 'completed'].includes(order.status) ? 'bg-[#ff914a] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                          <Package className="w-3.5 h-3.5" />
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['preparing', 'completed'].includes(order.status) ? 'text-[#ff914a]' : 'text-gray-400'}`}>Preparando</span>
+                      </div>
+                      
+                      <div className="flex flex-col items-center gap-1 bg-white px-2">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${order.status === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${order.status === 'completed' ? 'text-green-600' : 'text-gray-400'}`}>Concluído</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3 mb-4 border-t border-gray-100 pt-4">
                   {order.items.map((item, i) => (
                     <div key={i} className="flex justify-between text-sm">
                       <div className="flex gap-2">
