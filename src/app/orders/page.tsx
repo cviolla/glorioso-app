@@ -17,7 +17,7 @@ type OrderItem = {
 type Order = {
   id: string;
   created_at: string;
-  status: 'pending' | 'preparing' | 'completed' | 'cancelled';
+  status: 'pending' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'archived';
   total_price: number;
   delivery_type: 'delivery' | 'pickup' | null;
   items: OrderItem[];
@@ -86,7 +86,10 @@ export default function OrdersPage() {
         return { label: 'Pendente', icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-100', border: 'border-yellow-200' };
       case 'preparing':
         return { label: 'Preparando', icon: Package, color: 'text-[#0066FF]', bg: 'bg-blue-100', border: 'border-blue-200' };
-      case 'completed':
+      case 'shipped':
+        return { label: 'A Caminho', icon: Package, color: 'text-purple-600', bg: 'bg-purple-100', border: 'border-purple-200' };
+      case 'delivered':
+      case 'archived':
         return { label: 'Concluído', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100', border: 'border-green-200' };
       case 'cancelled':
         return { label: 'Cancelado', icon: XCircle, color: 'text-red-600', bg: 'bg-red-100', border: 'border-red-200' };
@@ -118,7 +121,7 @@ export default function OrdersPage() {
       .subscribe();
 
     // Fallback polling
-    const hasActiveOrders = orders.some(o => o.status === 'pending' || o.status === 'preparing');
+    const hasActiveOrders = orders.some(o => ['pending', 'preparing', 'shipped'].includes(o.status));
     let interval: NodeJS.Timeout;
     if (hasActiveOrders) {
       interval = setInterval(() => {
@@ -225,29 +228,29 @@ export default function OrdersPage() {
                     <div className="absolute top-3 left-0 w-full h-0.5 bg-gray-200"></div>
                     <div 
                       className="absolute top-3 left-0 h-0.5 bg-[#532120] transition-all duration-500"
-                      style={{ width: order.status === 'pending' ? '15%' : order.status === 'preparing' ? '50%' : '100%' }}
+                      style={{ width: order.status === 'pending' ? '15%' : order.status === 'preparing' ? '50%' : order.status === 'shipped' ? '75%' : '100%' }}
                     ></div>
                     
                     <div className="relative flex justify-between">
                       <div className="flex flex-col items-center gap-1 bg-white px-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['pending', 'preparing', 'completed'].includes(order.status) ? 'bg-[#532120] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['pending', 'preparing', 'shipped', 'delivered', 'archived'].includes(order.status) ? 'bg-[#532120] text-white' : 'bg-gray-200 text-gray-400'}`}>
                           <Clock className="w-3.5 h-3.5" />
                         </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['pending', 'preparing', 'completed'].includes(order.status) ? 'text-[#532120]' : 'text-gray-400'}`}>Recebido</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['pending', 'preparing', 'shipped', 'delivered', 'archived'].includes(order.status) ? 'text-[#532120]' : 'text-gray-400'}`}>Recebido</span>
                       </div>
                       
                       <div className="flex flex-col items-center gap-1 bg-white px-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['preparing', 'completed'].includes(order.status) ? 'bg-[#ff914a] text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['preparing', 'shipped', 'delivered', 'archived'].includes(order.status) ? 'bg-[#ff914a] text-white' : 'bg-gray-200 text-gray-400'}`}>
                           <Package className="w-3.5 h-3.5" />
                         </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['preparing', 'completed'].includes(order.status) ? 'text-[#ff914a]' : 'text-gray-400'}`}>Preparando</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['preparing', 'shipped', 'delivered', 'archived'].includes(order.status) ? 'text-[#ff914a]' : 'text-gray-400'}`}>Preparando</span>
                       </div>
                       
                       <div className="flex flex-col items-center gap-1 bg-white px-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${order.status === 'completed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['delivered', 'archived'].includes(order.status) ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
                           <CheckCircle className="w-3.5 h-3.5" />
                         </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wide ${order.status === 'completed' ? 'text-green-600' : 'text-gray-400'}`}>Concluído</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['delivered', 'archived'].includes(order.status) ? 'text-green-600' : 'text-gray-400'}`}>Concluído</span>
                       </div>
                     </div>
                   </div>
@@ -273,14 +276,24 @@ export default function OrdersPage() {
                   ))}
                 </div>
 
-                <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                    {order.delivery_type === 'pickup' ? 'Retirada' : 'Delivery'}
-                  </span>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500 mb-0.5">Total</p>
-                    <p className="font-bold text-lg text-[#532120]">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                <div className="border-t border-gray-100 pt-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      {order.delivery_type === 'pickup' ? 'Retirada' : 'Delivery'}
+                    </span>
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500 mb-0.5">Total</p>
+                      <p className="font-bold text-lg text-[#532120]">R$ {order.total_price.toFixed(2).replace('.', ',')}</p>
+                    </div>
                   </div>
+                  {['delivered', 'archived'].includes(order.status) && (
+                    <Link 
+                      href="/menu"
+                      className="w-full mt-2 bg-[#f8ece3] text-[#532120] border border-[#532120]/20 py-3 rounded-xl font-bold text-center text-sm hover:bg-[#532120]/10 transition-colors"
+                    >
+                      Fazer novo pedido
+                    </Link>
+                  )}
                 </div>
               </motion.div>
             );
@@ -288,7 +301,7 @@ export default function OrdersPage() {
         </AnimatePresence>
       </main>
       
-      {orders.some(o => o.status === 'pending' || o.status === 'preparing') && (
+      {orders.some(o => ['pending', 'preparing', 'shipped'].includes(o.status)) && (
         <div className="fixed bottom-6 inset-x-0 flex justify-center z-50 pointer-events-none">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
