@@ -22,7 +22,8 @@ import {
   X,
   RefreshCw,
   Archive,
-  ChefHat
+  ChefHat,
+  Share2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
@@ -252,6 +253,44 @@ export default function AdminOrdersPage() {
     window.open(`/admin/orders/${id}/print?mode=kitchen`, '_blank');
   };
 
+  const handleShareOrder = (order: Order) => {
+    let text = `*PEDIDO #${order.id.slice(-4).toUpperCase()}*\n`;
+    text += `*Cliente:* ${order.customer_name}\n`;
+    text += `*Telefone:* ${order.customer_phone}\n`;
+    if (order.delivery_type === 'delivery') {
+      text += `*Endereço:* ${order.address_street}, ${order.address_number} - ${order.address_neighborhood}\n`;
+      if (order.address_complement) text += `*Ref:* ${order.address_complement}\n`;
+    } else {
+      text += `*Tipo:* Retirada\n`;
+    }
+    text += `*Pagamento:* ${order.payment_method}\n`;
+    text += `*Valor:* R$ ${order.total_price.toFixed(2).replace('.', ',')}\n\n`;
+    
+    text += `*ITENS:*\n`;
+    order.items.forEach(item => {
+      text += `${item.quantity}x ${item.name}`;
+      if (item.variant) text += ` (${item.variant})`;
+      text += '\n';
+      if (item.addons && item.addons.length > 0) {
+        text += `  + ${item.addons.map(a => a.name).join(', ')}\n`;
+      }
+    });
+    
+    if (order.observation) {
+      text += `\n*Obs:* ${order.observation}`;
+    }
+
+    if (navigator.share) {
+      navigator.share({
+        title: `Pedido #${order.id.slice(-4).toUpperCase()}`,
+        text: text
+      }).catch(console.error);
+    } else {
+      const encodedText = encodeURIComponent(text);
+      window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+    }
+  };
+
   const getCashClosingData = () => {
     let sessionOrders = [];
     let isDayMode = false;
@@ -389,10 +428,17 @@ export default function AdminOrdersPage() {
           </motion.button>
           {!currentSession ? (
             <button 
-              onClick={async () => {
-                if (confirm("Deseja abrir o caixa neste momento? O relatório de fechamento contará a partir de agora.")) {
-                  await openCashSession();
-                }
+              onClick={() => {
+                setModalConfig({
+                  isOpen: true,
+                  title: "Confirmar Abertura",
+                  message: "Deseja abrir o caixa neste momento? O relatório de fechamento contará a partir de agora.",
+                  type: "info",
+                  onConfirm: async () => {
+                    await openCashSession();
+                    setModalConfig(prev => ({ ...prev, isOpen: false }));
+                  }
+                });
               }}
               className="flex items-center gap-2 bg-emerald-500 text-white px-6 py-3 rounded-2xl font-black hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/20"
             >
@@ -627,6 +673,13 @@ export default function AdminOrdersPage() {
                         <ChefHat className="w-4 h-4" /> COZINHA
                       </button>
                       <button 
+                        onClick={() => handleShareOrder(selectedOrder)}
+                        className="text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
+                        title="Enviar para Entregador"
+                      >
+                        <Share2 className="w-4 h-4" /> ENVIAR
+                      </button>
+                      <button 
                         onClick={() => deleteOrder(selectedOrder.id)}
                         className="text-rose-500 hover:text-rose-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                         title="Apagar Pedido"
@@ -798,6 +851,13 @@ export default function AdminOrdersPage() {
                     className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
                   >
                     <ChefHat className="w-4 h-4" /> COZINHA
+                  </button>
+                  <button 
+                    onClick={() => handleShareOrder(selectedOrder)}
+                    className="text-emerald-600 hover:text-emerald-700 transition-colors flex items-center gap-1.5 font-black text-xs uppercase tracking-widest"
+                    title="Enviar para Entregador"
+                  >
+                    <Share2 className="w-4 h-4" /> ENVIAR
                   </button>
                   <button 
                     onClick={() => deleteOrder(selectedOrder.id)}

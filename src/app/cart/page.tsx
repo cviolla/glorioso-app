@@ -353,11 +353,11 @@ export default function CartPage() {
       // Mostrar modal para confirmar se o cliente enviou o pedido no WhatsApp
       setModalConfig({
         isOpen: true,
-        title: "Confirmação de Envio",
-        message: "Para finalizar, confirme se você conseguiu enviar a mensagem com os detalhes do seu pedido no nosso WhatsApp.",
-        type: "success",
-        confirmText: "Sim, eu enviei",
-        cancelText: "Ainda não",
+        title: "⚠️ Atenção! Quase lá...",
+        message: "Seu pedido SÓ SERÁ PROCESSADO e preparado pela nossa equipe APÓS você enviar a mensagem no nosso WhatsApp. Você conseguiu enviar a mensagem com os detalhes?",
+        type: "warning",
+        confirmText: "Sim, eu enviei!",
+        cancelText: "Ainda não enviei",
         onConfirm: async () => {
           setIsSubmitting(true);
           try {
@@ -920,22 +920,27 @@ export default function CartPage() {
               </button>
             )}
             {step === 'summary' && (
-              <button 
-                onClick={handleCheckoutSubmit} 
-                disabled={isSubmitting}
-                className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processando...
-                  </>
-                ) : (
-                  <>
-                    Enviar via WhatsApp <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
+              <div className="flex flex-col gap-3">
+                <p className="text-xs text-center text-[#381010]/80 font-bold bg-[#ff914a]/20 py-2.5 px-4 rounded-xl border border-[#ff914a]/30">
+                  ⚠️ Atenção: Seu pedido SÓ SERÁ PROCESSADO após o envio da mensagem no WhatsApp.
+                </p>
+                <button 
+                  onClick={handleCheckoutSubmit} 
+                  disabled={isSubmitting}
+                  className="w-full bg-[#ff914a] text-[#381010] font-bold py-4 rounded-xl shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed hover:bg-[#ff9f61] transition-colors"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      Enviar Pedido no WhatsApp <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </div>
         </div>
