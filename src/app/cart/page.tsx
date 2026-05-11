@@ -343,66 +343,51 @@ export default function CartPage() {
       
       text += `\nPor favor, envie-nos esta mensagem agora. Assim que recebermos estaremos atendendo você.`;
       
-      // 5. Abrir WhatsApp e mostrar confirmação
+      // 5. Abrir WhatsApp e registrar pedido no banco de dados
       const cleanNumber = whatsappNumber.replace(/\D/g, '');
       const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(text)}`;
       window.open(whatsappUrl, '_blank');
       
-      setIsSubmitting(false); // Stop loading spinner so modal is interactive
-      
-      // Mostrar modal para confirmar se o cliente enviou o pedido no WhatsApp
-      setModalConfig({
-        isOpen: true,
-        title: "⚠️ Atenção! Quase lá...",
-        message: "Seu pedido SÓ SERÁ PROCESSADO e preparado pela nossa equipe APÓS você enviar a mensagem no nosso WhatsApp. Você conseguiu enviar a mensagem com os detalhes?",
-        type: "warning",
-        confirmText: "Sim, eu enviei!",
-        cancelText: "Ainda não enviei",
-        onConfirm: async () => {
-          setIsSubmitting(true);
-          try {
-            // Só agora salva no banco de dados como 'pending'
-            const { error } = await supabase.from('orders').insert({
-              id: newOrderId,
-              customer_name: userInfo.name,
-              customer_phone: userInfo.phone,
-              delivery_type: deliveryType,
-              address_street: address.street,
-              address_number: address.number,
-              address_neighborhood: address.neighborhood,
-              address_complement: address.complement,
-              address_reference: address.reference,
-              payment_method: paymentSummary,
-              order_time: paymentInfo.orderTime,
-              observation: finalObservation,
-              total_price: finalTotal,
-              items: items.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price,
-                variant: item.variant,
-                addons: item.addons
-              })),
-              status: 'pending'
-            });
+      try {
+        // Salva no banco de dados como 'pending' imediatamente
+        const { error } = await supabase.from('orders').insert({
+          id: newOrderId,
+          customer_name: userInfo.name,
+          customer_phone: userInfo.phone,
+          delivery_type: deliveryType,
+          address_street: address.street,
+          address_number: address.number,
+          address_neighborhood: address.neighborhood,
+          address_complement: address.complement,
+          address_reference: address.reference,
+          payment_method: paymentSummary,
+          order_time: paymentInfo.orderTime,
+          observation: finalObservation,
+          total_price: finalTotal,
+          items: items.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            variant: item.variant,
+            addons: item.addons
+          })),
+          status: 'pending'
+        });
 
-            if (error) throw error;
-            
-            clearCart();
-            router.push('/menu');
-          } catch (e) {
-            console.error("Erro ao salvar pedido no banco:", e);
-            setModalConfig({
-              isOpen: true,
-              title: "Erro no Pedido",
-              message: "Houve um erro ao processar seu pedido no banco de dados. Por favor, tente novamente ou entre em contato.",
-              type: "danger"
-            });
-          } finally {
-            setIsSubmitting(false);
-          }
-        }
-      });
+        if (error) throw error;
+        
+        clearCart();
+        router.push('/orders');
+      } catch (e) {
+        console.error("Erro ao salvar pedido no banco:", e);
+        setModalConfig({
+          isOpen: true,
+          title: "Erro no Pedido",
+          message: "Houve um erro ao processar seu pedido no banco de dados. Por favor, tente novamente ou entre em contato.",
+          type: "danger"
+        });
+        setIsSubmitting(false);
+      }
       
     } catch (err: unknown) {
       console.error("Erro ao processar checkout:", err);
@@ -936,7 +921,7 @@ export default function CartPage() {
                     </>
                   ) : (
                     <>
-                      Enviar Pedido no WhatsApp <ArrowRight className="w-5 h-5" />
+                      ENVIAR PEDIDO NO WHATSAPP <ArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </button>
