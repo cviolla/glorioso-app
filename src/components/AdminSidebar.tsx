@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { Package, LayoutDashboard, Settings, LogOut, History, Wallet, Users } from 'lucide-react';
+import { Package, LayoutDashboard, Settings, LogOut, History, Wallet } from 'lucide-react';
 import { createBrowserClient } from '@supabase/ssr';
 import { useRouter, usePathname } from 'next/navigation';
 import { NotificationListener } from './NotificationListener';
@@ -96,17 +96,6 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
             Caixa
           </Link>
           <Link 
-            href="/admin/customers" 
-            className={`flex items-center gap-3 px-4 py-4 font-black text-xs uppercase tracking-widest rounded-2xl transition-all ${
-              pathname === '/admin/customers' 
-                ? 'bg-[var(--color-brand-accent)] text-white shadow-lg shadow-[var(--color-brand-accent)]/20' 
-                : 'text-gray-400 hover:bg-gray-50 hover:text-[var(--color-brand-dark)]'
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            Clientes
-          </Link>
-          <Link 
             href="/admin/settings" 
             className={`flex items-center gap-3 px-4 py-4 font-black text-xs uppercase tracking-widest rounded-2xl transition-all ${
               pathname === '/admin/settings' 
@@ -153,10 +142,6 @@ export function AdminSidebar({ children }: { children: ReactNode }) {
         <Link href="/admin/cash-history" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/admin/cash-history' ? 'text-[var(--color-brand-accent)]' : 'text-gray-400'}`}>
           <Wallet className="w-6 h-6" />
           <span className="text-[10px] font-black uppercase tracking-tight">Caixa</span>
-        </Link>
-        <Link href="/admin/customers" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/admin/customers' ? 'text-[var(--color-brand-accent)]' : 'text-gray-400'}`}>
-          <Users className="w-6 h-6" />
-          <span className="text-[10px] font-black uppercase tracking-tight">Clientes</span>
         </Link>
         <Link href="/admin/settings" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/admin/settings' ? 'text-[var(--color-brand-accent)]' : 'text-gray-400'}`}>
           <Settings className="w-6 h-6" />
