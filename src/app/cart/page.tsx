@@ -46,6 +46,7 @@ export default function CartPage() {
   const [needsChange, setNeedsChange] = useState(false);
   const [changeFor, setChangeFor] = useState('');
   const [voucherBrand, setVoucherBrand] = useState('');
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchSettings();
@@ -442,8 +443,6 @@ export default function CartPage() {
       setStep('cart');
     }
   };
-
-  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   // Garante que a imagem é válida, caso contrário usa o fallback
   const getValidImageUrl = (url?: string, itemId?: string) => {
