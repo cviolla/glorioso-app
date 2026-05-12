@@ -62,10 +62,16 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 🛡️ Fail-safe: Verificar se é admin no servidor
-  const isAdmin = user?.email?.startsWith('admin.') || user?.email?.endsWith('@glorioso.com');
+  // 🛡️ Fail-safe: Verificar se é admin no servidor (exceto na tela de login)
+  // Nota: Adicionamos seu e-mail pessoal também para garantir acesso
+  const isAdmin = user?.email?.startsWith('admin.') || 
+                  user?.email?.endsWith('@glorioso.com') ||
+                  user?.email === 'ccviolla@gmail.com';
   
-  if (!isAdmin) {
+  // Só redireciona se NÃO for a página de login e NÃO for admin
+  // Mas como o layout envolve tudo, precisamos checar a URL ou confiar no middleware para o login
+  // O middleware já permite /admin/login, então aqui só checamos se o usuário existe e não é admin
+  if (user && !isAdmin) {
     redirect('/');
   }
 

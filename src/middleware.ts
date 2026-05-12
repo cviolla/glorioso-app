@@ -57,7 +57,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // 🔒 REGRA DE OURO: Proteger rotas /admin
-  const isAdmin = user?.email?.startsWith('admin.') || user?.email?.endsWith('@glorioso.com');
+  const isAdmin = user?.email?.startsWith('admin.') || 
+                  user?.email?.endsWith('@glorioso.com') ||
+                  user?.email === 'ccviolla@gmail.com';
   const isPathAdmin = request.nextUrl.pathname.startsWith('/admin');
   const isLoginPage = request.nextUrl.pathname.includes('/admin/login');
 
