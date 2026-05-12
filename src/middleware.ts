@@ -64,9 +64,12 @@ export async function middleware(request: NextRequest) {
   const isLoginPage = request.nextUrl.pathname.includes('/admin/login');
 
   if (isPathAdmin && !isLoginPage) {
-    if (!user || !isAdmin) {
-      console.log('🛑 [Middleware] Acesso negado para:', user?.email || 'Anônimo');
+    if (!user) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+    if (!isAdmin) {
+      console.log('🛑 [Middleware] Acesso negado para cliente:', user?.email);
+      return NextResponse.redirect(new URL('/', request.url))
     }
   }
 

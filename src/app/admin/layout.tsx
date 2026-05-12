@@ -62,17 +62,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 🛡️ Segurança: Bloquear apenas usuários Logados que NÃO são admins
-  const userEmail = user?.email?.toLowerCase();
-  const isAdmin = userEmail?.startsWith('admin.') || 
-                  userEmail?.endsWith('@glorioso.com') ||
-                  userEmail === 'ccviolla@gmail.com';
-  
-  if (user && !isAdmin) {
-    console.log('🚫 Bloqueio Admin Layout:', userEmail);
-    redirect('/');
-  }
-
   return (
     <AdminSidebar>
       <CopyProtection />
