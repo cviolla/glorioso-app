@@ -77,7 +77,7 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
           <>
             <p>TEL: {order.customer_phone}</p>
             {order.delivery_type === 'delivery' && (
-              <div className="mt-1 pt-1 border-t border-black/10">
+              <div className="mt-1 pt-1 border-t border-[var(--color-brand-dark)]/10">
                 <p>END: {order.address_street}, {order.address_number}</p>
                 <p>BAIRRO: {order.address_neighborhood}</p>
                 {order.address_complement && <p>COMPL: {order.address_complement}</p>}
@@ -129,13 +129,13 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
                 <span>R${fmt(deliveryFee)}</span>
               </div>
             )}
-            <div className="item-row text-[11pt] mt-1 pt-1 border-t border-black/30">
+            <div className="item-row text-[11pt] mt-1 pt-1 border-t border-[var(--color-brand-dark)]/30">
               <span className="underline uppercase">TOTAL: R${fmt(order.total_price)}</span>
             </div>
           </div>
 
           <div className="mb-2 text-[8.5pt] text-left">
-            <p className="uppercase leading-snug border-l-4 border-black pl-2 py-1 bg-black/5">PAGAMENTO: {order.payment_method}</p>
+            <p className="uppercase leading-snug border border-[var(--color-brand-dark)]/20 rounded-sm px-2 py-1 bg-[var(--color-brand-dark)]/5">PAGAMENTO: {order.payment_method}</p>
           </div>
           <p className="text-[8pt] leading-none mt-1">{SEP_LINE}</p>
         </>
@@ -143,7 +143,7 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
 
       {/* Observações */}
       {order.observation && (
-        <div className={`mb-2 p-1 border-2 border-black ${isKitchen ? 'bg-black text-white' : ''}`}>
+        <div className={`mb-2 p-1 border-2 border-[var(--color-brand-dark)] ${isKitchen ? 'bg-[var(--color-brand-black)] text-white' : ''}`}>
           <p className={`${isKitchen ? 'text-[9pt]' : 'text-[8pt]'} leading-tight underline mb-1 uppercase`}>OBSERVAÇÕES:</p>
           <p className={`${isKitchen ? 'text-[12pt]' : 'text-[9.5pt]'} leading-tight`}>{order.observation}</p>
         </div>
@@ -157,7 +157,7 @@ export function InvoicePrint({ order, mode = 'customer' }: { order: Order, mode?
         </div>
       ) : (
         <div className="text-center mt-2 pb-12">
-          <p className="text-[11pt] uppercase border-t-2 border-black pt-1">BOM TRABALHO!</p>
+          <p className="text-[11pt] uppercase border-t-2 border-[var(--color-brand-dark)] pt-1">BOM TRABALHO!</p>
         </div>
       )}
     </div>

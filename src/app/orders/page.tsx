@@ -222,10 +222,10 @@ export default function OrdersPage() {
                       </div>
                       
                       <div className="flex flex-col items-center gap-1 bg-white px-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['delivered', 'archived'].includes(order.status) ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center z-10 transition-colors ${['delivered', 'archived'].includes(order.status) ? 'bg-green-500 text-white' : 'bg-gray-200 text-white'}`}>
                           <CheckCircle className="w-3.5 h-3.5" />
                         </div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['delivered', 'archived'].includes(order.status) ? 'text-green-600' : 'text-gray-400'}`}>Concluído</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${['delivered', 'archived'].includes(order.status) ? 'text-green-700' : 'text-[#381010]/40'}`}>Concluído</span>
                       </div>
                     </div>
                   </div>

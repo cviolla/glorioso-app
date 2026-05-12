@@ -676,7 +676,7 @@ function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item:
       <div className="flex items-center gap-1.5 pr-1">
         <button 
           onClick={onToggleVisibility}
-          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${item.is_active ? 'bg-blue-50 text-blue-500 hover:bg-blue-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+          className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${item.is_active ? 'bg-blue-100/50 text-blue-600 hover:bg-blue-100' : 'bg-gray-100 text-[#381010]/40 hover:bg-gray-200'}`}
           title={item.is_active ? "Esconder Produto" : "Mostrar Produto"}
         >
           {item.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}

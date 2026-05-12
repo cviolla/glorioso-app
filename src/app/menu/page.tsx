@@ -327,7 +327,7 @@ export default function MenuPage() {
 
                 {category.subcategories && category.subcategories.map((sub, idx) => (
                   <div key={idx} className="mt-8 mb-4">
-                    <h3 className="text-lg font-bold text-[#954e3a] mb-4 bg-[#f8ece3] sticky top-[72px] z-20 py-2 border-l-4 border-[#ff914a] pl-3">
+                    <h3 className="text-lg font-black text-[#532120] mb-4 bg-gradient-to-r from-[#f8ece3] to-transparent sticky top-[72px] z-20 py-2.5 px-4 rounded-r-2xl shadow-sm border-l-2 border-[#ff914a]/30">
                       {sub.name}
                     </h3>
                     {sub.items.map(item => (

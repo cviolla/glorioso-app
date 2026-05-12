@@ -30,7 +30,7 @@ export function Sidebar({ onSelectCategory }: { onSelectCategory: (id: string) =
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black z-40"
+              className="fixed inset-0 bg-[var(--color-brand-black)] z-40"
             />
             <motion.div 
               initial={{ x: "-100%" }}

@@ -295,7 +295,7 @@ export default function AdminSettingsPage() {
                         setLocalFees(newFees);
                         setEditingNames(prev => { const n = { ...prev }; delete n[neighborhood]; return n; });
                       }}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-300 hover:text-rose-500 hover:bg-rose-50 transition-all shrink-0"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-rose-600 hover:bg-rose-50 transition-all shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

@@ -80,7 +80,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
         <div className="flex items-center gap-2 bg-[var(--color-brand-accent)] rounded-full px-1.5 py-1 shadow-sm" onClick={e => e.stopPropagation()}>
           <button 
             onClick={(e) => handleRemoveFast(e, cartItem.cartItemId, cartItem.quantity)}
-            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-[var(--color-brand-dark)]/10 rounded-full hover:bg-[var(--color-brand-dark)]/20 transition-colors"
           >
             <Minus className="w-3.5 h-3.5 font-bold" />
           </button>
@@ -95,7 +95,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
           </motion.span>
           <button 
             onClick={(e) => handleIncrementFast(e, cartItem.cartItemId)}
-            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-black/10 rounded-full hover:bg-black/20 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-[var(--color-brand-dark)]/10 rounded-full hover:bg-[var(--color-brand-dark)]/20 transition-colors"
           >
             <Plus className="w-3.5 h-3.5 font-bold" />
           </button>
@@ -264,7 +264,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
 
       {/* Product Details Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center">
+        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-[var(--color-brand-black)]/60 backdrop-blur-sm sm:items-center">
           {/* Click to close area */}
           <div className="absolute inset-0" onClick={() => setIsModalOpen(false)}></div>
           
