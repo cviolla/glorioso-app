@@ -51,11 +51,7 @@ export default function OrdersPage() {
     setSearched(true);
     try {
       const { data, error } = await supabase
-        .from('orders')
-        .select('id, created_at, status, total_price, delivery_type, items')
-        .in('id', idsToSearch)
-        .order('created_at', { ascending: false })
-        .limit(10);
+        .rpc('get_public_orders', { order_ids: idsToSearch });
 
       if (error) throw error;
       setOrders(data || []);
