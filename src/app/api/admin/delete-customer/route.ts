@@ -54,42 +54,45 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (fetchError) {
-      return NextResponse.json({ error: 'Erro ao buscar cliente: ' + fetchError.message }, { status: 500 });
+      return NextResponse.json({ error: 'Erro de busca: ' + fetchError.message }, { status: 500 });
     }
 
     if (!customer) {
-      return NextResponse.json({ error: 'Cliente não encontrado' }, { status: 404 });
+      return NextResponse.json({ error: 'Cliente não encontrado no banco' }, { status: 404 });
     }
 
-    // A. Se tiver user_id, deletar da autenticação do Supabase
-    if (customer.user_id) {
-      try {
-        const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(customer.user_id);
-        if (authDeleteError) {
-          console.error('Erro ao deletar usuário Auth:', authDeleteError);
-        }
-      } catch (e) {
-        console.error('Exceção ao deletar usuário Auth:', e);
-      }
-    }
-
-    // B. Deletar da tabela customers usando o telefone como chave
+    // A. Deletar da tabela customers PRIMEIRO
+    // Se houver restrição de FK, isso vai falhar e nos dizer o motivo
     const { error: dbDeleteError } = await supabaseAdmin
       .from('customers')
       .delete()
       .eq('phone', phone);
 
     if (dbDeleteError) {
+      // Se o erro for de Foreign Key, vamos dar uma mensagem clara
+      if (dbDeleteError.code === '23503') {
+        return NextResponse.json({ 
+          error: 'Não é possível excluir este cliente porque ele possui pedidos vinculados. Remova ou altere os pedidos primeiro.' 
+        }, { status: 400 });
+      }
       return NextResponse.json({ error: 'Erro ao excluir no banco: ' + dbDeleteError.message }, { status: 500 });
+    }
+
+    // B. Se a exclusão no banco deu certo, e ele tiver user_id, deletar da autenticação
+    if (customer.user_id) {
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(customer.user_id);
+      } catch (e) {
+        console.error('Erro (não crítico) ao deletar usuário Auth:', e);
+      }
     }
 
     return NextResponse.json({ success: true, message: 'Cliente excluído com sucesso' });
 
   } catch (error: any) {
-    console.error('Erro fatal na API de exclusão:', error);
+    console.error('Erro fatal:', error);
     return NextResponse.json({ 
-      error: 'Erro interno do servidor', 
-      details: error.message || 'Desconhecido' 
+      error: 'Erro crítico: ' + (error.message || 'Desconhecido') 
     }, { status: 500 });
   }
 }
