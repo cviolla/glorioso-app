@@ -232,23 +232,23 @@ export default function OrdersPage() {
       <main className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
         
         {!user && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#532120] text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#532120] text-white p-6 rounded-2xl shadow-lg relative overflow-hidden flex flex-col items-center text-center">
             <div className="absolute right-[-20px] top-[-20px] opacity-10">
               <Star className="w-32 h-32 fill-current" />
             </div>
-            <div className="relative z-10">
-              <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+            <div className="relative z-10 w-full flex flex-col items-center">
+              <h3 className="font-bold text-xl mb-2 flex items-center gap-2 justify-center">
                 <Star className="w-5 h-5 text-[#ff914a] fill-[#ff914a]" /> Crie sua conta!
               </h3>
-              <p className="text-sm text-white/80 mb-5 leading-relaxed">
-                Crie uma conta rápida com celular e senha pra acessar seu histórico.
+              <p className="text-sm text-white/80 mb-6 leading-relaxed max-w-sm">
+                Crie uma conta rápida com celular e senha pra acessar seu histórico no Glorioso Brownie.
               </p>
-              <div className="flex flex-wrap gap-3">
-                <button onClick={() => { setAuthMode('register'); setShowAuthModal(true); }} className="bg-[#ff914a] text-[#381010] font-bold px-6 py-2.5 rounded-xl shadow-md hover:scale-105 transition-transform text-sm">
+              <div className="flex flex-row flex-wrap gap-3 justify-center w-full">
+                <button onClick={() => { setAuthMode('register'); setShowAuthModal(true); }} className="bg-[#ff914a] text-[#381010] font-bold px-6 py-3 rounded-xl shadow-md hover:scale-105 transition-transform text-sm whitespace-nowrap">
                   Crie sua conta aqui!
                 </button>
-                <button onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm">
-                  Já tenho conta (Entrar)
+                <button onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold px-6 py-3 rounded-xl transition-colors text-sm whitespace-nowrap">
+                  Entrar na conta
                 </button>
               </div>
             </div>
