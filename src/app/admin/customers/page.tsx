@@ -22,6 +22,7 @@ export default function CustomersPage() {
   const [newPassword, setNewPassword] = useState("");
   const [isResetting, setIsResetting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [onlyRegistered, setOnlyRegistered] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -107,10 +108,12 @@ export default function CustomersPage() {
     }
   };
 
-  const filteredCustomers = customers.filter(c => 
-    c.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    c.phone?.includes(searchTerm)
-  );
+  const filteredCustomers = customers.filter(c => {
+    const matchesSearch = c.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         c.phone?.includes(searchTerm);
+    const matchesFilter = onlyRegistered ? c.user_id !== null : true;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <div className="space-y-6 pb-12">
@@ -122,15 +125,25 @@ export default function CustomersPage() {
           <p className="text-sm text-gray-500">Gerencie perfis e acessos dos seus clientes.</p>
         </div>
 
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar por nome ou telefone..."
-            className="pl-10 pr-4 py-2.5 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#ff914a] bg-white shadow-sm w-full md:w-72 text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-xl border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+               onClick={() => setOnlyRegistered(!onlyRegistered)}>
+            <div className={`w-8 h-4 rounded-full relative transition-colors ${onlyRegistered ? 'bg-[#ff914a]' : 'bg-gray-200'}`}>
+              <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${onlyRegistered ? 'left-[1.15rem]' : 'left-0.5'}`} />
+            </div>
+            <span className="text-xs font-bold text-gray-600 whitespace-nowrap">Apenas cadastrados</span>
+          </div>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nome ou telefone..."
+              className="pl-10 pr-4 py-2.5 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#ff914a] bg-white shadow-sm w-full md:w-72 text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </header>
 
@@ -160,9 +173,15 @@ export default function CustomersPage() {
                     <div className="flex items-center gap-2 mb-0.5">
                       <h3 className="font-bold text-[#381010] truncate text-sm" title={customer.name}>{customer.name || 'Sem nome'}</h3>
                       {customer.user_id ? (
-                        <span className="bg-green-100 text-green-600 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shrink-0">Logado</span>
+                        <div className="flex items-center gap-1 bg-green-50 text-green-600 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shrink-0 border border-green-100">
+                          <CheckCircle2 className="w-2 h-2" />
+                          Cadastrado
+                        </div>
                       ) : (
-                        <span className="bg-gray-100 text-gray-400 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shrink-0">Anônimo</span>
+                        <div className="flex items-center gap-1 bg-gray-50 text-gray-400 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shrink-0 border border-gray-100">
+                          <UserIcon className="w-2 h-2" />
+                          Convidado
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-gray-500">
