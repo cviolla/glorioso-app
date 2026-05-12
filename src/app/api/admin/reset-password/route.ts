@@ -21,7 +21,9 @@ export async function POST(request: Request) {
 
   const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
 
-  if (authError || !user) {
+  const isAdmin = user?.email?.startsWith('admin.') || user?.email?.endsWith('@glorioso.com');
+
+  if (authError || !user || !isAdmin) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
   }
 

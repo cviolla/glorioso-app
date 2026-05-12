@@ -62,6 +62,13 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const { data: { user } } = await supabase.auth.getUser();
 
+  // 🛡️ Fail-safe: Verificar se é admin no servidor
+  const isAdmin = user?.email?.startsWith('admin.') || user?.email?.endsWith('@glorioso.com');
+  
+  if (!isAdmin) {
+    redirect('/');
+  }
+
   return (
     <AdminSidebar>
       <CopyProtection />

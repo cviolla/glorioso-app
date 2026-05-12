@@ -56,15 +56,20 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Proteger rotas /admin
-  if (request.nextUrl.pathname.startsWith('/admin') && !request.nextUrl.pathname.includes('/admin/login')) {
-    if (!user) {
+  // 🔒 REGRA DE OURO: Proteger rotas /admin
+  const isAdmin = user?.email?.startsWith('admin.') || user?.email?.endsWith('@glorioso.com');
+  const isPathAdmin = request.nextUrl.pathname.startsWith('/admin');
+  const isLoginPage = request.nextUrl.pathname.includes('/admin/login');
+
+  if (isPathAdmin && !isLoginPage) {
+    if (!user || !isAdmin) {
+      console.log('🛑 [Middleware] Acesso negado para:', user?.email || 'Anônimo');
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }
 
-  // Se já logado, não deixa ir pro login
-  if (request.nextUrl.pathname === '/admin/login' && user) {
+  // Se já logado como admin, não deixa ir pro login
+  if (isLoginPage && user && isAdmin) {
     return NextResponse.redirect(new URL('/admin/orders', request.url))
   }
 
@@ -72,5 +77,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/admin'],
 }
