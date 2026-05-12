@@ -245,7 +245,7 @@ export default function OrdersPage() {
                   onClick={() => { setAuthMode('register'); setShowAuthModal(true); }} 
                   className="bg-[#ff914a] text-[#381010] font-bold px-4 py-2.5 rounded-xl shadow-md hover:scale-105 transition-transform text-xs sm:text-sm flex-1"
                 >
-                  Crie sua conta aqui!
+                  Crie sua conta!
                 </button>
                 <button 
                   onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} 
