@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { ArrowLeft, Package, Clock, CheckCircle, XCircle, RefreshCw, Cloud, LogOut, Phone, Mail, Lock } from "lucide-react";
+import { ArrowLeft, Package, Clock, CheckCircle, XCircle, RefreshCw, Star, LogOut, Phone, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -234,18 +234,23 @@ export default function OrdersPage() {
         {!user && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#532120] text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
             <div className="absolute right-[-20px] top-[-20px] opacity-10">
-              <Cloud className="w-32 h-32" />
+              <Star className="w-32 h-32 fill-current" />
             </div>
             <div className="relative z-10">
               <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
-                <Cloud className="w-5 h-5 text-[#ff914a]" /> Crie sua conta!
+                <Star className="w-5 h-5 text-[#ff914a] fill-[#ff914a]" /> Crie sua conta!
               </h3>
-              <p className="text-sm text-white/80 mb-4 leading-relaxed">
+              <p className="text-sm text-white/80 mb-5 leading-relaxed">
                 Crie uma conta rápida com celular e senha pra acessar seu histórico.
               </p>
-              <button onClick={() => setShowAuthModal(true)} className="bg-[#ff914a] text-[#381010] font-bold px-6 py-2.5 rounded-xl shadow-md hover:scale-105 transition-transform text-sm">
-                Crie sua conta aqui!
-              </button>
+              <div className="flex flex-wrap gap-3">
+                <button onClick={() => { setAuthMode('register'); setShowAuthModal(true); }} className="bg-[#ff914a] text-[#381010] font-bold px-6 py-2.5 rounded-xl shadow-md hover:scale-105 transition-transform text-sm">
+                  Crie sua conta aqui!
+                </button>
+                <button onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold px-6 py-2.5 rounded-xl transition-colors text-sm">
+                  Já tenho conta (Entrar)
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
