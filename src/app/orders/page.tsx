@@ -403,7 +403,7 @@ export default function OrdersPage() {
                   {authMode === 'login' && loginAttempts >= 5 ? (
                     <button 
                       type="button" 
-                      onClick={() => window.open('https://wa.me/5521990062956?text=Olá! Esqueci minha senha no site e gostaria de resetar.')}
+                      onClick={() => window.open('https://wa.me/5521990062956?text=Olá! Esqueci minha senha no app. Pode me ajudar?')}
                       className="w-full bg-amber-500 text-white font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 hover:bg-amber-600 transition-colors mt-4 shadow-lg shadow-amber-500/20"
                     >
                       Esqueci minha Senha
