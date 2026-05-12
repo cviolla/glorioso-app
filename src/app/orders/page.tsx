@@ -138,27 +138,61 @@ export default function OrdersPage() {
     setAuthLoading(true);
     setAuthError('');
     try {
+      const phoneDigits = authForm.phone.replace(/\D/g, '');
+      if (phoneDigits.length < 10) {
+        throw new Error('Telefone inválido.');
+      }
+
+      // Criamos um email virtual baseado no telefone para o Supabase Auth
+      const virtualEmail = `${phoneDigits}@gloriosobrownie.internal`;
+
       if (authMode === 'register') {
-        if (!authForm.email || !authForm.password || authForm.phone.replace(/\D/g, '').length < 13) {
-          throw new Error('Preencha todos os campos corretamente.');
+        if (!authForm.password) {
+          throw new Error('Defina uma senha.');
         }
+        
         const { data, error } = await supabase.auth.signUp({
-          email: authForm.email,
+          email: virtualEmail,
           password: authForm.password,
-          options: { data: { phone: authForm.phone } }
+          options: { 
+            data: { 
+              phone: authForm.phone,
+              display_phone: authForm.phone 
+            } 
+          }
         });
-        if (error) throw error;
+
+        if (error) {
+          if (error.message.includes('User already registered')) {
+            throw new Error('Este telefone já possui conta. Tente entrar.');
+          }
+          throw error;
+        }
+
         if (data.user) {
-          await supabase.from('customers').upsert({ phone: authForm.phone, email: authForm.email, user_id: data.user.id }, { onConflict: 'phone' });
+          // Salvar na tabela de clientes vinculando o user_id
+          await supabase.from('customers').upsert({ 
+            phone: authForm.phone, 
+            email: virtualEmail, // Guardamos o virtual para referência
+            user_id: data.user.id 
+          }, { onConflict: 'phone' });
+          
           await handleLinkOrders(data.user.id);
           setShowAuthModal(false);
         }
       } else {
-        const { data: customerData, error: customerError } = await supabase.from('customers').select('email').eq('phone', authForm.phone).single();
-        if (customerError || !customerData?.email) throw new Error('Telefone não encontrado. Verifique se você já tem conta.');
-        
-        const { data, error } = await supabase.auth.signInWithPassword({ email: customerData.email, password: authForm.password });
-        if (error) throw new Error('Senha incorreta.');
+        const { data, error } = await supabase.auth.signInWithPassword({ 
+          email: virtualEmail, 
+          password: authForm.password 
+        });
+
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('Telefone ou senha incorretos.');
+          }
+          throw error;
+        }
+
         if (data.user) {
           await handleLinkOrders(data.user.id);
           setShowAuthModal(false);
@@ -343,15 +377,7 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
-                  {authMode === 'register' && (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                      <label className="text-sm font-bold text-[#381010] mb-1 block mt-4">E-mail (Para recuperar senha)</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><Mail className="w-5 h-5 text-gray-400" /></div>
-                        <input type="email" placeholder="seu@email.com" required className="w-full border border-gray-300 rounded-xl py-3 pl-10 pr-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white transition-all" value={authForm.email} onChange={e => setAuthForm({...authForm, email: e.target.value})} />
-                      </div>
-                    </motion.div>
-                  )}
+                  {/* E-mail removido a pedido do usuário para simplificar */}
 
                   <div className={authMode === 'register' ? 'mt-4' : ''}>
                     <label className="text-sm font-bold text-[#381010] mb-1 block">Senha</label>
