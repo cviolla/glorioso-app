@@ -113,7 +113,7 @@ export default function OrderPrintPage({ params, searchParams }: PageProps) {
       {/* Preview do recibo térmico */}
       <div className="py-8 flex justify-center print:p-0 print:m-0 print:block">
         <div className="bg-white shadow-2xl rounded-lg overflow-hidden print:shadow-none print:rounded-none">
-          <InvoicePrint order={order as any} mode={printMode as any} />
+          <InvoicePrint order={order} mode={printMode} />
         </div>
       </div>
     </div>

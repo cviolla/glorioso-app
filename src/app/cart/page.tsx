@@ -121,6 +121,7 @@ export default function CartPage() {
 
   const [prevTotal, setPrevTotal] = useState(finalTotal);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (isHydrated && paymentMethods.length > 0) {
       if (splitPayments.length === 0) {

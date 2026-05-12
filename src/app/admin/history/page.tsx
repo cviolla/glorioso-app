@@ -111,6 +111,7 @@ export default function AdminHistoryPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchHistory(true);
   }, [fetchHistory]);

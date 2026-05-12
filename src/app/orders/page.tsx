@@ -30,17 +30,6 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  useEffect(() => {
-    setIsHydrated(true);
-    const savedIds = JSON.parse(localStorage.getItem("glorioso_tracked_orders") || "[]");
-    if (savedIds && savedIds.length > 0) {
-      setTrackedIds(savedIds);
-      fetchOrders(savedIds);
-    } else {
-      setSearched(true);
-    }
-  }, []);
-
   const fetchOrders = async (idsToSearch: string[]) => {
     if (!idsToSearch || idsToSearch.length === 0) {
       setSearched(true);
@@ -61,6 +50,17 @@ export default function OrdersPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setIsHydrated(true);
+    const savedIds = JSON.parse(localStorage.getItem("glorioso_tracked_orders") || "[]");
+    if (savedIds && savedIds.length > 0) {
+      setTrackedIds(savedIds);
+      fetchOrders(savedIds);
+    } else {
+      setSearched(true);
+    }
+  }, []);
 
   const getStatusConfig = (status: Order['status']) => {
     switch (status) {
