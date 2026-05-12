@@ -181,8 +181,10 @@ export function ProductCard({ item }: { item: MenuItem }) {
   const addonsPrice = item.addons?.filter(a => selectedAddons.includes(a.name)).reduce((sum, a) => sum + a.price, 0) || 0;
   const totalModalPrice = (currentModalPrice + addonsPrice) * quantity;
 
+  const [imageError, setImageError] = useState(false);
+
   const getValidImageUrl = (url?: string) => {
-    if (!url || typeof url !== 'string') return "/glorioso-brownie.png";
+    if (imageError || !url || typeof url !== 'string') return "/glorioso-brownie.png";
     const cleanUrl = url.trim();
     if (cleanUrl === "" || cleanUrl === "null" || cleanUrl === "undefined") return "/glorioso-brownie.png";
     return cleanUrl;
@@ -219,6 +221,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                 sizes="96px"
+                onError={() => setImageError(true)}
               />
             </motion.div>
             <AnimatePresence>
@@ -298,6 +301,9 @@ export function ProductCard({ item }: { item: MenuItem }) {
                   alt={item.name}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 448px"
+                  onError={() => setImageError(true)}
+                  priority
                 />
               </div>
 

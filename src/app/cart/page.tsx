@@ -443,8 +443,11 @@ export default function CartPage() {
     }
   };
 
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+
   // Garante que a imagem é válida, caso contrário usa o fallback
-  const getValidImageUrl = (url?: string) => {
+  const getValidImageUrl = (url?: string, itemId?: string) => {
+    if (itemId && imageErrors[itemId]) return "/glorioso-brownie.png";
     if (!url || typeof url !== 'string') return "/glorioso-brownie.png";
     const cleanUrl = url.trim();
     if (cleanUrl === "" || cleanUrl === "null" || cleanUrl === "undefined") return "/glorioso-brownie.png";
@@ -504,10 +507,11 @@ export default function CartPage() {
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-16 h-16 shrink-0 overflow-hidden relative rounded-xl border border-white/10">
                            <Image 
-                             src={getValidImageUrl(item.imageUrl)} 
+                             src={getValidImageUrl(item.imageUrl, item.cartItemId)} 
                              alt={item.name} 
                              fill 
                              className="object-cover" 
+                             onError={() => setImageErrors(prev => ({ ...prev, [item.cartItemId]: true }))}
                            />
                         </div>
                         <div className="flex-1">

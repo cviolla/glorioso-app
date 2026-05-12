@@ -638,14 +638,32 @@ export default function AdminProductsPage() {
 }
 
 function ProductListItem({ item, onEdit, onDelete, onToggleVisibility }: { item: MenuItem, onEdit: () => void, onDelete: () => void, onToggleVisibility: () => void }) {
+  const [imageError, setImageError] = useState(false);
+  const displayImage = imageError || !item.imageUrl ? null : item.imageUrl;
+
   return (
     <div className={`flex items-center justify-between p-2.5 bg-white hover:bg-[var(--color-brand-light)]/30 rounded-xl transition-all group border shadow-sm ${!item.is_active ? 'opacity-60 grayscale-[0.5]' : 'border-gray-50 hover:border-gray-100'}`}>
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-gray-50 rounded-lg overflow-hidden shrink-0 flex items-center justify-center relative border border-gray-100">
-          {item.imageUrl ? (
-            <Image src={item.imageUrl} alt={item.name} fill sizes="48px" className="object-cover group-hover:scale-110 transition-transform duration-500" />
+          {displayImage ? (
+            <Image 
+              src={displayImage} 
+              alt={item.name} 
+              fill 
+              sizes="48px" 
+              className="object-cover group-hover:scale-110 transition-transform duration-500" 
+              onError={() => setImageError(true)}
+            />
           ) : (
-            <ImageIcon className="w-5 h-5 text-gray-300" />
+            <div className="w-full h-full flex items-center justify-center bg-[#f8ece3]">
+              <Image 
+                src="/glorioso-brownie.png" 
+                alt="Fallback" 
+                width={24} 
+                height={24} 
+                className="opacity-40 grayscale"
+              />
+            </div>
           )}
           {!item.is_active && (
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
