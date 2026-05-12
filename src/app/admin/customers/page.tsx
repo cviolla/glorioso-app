@@ -82,17 +82,20 @@ export default function CustomersPage() {
     setIsDeleting(true);
 
     try {
-      const { error } = await supabase
-        .from('customers')
-        .delete()
-        .eq('id', customerToDelete.id);
+      const response = await fetch('/api/admin/delete-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId: customerToDelete.id })
+      });
 
-      if (error) throw error;
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || 'Erro ao excluir cliente');
 
       setCustomers(prev => prev.filter(c => c.id !== customerToDelete.id));
       setCustomerToDelete(null);
-    } catch (error) {
-      alert("Erro ao excluir cliente.");
+    } catch (error: any) {
+      alert(error.message || "Erro ao excluir cliente.");
     } finally {
       setIsDeleting(false);
     }
