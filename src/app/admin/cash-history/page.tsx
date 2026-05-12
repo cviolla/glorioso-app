@@ -51,6 +51,7 @@ interface CashSession {
   opened_at: string;
   closed_at: string | null;
   total: number;
+  totalsByPaymentMethod?: Record<string, number>;
   count: number;
   orders: Order[];
 }
@@ -92,11 +93,37 @@ export default function AdminCashHistoryPage() {
           const { data: orders, error: ordersError } = await query.order('created_at', { ascending: false });
           if (ordersError) throw ordersError;
 
-          const total = (orders || []).reduce((sum, o) => sum + Number(o.total_price), 0);
+          const totalsByPaymentMethod: Record<string, number> = {};
+          const total = (orders || []).reduce((sum, o) => {
+            const orderTotal = Number(o.total_price);
+            const rawMethod = o.payment_method || 'OUTRO';
+
+            if (rawMethod.includes(': R$')) {
+              const parts = rawMethod.split('|');
+              parts.forEach(part => {
+                const [methodPart, valuePart] = part.split(': R$');
+                if (methodPart && valuePart) {
+                  const method = methodPart.trim().toUpperCase();
+                  // Handles typical BR formatting, e.g. "1.250,00" -> "1250.00" or "50,00" -> "50.00"
+                  const valueStr = valuePart.trim().replace(/\./g, '').replace(',', '.');
+                  const value = parseFloat(valueStr);
+                  if (!isNaN(value) && value > 0) {
+                    totalsByPaymentMethod[method] = (totalsByPaymentMethod[method] || 0) + value;
+                  }
+                }
+              });
+            } else {
+              const method = rawMethod.trim().toUpperCase();
+              totalsByPaymentMethod[method] = (totalsByPaymentMethod[method] || 0) + orderTotal;
+            }
+
+            return sum + orderTotal;
+          }, 0);
           
           return {
             ...session,
             total,
+            totalsByPaymentMethod,
             count: (orders || []).length,
             orders: orders || []
           };
@@ -226,6 +253,21 @@ export default function AdminCashHistoryPage() {
                       <p className="text-2xl font-black text-[#ff914a]">R$ {selectedSession.total.toFixed(2).replace('.', ',')}</p>
                     </div>
                   </div>
+
+                  {selectedSession.totalsByPaymentMethod && Object.keys(selectedSession.totalsByPaymentMethod).length > 0 && (
+                    <div className="relative z-10 mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-5 justify-end">
+                      <div className="flex flex-col items-end border-r border-white/10 pr-5">
+                        <span className="text-white/40 text-[8.5px] font-black uppercase tracking-widest">Pedidos</span>
+                        <span className="text-white text-sm font-black">{selectedSession.count}</span>
+                      </div>
+                      {Object.entries(selectedSession.totalsByPaymentMethod).map(([method, amount]) => (
+                        <div key={method} className="flex flex-col items-end">
+                          <span className="text-white/40 text-[8.5px] font-black uppercase tracking-widest">{method}</span>
+                          <span className="text-white text-sm font-black">R$ {amount.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="p-5">
@@ -316,19 +358,18 @@ export default function AdminCashHistoryPage() {
               transition={{ type: 'spring', damping: 30, stiffness: 250 }}
               className="bg-white rounded-t-2xl w-full shadow-[0_-15px_50px_rgba(0,0,0,0.4)] fixed top-[12dvh] bottom-0 left-0 right-0 flex flex-col overflow-hidden"
             >
-              <div className="flex justify-center pt-2 pb-1 bg-[var(--color-brand-dark)]">
-                <div className="w-10 h-1 rounded-full bg-white/10" />
-              </div>
-              
-              <div className="bg-[var(--color-brand-dark)] px-4 pb-4 text-white relative shrink-0">
+              <div className="flex justify-center pt-3 pb-2 bg-[var(--color-brand-dark)] relative">
+                <div className="w-10 h-1 rounded-full bg-white/20 mt-1" />
                 <button 
                   onClick={() => setSelectedSession(null)}
-                  className="absolute right-3 top-0 p-2 text-white/30 hover:text-white transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-white/40 hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
-
-                <div className="flex justify-between items-start relative z-10 pt-2">
+              </div>
+              
+              <div className="bg-[var(--color-brand-dark)] px-4 pb-4 text-white relative shrink-0">
+                <div className="flex justify-between items-start relative z-10">
                   <div>
                     <h2 className="text-[13px] font-black tracking-tight leading-tight">
                       Ab: {formatDate(selectedSession.opened_at)}
@@ -347,12 +388,20 @@ export default function AdminCashHistoryPage() {
                   </div>
                 </div>
 
-                <div className="mt-3 flex gap-2">
-                  <div className="px-3 h-9 bg-white/5 rounded-xl flex flex-col items-center justify-center border border-white/5 flex-1">
-                    <span className="text-[7.5px] text-white/40 font-black uppercase tracking-widest mb-0.5">PEDIDOS</span>
-                    <span className="text-[11px] font-black text-white">{selectedSession.count}</span>
+                {selectedSession.totalsByPaymentMethod && Object.keys(selectedSession.totalsByPaymentMethod).length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap gap-2 relative z-10">
+                    <div className="flex flex-col items-start bg-white/5 p-1.5 px-2 rounded-lg flex-1 min-w-[30%]">
+                      <span className="text-white/40 text-[7px] font-black uppercase tracking-widest">PEDIDOS</span>
+                      <span className="text-white text-[11px] font-black">{selectedSession.count}</span>
+                    </div>
+                    {Object.entries(selectedSession.totalsByPaymentMethod).map(([method, amount]) => (
+                      <div key={method} className="flex flex-col items-start bg-white/5 p-1.5 px-2 rounded-lg flex-1 min-w-[30%]">
+                        <span className="text-white/40 text-[7px] font-black uppercase tracking-widest truncate max-w-[85px]">{method}</span>
+                        <span className="text-white text-[11px] font-black">R$ {amount.toFixed(2).replace('.', ',')}</span>
+                      </div>
+                    ))}
                   </div>
-                </div>
+                )}
               </div>
 
               <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50/50">
