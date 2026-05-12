@@ -88,7 +88,13 @@ export default function CustomersPage() {
         body: JSON.stringify({ phone: customerToDelete.phone })
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error("O servidor retornou uma resposta inválida. O deploy pode ainda estar em andamento.");
+      }
 
       if (!response.ok) throw new Error(data.error || 'Erro ao excluir cliente');
 
