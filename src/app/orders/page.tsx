@@ -24,7 +24,7 @@ type Order = {
 };
 
 export default function OrdersPage() {
-  const [phone, setPhone] = useState("");
+  const [trackedIds, setTrackedIds] = useState<string[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,33 +32,20 @@ export default function OrdersPage() {
 
   useEffect(() => {
     setIsHydrated(true);
-    const savedPhone = localStorage.getItem("@glorioso:phone");
-    if (savedPhone) {
-      setPhone(savedPhone);
-      fetchOrders(savedPhone);
+    const savedIds = JSON.parse(localStorage.getItem("glorioso_tracked_orders") || "[]");
+    if (savedIds && savedIds.length > 0) {
+      setTrackedIds(savedIds);
+      fetchOrders(savedIds);
+    } else {
+      setSearched(true);
     }
   }, []);
 
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '');
-    let number = digits;
-    if (digits.startsWith('5521')) number = digits.slice(4);
-    else if (digits.startsWith('21')) number = digits.slice(2);
-    
-    number = number.slice(0, 9);
-
-    if (number.length <= 5) return `+55 (21) ${number}`;
-    return `+55 (21) ${number.slice(0, 5)}-${number.slice(5)}`;
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhone(e.target.value);
-    setPhone(formatted);
-  };
-
-  const fetchOrders = async (phoneToSearch: string) => {
-    const cleanPhone = phoneToSearch.replace(/\D/g, '');
-    if (cleanPhone.length < 12) return;
+  const fetchOrders = async (idsToSearch: string[]) => {
+    if (!idsToSearch || idsToSearch.length === 0) {
+      setSearched(true);
+      return;
+    }
 
     setIsLoading(true);
     setSearched(true);
@@ -66,13 +53,12 @@ export default function OrdersPage() {
       const { data, error } = await supabase
         .from('orders')
         .select('id, created_at, status, total_price, delivery_type, items')
-        .eq('customer_phone', phoneToSearch)
+        .in('id', idsToSearch)
         .order('created_at', { ascending: false })
         .limit(10);
 
       if (error) throw error;
       setOrders(data || []);
-      localStorage.setItem("@glorioso:phone", phoneToSearch);
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
     } finally {
@@ -100,9 +86,10 @@ export default function OrdersPage() {
 
   // Setup Realtime Subscription and Auto-refresh
   useEffect(() => {
-    if (!phone) return;
+    if (trackedIds.length === 0) return;
 
     // Realtime Supabase
+    const filterString = `id=in.(${trackedIds.join(',')})`;
     const channel = supabase
       .channel('orders-updates')
       .on(
@@ -111,11 +98,11 @@ export default function OrdersPage() {
           event: '*',
           schema: 'public',
           table: 'orders',
-          filter: `customer_phone=eq.${phone}`
+          filter: filterString
         },
         () => {
           // Atualiza a lista quando houver mudança num pedido em realtime
-          fetchOrders(phone);
+          fetchOrders(trackedIds);
         }
       )
       .subscribe();
@@ -125,7 +112,7 @@ export default function OrdersPage() {
     let interval: NodeJS.Timeout;
     if (hasActiveOrders) {
       interval = setInterval(() => {
-        fetchOrders(phone);
+        fetchOrders(trackedIds);
       }, 30000);
     }
 
@@ -133,7 +120,7 @@ export default function OrdersPage() {
       supabase.removeChannel(channel);
       if (interval) clearInterval(interval);
     };
-  }, [orders, phone]);
+  }, [orders, trackedIds]);
 
   if (!isHydrated) return null;
 
@@ -147,29 +134,21 @@ export default function OrdersPage() {
       </header>
 
       <main className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <h2 className="font-bold text-[#381010] mb-3">Acompanhe seu pedido</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Digite seu WhatsApp para ver o status dos seus pedidos recentes.
-          </p>
-          
-          <div className="flex gap-2">
-            <input 
-              type="tel" 
-              placeholder="99999-9999" 
-              className="flex-1 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#ff914a] focus:ring-1 focus:ring-[#ff914a] text-[#381010] bg-white text-[16px] transition-all"
-              value={phone}
-              onChange={handlePhoneChange}
-              onKeyDown={(e) => e.key === 'Enter' && fetchOrders(phone)}
-            />
-            <button 
-              onClick={() => fetchOrders(phone)}
-              disabled={isLoading || phone.replace(/\D/g, '').length < 12}
-              className="bg-[#532120] text-white px-5 rounded-xl font-bold flex items-center justify-center disabled:opacity-50 transition-colors"
-            >
-              {isLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
-            </button>
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 className="font-bold text-[#381010] mb-1">Acompanhamento Ativo</h2>
+            <p className="text-sm text-gray-600">
+              Seus pedidos recentes neste dispositivo.
+            </p>
           </div>
+          <button 
+            onClick={() => fetchOrders(trackedIds)}
+            disabled={isLoading || trackedIds.length === 0}
+            className="bg-[#532120]/10 text-[#532120] p-3 rounded-xl font-bold flex items-center justify-center disabled:opacity-50 transition-colors hover:bg-[#532120]/20"
+            aria-label="Atualizar pedidos"
+          >
+            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
         <AnimatePresence mode="popLayout">
@@ -183,9 +162,9 @@ export default function OrdersPage() {
               <div className="w-16 h-16 bg-[#532120]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Package className="w-8 h-8 text-[#532120]/40" />
               </div>
-              <h3 className="font-bold text-[#381010] mb-2">Nenhum pedido encontrado</h3>
+              <h3 className="font-bold text-[#381010] mb-2">Nenhum pedido recente</h3>
               <p className="text-sm text-gray-500">
-                Não encontramos pedidos para este número nos últimos dias.
+                Não encontramos pedidos recentes feitos por este aparelho.
               </p>
             </motion.div>
           )}

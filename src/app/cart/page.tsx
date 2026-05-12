@@ -376,6 +376,15 @@ export default function CartPage() {
 
         if (error) throw error;
         
+        // Salva o ID do pedido no rastreio por dispositivo (Opção 1 de blindagem)
+        const trackedOrders = JSON.parse(localStorage.getItem('glorioso_tracked_orders') || '[]');
+        if (!trackedOrders.includes(newOrderId)) {
+          trackedOrders.push(newOrderId);
+          // Manter no máximo os últimos 10 pedidos no rastreio para não encher o storage
+          if (trackedOrders.length > 10) trackedOrders.shift();
+          localStorage.setItem('glorioso_tracked_orders', JSON.stringify(trackedOrders));
+        }
+
         clearCart();
         router.push('/orders');
       } catch (e) {
