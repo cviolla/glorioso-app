@@ -118,8 +118,11 @@ export default function OrdersPage() {
 
   const handleLinkOrders = async (userId: string) => {
     if (trackedIds.length > 0) {
-      // Ignorar erros caso RLS bloqueie sem estar configurado corretamente
-      await supabase.from('orders').update({ user_id: userId }).in('id', trackedIds).catch(console.error);
+      try {
+        await supabase.from('orders').update({ user_id: userId }).in('id', trackedIds);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
