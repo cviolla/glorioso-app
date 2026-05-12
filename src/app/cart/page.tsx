@@ -506,13 +506,14 @@ export default function CartPage() {
                     return (
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-16 h-16 shrink-0 overflow-hidden relative rounded-xl border border-white/10">
-                           <Image 
-                             src={getValidImageUrl(item.imageUrl, item.cartItemId)} 
-                             alt={item.name} 
-                             fill 
-                             className="object-cover" 
-                             onError={() => setImageErrors(prev => ({ ...prev, [item.cartItemId]: true }))}
-                           />
+                             <Image 
+                               src={getValidImageUrl(item.imageUrl, item.cartItemId)} 
+                               alt={item.name} 
+                               fill 
+                               className="object-cover" 
+                               sizes="64px"
+                               onError={() => setImageErrors(prev => ({ ...prev, [item.cartItemId]: true }))}
+                             />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-[15px] leading-tight mb-1">{item.name}</h3>
