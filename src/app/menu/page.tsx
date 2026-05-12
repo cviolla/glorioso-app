@@ -191,12 +191,15 @@ export default function MenuPage() {
                 key={category.id}
                 id={`nav-btn-${category.id}`}
                 onClick={() => scrollToCategory(category.id)}
-                className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all shrink-0 ${
-                  activeCategory === category.id
-                    ? "bg-[#532120] text-[#ff914a] shadow-md scale-105"
-                    : "bg-white text-[#532120] border border-[#532120]/20 hover:bg-[#532120]/5"
-                }`}
+                className={`relative px-5 py-2.5 rounded-full text-sm font-black transition-all whitespace-nowrap active:scale-95 ${activeCategory === category.id ? 'text-[#381010]' : 'text-[#532120]/60 hover:text-[#532120]'}`}
               >
+                {activeCategory === category.id && (
+                  <motion.div 
+                    layoutId="activeCategory"
+                    className="absolute inset-0 bg-[#ff914a] rounded-full -z-10 shadow-sm shadow-[#ff914a]/20"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
                 {category.name}
               </button>
             ))}
@@ -310,14 +313,14 @@ export default function MenuPage() {
           <div className="pt-2 flex flex-col gap-10">
             {categories.map(category => (
               <div key={category.id} id={`category-${category.id}`} className="scroll-mt-24">
-                <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b-2 border-[#954e3a] pb-2">
+                <h2 className="text-2xl font-black text-[#381010] mb-6 flex items-center justify-between border-b border-[#954e3a]/30 pb-3 tracking-tighter">
                   {category.name}
                   <Image 
                     src="/glorioso-brownie.png" 
                     alt="Logo Glorioso Brownie" 
                     width={60}
                     height={20}
-                    className="h-[15px] w-auto object-contain block"
+                    className="h-[14px] w-auto object-contain opacity-40 grayscale brightness-0"
                   />
                 </h2>
 

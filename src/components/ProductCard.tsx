@@ -77,29 +77,42 @@ export function ProductCard({ item }: { item: MenuItem }) {
     
     if (cartItem && cartItem.quantity > 0) {
       return (
-        <div className="flex items-center gap-2 bg-[var(--color-brand-accent)] rounded-full px-1.5 py-1 shadow-sm" onClick={e => e.stopPropagation()}>
-          <button 
+        <motion.div 
+          layout
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="flex items-center gap-2 bg-[var(--color-brand-accent)] rounded-full px-1.5 py-1 shadow-md shadow-[var(--color-brand-accent)]/20" 
+          onClick={e => e.stopPropagation()}
+        >
+          <motion.button 
+            whileTap={{ scale: 0.85 }}
             onClick={(e) => handleRemoveFast(e, cartItem.cartItemId, cartItem.quantity)}
-            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-[var(--color-brand-dark)]/10 rounded-full hover:bg-[var(--color-brand-dark)]/20 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-white/20 rounded-full hover:bg-white/40 transition-colors shadow-sm"
           >
             <Minus className="w-3.5 h-3.5 font-bold" />
-          </button>
-          <motion.span 
-            key={cartItem.quantity}
-            initial={{ scale: 1.5 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 15 }}
-            className="text-[var(--color-brand-dark)] font-black text-xs w-3 text-center"
-          >
-            {cartItem.quantity}
-          </motion.span>
-          <button 
+          </motion.button>
+          
+          <AnimatePresence mode="wait">
+            <motion.span 
+              key={cartItem.quantity}
+              initial={{ scale: 1.5, y: -4, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.8, y: 4, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 600, damping: 15 }}
+              className="text-[var(--color-brand-dark)] font-black text-xs w-3 text-center"
+            >
+              {cartItem.quantity}
+            </motion.span>
+          </AnimatePresence>
+
+          <motion.button 
+            whileTap={{ scale: 0.85 }}
             onClick={(e) => handleIncrementFast(e, cartItem.cartItemId)}
-            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-[var(--color-brand-dark)]/10 rounded-full hover:bg-[var(--color-brand-dark)]/20 transition-colors"
+            className="w-6 h-6 flex items-center justify-center text-[var(--color-brand-dark)] bg-white/20 rounded-full hover:bg-white/40 transition-colors shadow-sm"
           >
             <Plus className="w-3.5 h-3.5 font-bold" />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       );
     }
 
