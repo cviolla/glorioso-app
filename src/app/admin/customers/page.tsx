@@ -85,14 +85,14 @@ export default function CustomersPage() {
       const response = await fetch('/api/admin/delete-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerId: customerToDelete.id })
+        body: JSON.stringify({ phone: customerToDelete.phone })
       });
 
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || 'Erro ao excluir cliente');
 
-      setCustomers(prev => prev.filter(c => c.id !== customerToDelete.id));
+      setCustomers(prev => prev.filter(c => c.phone !== customerToDelete.phone));
       setCustomerToDelete(null);
     } catch (error: any) {
       alert(error.message || "Erro ao excluir cliente.");

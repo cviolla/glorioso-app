@@ -26,10 +26,10 @@ export async function POST(request: Request) {
   }
 
   // 2. Receber os dados
-  const { customerId } = await request.json();
+  const { phone } = await request.json();
 
-  if (!customerId) {
-    return NextResponse.json({ error: 'ID do cliente é obrigatório' }, { status: 400 });
+  if (!phone) {
+    return NextResponse.json({ error: 'Telefone do cliente é obrigatório' }, { status: 400 });
   }
 
   // 3. Usar o Service Role para as operações administrativas
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const { data: customer, error: fetchError } = await supabaseAdmin
       .from('customers')
       .select('user_id, phone')
-      .eq('id', customerId)
+      .eq('phone', phone)
       .single();
 
     if (fetchError || !customer) {
@@ -61,15 +61,14 @@ export async function POST(request: Request) {
       const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(customer.user_id);
       if (authDeleteError) {
         console.error('Erro ao deletar usuário Auth:', authDeleteError);
-        // Continuamos mesmo se der erro no Auth, para garantir a limpeza da tabela customers
       }
     }
 
-    // B. Deletar da tabela customers
+    // B. Deletar da tabela customers usando o telefone como chave
     const { error: dbDeleteError } = await supabaseAdmin
       .from('customers')
       .delete()
-      .eq('id', customerId);
+      .eq('phone', phone);
 
     if (dbDeleteError) {
       throw dbDeleteError;
