@@ -96,11 +96,11 @@ export default function AdminCashHistoryPage() {
           const totalsByPaymentMethod: Record<string, number> = {};
           const total = (orders || []).reduce((sum, o) => {
             const orderTotal = Number(o.total_price);
-            const rawMethod = o.payment_method || 'OUTRO';
+            const rawMethod = String(o.payment_method || 'OUTRO');
 
             if (rawMethod.includes(': R$')) {
               const parts = rawMethod.split('|');
-              parts.forEach(part => {
+              parts.forEach((part: string) => {
                 const [methodPart, valuePart] = part.split(': R$');
                 if (methodPart && valuePart) {
                   const method = methodPart.trim().toUpperCase();
