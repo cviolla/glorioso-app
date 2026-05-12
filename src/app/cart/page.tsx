@@ -350,6 +350,13 @@ export default function CartPage() {
       
       try {
         // Salva no banco de dados como 'pending' imediatamente
+        // 5.1 Registrar/Atualizar cliente na base central
+        await supabase.from('customers').upsert({
+          phone: userInfo.phone,
+          name: userInfo.name
+        }, { onConflict: 'phone' });
+
+        // 5.2 Salva no banco de dados como 'pending' imediatamente
         const { error } = await supabase.from('orders').insert({
           id: newOrderId,
           customer_name: userInfo.name,

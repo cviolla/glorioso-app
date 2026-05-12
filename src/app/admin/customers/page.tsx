@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Users, Search, Key, Phone, User as UserIcon, ShieldAlert, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { Users, Search, Key, Phone, User as UserIcon, ShieldAlert, Loader2, CheckCircle2, XCircle, Trash2, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Customer = {
@@ -18,8 +18,10 @@ export default function CustomersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [isResetting, setIsResetting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -75,6 +77,27 @@ export default function CustomersPage() {
     }
   };
 
+  const handleDeleteCustomer = async () => {
+    if (!customerToDelete) return;
+    setIsDeleting(true);
+
+    try {
+      const { error } = await supabase
+        .from('customers')
+        .delete()
+        .eq('id', customerToDelete.id);
+
+      if (error) throw error;
+
+      setCustomers(prev => prev.filter(c => c.id !== customerToDelete.id));
+      setCustomerToDelete(null);
+    } catch (error) {
+      alert("Erro ao excluir cliente.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const filteredCustomers = customers.filter(c => 
     c.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.phone?.includes(searchTerm)
@@ -108,7 +131,7 @@ export default function CustomersPage() {
           <p className="text-gray-500 font-medium">Carregando clientes...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           <AnimatePresence>
             {filteredCustomers.map((customer) => (
               <motion.div
@@ -117,49 +140,52 @@ export default function CustomersPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-white p-5 rounded-2xl shadow-sm border border-gray-50 hover:shadow-md transition-shadow relative overflow-hidden group"
+                className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col justify-between"
               >
-                {!customer.user_id && (
-                  <div className="absolute top-0 right-0 bg-gray-100 text-gray-500 text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">
-                    Anônimo
-                  </div>
-                )}
-                {customer.user_id && (
-                  <div className="absolute top-0 right-0 bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-tighter">
-                    Logado
-                  </div>
-                )}
-
-                <div className="flex items-start gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${customer.user_id ? 'bg-[#ff914a]/10 text-[#ff914a]' : 'bg-gray-100 text-gray-400'}`}>
-                    <UserIcon className="w-6 h-6" />
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${customer.user_id ? 'bg-[#ff914a]/10 text-[#ff914a]' : 'bg-gray-100 text-gray-400'}`}>
+                    <UserIcon className="w-5 h-5" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#381010] truncate" title={customer.name}>{customer.name || 'Sem nome'}</h3>
-                    <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-0.5">
-                      <Phone className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="font-bold text-[#381010] truncate text-sm" title={customer.name}>{customer.name || 'Sem nome'}</h3>
+                      {customer.user_id ? (
+                        <span className="bg-green-100 text-green-600 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shrink-0">Logado</span>
+                      ) : (
+                        <span className="bg-gray-100 text-gray-400 text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter shrink-0">Anônimo</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <Phone className="w-3 h-3" />
                       <span>{customer.phone}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 pt-4 border-t border-gray-50 flex items-center justify-between">
-                  <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
-                    Desde {new Date(customer.created_at).toLocaleDateString('pt-BR')}
-                  </div>
+                <div className="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between gap-2">
+                  <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">
+                    {new Date(customer.created_at).toLocaleDateString('pt-BR')}
+                  </span>
                   
-                  {customer.user_id ? (
-                    <button
-                      onClick={() => setSelectedCustomer(customer)}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-[#532120] text-white rounded-lg text-xs font-bold hover:bg-[#381010] transition-colors"
-                    >
-                      <Key className="w-3.5 h-3.5" />
-                      Resetar Senha
-                    </button>
-                  ) : (
-                    <div className="text-[10px] text-gray-300 italic">Sem acesso cloud</div>
-                  )}
+                    <div className="flex items-center gap-1">
+                      {customer.user_id && (
+                        <button
+                          onClick={() => setSelectedCustomer(customer)}
+                          className="flex items-center gap-1.5 px-2.5 py-1 bg-[#532120] text-white rounded-lg text-[10px] font-bold hover:bg-[#381010] transition-colors whitespace-nowrap"
+                        >
+                          <Key className="w-3 h-3" />
+                          Resetar
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setCustomerToDelete(customer)}
+                        className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                        title="Excluir cliente"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                 </div>
               </motion.div>
             ))}
@@ -250,6 +276,61 @@ export default function CustomersPage() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Modal de Exclusão */}
+      <AnimatePresence>
+        {customerToDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isDeleting && setCustomerToDelete(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white w-full max-w-sm rounded-3xl shadow-2xl relative overflow-hidden p-6"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+                  <AlertTriangle className="w-8 h-8 text-red-500" />
+                </div>
+                
+                <h2 className="text-xl font-black text-[#381010] mb-2">Excluir Cliente?</h2>
+                <p className="text-sm text-gray-500 mb-6">
+                  Você está prestes a excluir <span className="font-bold text-[#381010]">{customerToDelete.name || customerToDelete.phone}</span>.
+                </p>
+
+                <div className="w-full bg-red-50 border border-red-100 rounded-2xl p-4 mb-6">
+                  <p className="text-xs text-red-600 font-bold leading-relaxed">
+                    ⚠️ ATENÇÃO: Esta ação é permanente e não pode ser desfeita. O perfil do cliente será removido da base de dados.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => setCustomerToDelete(null)}
+                    disabled={isDeleting}
+                    className="flex-1 px-4 py-3 rounded-xl border border-gray-100 text-gray-500 font-bold hover:bg-gray-50 transition-colors text-sm"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleDeleteCustomer}
+                    disabled={isDeleting}
+                    className="flex-1 px-4 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 text-sm"
+                  >
+                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Excluir'}
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}

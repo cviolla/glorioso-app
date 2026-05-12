@@ -38,6 +38,7 @@ export default function OrdersPage() {
   const [authForm, setAuthForm] = useState({ phone: '', email: '', password: '' });
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [loginAttempts, setLoginAttempts] = useState(0);
 
   useEffect(() => {
     setIsHydrated(true);
@@ -188,12 +189,14 @@ export default function OrdersPage() {
 
         if (error) {
           if (error.message.includes('Invalid login credentials')) {
+            setLoginAttempts(prev => prev + 1);
             throw new Error('Telefone ou senha incorretos.');
           }
           throw error;
         }
 
         if (data.user) {
+          setLoginAttempts(0);
           await handleLinkOrders(data.user.id);
           setShowAuthModal(false);
         }
@@ -372,8 +375,8 @@ export default function OrdersPage() {
                 </div>
 
                 <div className="flex gap-2 p-1 bg-gray-100 rounded-xl mb-6">
-                  <button type="button" onClick={() => { setAuthMode('register'); setAuthError(''); }} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authMode === 'register' ? 'bg-white text-[#532120] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Criar Senha</button>
-                  <button type="button" onClick={() => { setAuthMode('login'); setAuthError(''); }} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authMode === 'login' ? 'bg-white text-[#532120] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Já tenho conta</button>
+                  <button type="button" onClick={() => { setAuthMode('register'); setAuthError(''); setLoginAttempts(0); }} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authMode === 'register' ? 'bg-white text-[#532120] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Criar Senha</button>
+                  <button type="button" onClick={() => { setAuthMode('login'); setAuthError(''); setLoginAttempts(0); }} className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${authMode === 'login' ? 'bg-white text-[#532120] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>Já tenho conta</button>
                 </div>
 
                 <form onSubmit={handleAuth} className="space-y-4">
@@ -397,9 +400,19 @@ export default function OrdersPage() {
 
                   {authError && <p className="text-red-500 text-sm font-medium p-3 bg-red-50 rounded-xl border border-red-100 text-center">{authError}</p>}
 
-                  <button type="submit" disabled={authLoading} className="w-full bg-[#532120] text-white font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 hover:bg-[#381010] transition-colors disabled:opacity-70 mt-4">
-                    {authLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : (authMode === 'register' ? 'Criar Conta e Salvar' : 'Entrar na Conta')}
-                  </button>
+                  {authMode === 'login' && loginAttempts >= 5 ? (
+                    <button 
+                      type="button" 
+                      onClick={() => window.open('https://wa.me/5521990062956?text=Olá! Esqueci minha senha no site e gostaria de resetar.')}
+                      className="w-full bg-amber-500 text-white font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 hover:bg-amber-600 transition-colors mt-4 shadow-lg shadow-amber-500/20"
+                    >
+                      Esqueci minha Senha
+                    </button>
+                  ) : (
+                    <button type="submit" disabled={authLoading} className="w-full bg-[#532120] text-white font-bold py-3.5 rounded-xl flex justify-center items-center gap-2 hover:bg-[#381010] transition-colors disabled:opacity-70 mt-4">
+                      {authLoading ? <RefreshCw className="w-5 h-5 animate-spin" /> : (authMode === 'register' ? 'Criar Conta e Salvar' : 'Entrar na Conta')}
+                    </button>
+                  )}
                 </form>
               </div>
             </motion.div>
