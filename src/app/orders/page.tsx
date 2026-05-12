@@ -238,13 +238,13 @@ export default function OrdersPage() {
             </div>
             <div className="relative z-10">
               <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
-                <Cloud className="w-5 h-5 text-[#ff914a]" /> Salve na Nuvem!
+                <Cloud className="w-5 h-5 text-[#ff914a]" /> Crie sua conta!
               </h3>
               <p className="text-sm text-white/80 mb-4 leading-relaxed">
-                Crie uma conta rápida com seu celular para nunca mais perder o histórico dos seus pedidos, mesmo se trocar de aparelho.
+                Crie uma conta rápida com celular e senha pra acessar seu histórico.
               </p>
               <button onClick={() => setShowAuthModal(true)} className="bg-[#ff914a] text-[#381010] font-bold px-6 py-2.5 rounded-xl shadow-md hover:scale-105 transition-transform text-sm">
-                Salvar meu histórico agora
+                Crie sua conta aqui!
               </button>
             </div>
           </motion.div>
