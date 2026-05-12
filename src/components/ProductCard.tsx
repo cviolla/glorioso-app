@@ -168,6 +168,13 @@ export function ProductCard({ item }: { item: MenuItem }) {
   const addonsPrice = item.addons?.filter(a => selectedAddons.includes(a.name)).reduce((sum, a) => sum + a.price, 0) || 0;
   const totalModalPrice = (currentModalPrice + addonsPrice) * quantity;
 
+  const getValidImageUrl = (url?: string) => {
+    if (!url || typeof url !== 'string') return "/glorioso-brownie.png";
+    const cleanUrl = url.trim();
+    if (cleanUrl === "" || cleanUrl === "null" || cleanUrl === "undefined") return "/glorioso-brownie.png";
+    return cleanUrl;
+  };
+
   return (
     <>
       {/* Product Card */}
@@ -194,7 +201,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               className="w-full h-full relative"
             >
               <Image 
-                src={item.imageUrl || "/glorioso-brownie.png"} 
+                src={getValidImageUrl(item.imageUrl)} 
                 alt={item.name}
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -274,7 +281,7 @@ export function ProductCard({ item }: { item: MenuItem }) {
               {/* Header Image */}
               <div className="w-full h-48 sm:h-64 relative bg-[#f8ece3]">
                 <Image 
-                  src={item.imageUrl || "/glorioso-brownie.png"} 
+                  src={getValidImageUrl(item.imageUrl)} 
                   alt={item.name}
                   fill
                   className="object-cover"

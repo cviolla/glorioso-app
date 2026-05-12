@@ -443,6 +443,14 @@ export default function CartPage() {
     }
   };
 
+  // Garante que a imagem é válida, caso contrário usa o fallback
+  const getValidImageUrl = (url?: string) => {
+    if (!url || typeof url !== 'string') return "/glorioso-brownie.png";
+    const cleanUrl = url.trim();
+    if (cleanUrl === "" || cleanUrl === "null" || cleanUrl === "undefined") return "/glorioso-brownie.png";
+    return cleanUrl;
+  };
+
   return (
     <div className={`min-h-screen font-sans pb-6 ${step === 'cart' ? 'bg-[#1a0808] text-[#f8ece3]' : 'bg-[#fff5e9] text-[#381010]'}`}>
       <header className={`p-5 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${step === 'cart' ? 'border-white/5 bg-[#1a0808]/95' : 'border-[#532120]/10 bg-[#fff5e9]/95'}`}>
@@ -496,7 +504,7 @@ export default function CartPage() {
                       <div key={item.cartItemId} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                         <div className="w-16 h-16 shrink-0 overflow-hidden relative rounded-xl border border-white/10">
                            <Image 
-                             src={item.imageUrl || "/glorioso-brownie.png"} 
+                             src={getValidImageUrl(item.imageUrl)} 
                              alt={item.name} 
                              fill 
                              className="object-cover" 
