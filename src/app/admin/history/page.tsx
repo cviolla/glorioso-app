@@ -19,6 +19,7 @@ import {
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSettingsStore } from '@/store/settingsStore';
 
 interface OrderItem {
   name: string;
@@ -61,6 +62,11 @@ export default function AdminHistoryPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
+  const [savingPaymentId, setSavingPaymentId] = useState<string | null>(null);
+  const { paymentMethods: storePaymentMethods } = useSettingsStore();
+
+  const FALLBACK_METHODS = ['PIX', 'Dinheiro', 'Cartão de Débito', 'Cartão de Crédito', 'Voucher'];
+  const availablePaymentMethods = storePaymentMethods.length > 0 ? storePaymentMethods : FALLBACK_METHODS;
 
 
   const fetchHistory = useCallback(async (isInitial = false) => {
@@ -115,6 +121,43 @@ export default function AdminHistoryPage() {
   useEffect(() => {
     fetchHistory(true);
   }, [fetchHistory]);
+
+  const updatePaymentMethod = async (orderId: string, newMethod: string) => {
+    let originalMethod: string | undefined;
+    // Find original and optimistically update
+    setDailySummaries(prev => prev.map(summary => ({
+      ...summary,
+      orders: summary.orders.map(o => {
+        if (o.id === orderId) { originalMethod = o.payment_method; return { ...o, payment_method: newMethod }; }
+        return o;
+      })
+    })));
+    if (selectedOrder?.id === orderId) {
+      setSelectedOrder(prev => prev ? { ...prev, payment_method: newMethod } : null);
+    }
+    setSavingPaymentId(orderId);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ payment_method: newMethod })
+        .eq('id', orderId);
+      if (error) throw error;
+    } catch {
+      // Revert on failure
+      if (originalMethod !== undefined) {
+        const reverted = originalMethod;
+        setDailySummaries(prev => prev.map(summary => ({
+          ...summary,
+          orders: summary.orders.map(o => o.id === orderId ? { ...o, payment_method: reverted } : o)
+        })));
+        if (selectedOrder?.id === orderId) {
+          setSelectedOrder(prev => prev ? { ...prev, payment_method: reverted } : null);
+        }
+      }
+    } finally {
+      setSavingPaymentId(null);
+    }
+  };
 
   const filteredSummaries = dailySummaries.map(summary => {
     if (paymentFilter === 'all') return summary;
@@ -505,7 +548,23 @@ export default function AdminHistoryPage() {
                     </div>
                   )}
                   <div className="flex items-center gap-1.5 text-[11.5px] text-gray-500 pt-1.5 border-t border-gray-200">
-                    <CreditCard className="w-3.5 h-3.5" /> {selectedOrder.payment_method}
+                    <CreditCard className="w-3.5 h-3.5 shrink-0" />
+                    <select
+                      value={selectedOrder.payment_method}
+                      onChange={(e) => updatePaymentMethod(selectedOrder.id, e.target.value)}
+                      disabled={savingPaymentId === selectedOrder.id}
+                      className={`flex-1 text-[11.5px] font-bold bg-transparent border-0 outline-none cursor-pointer rounded transition-colors ${
+                        savingPaymentId === selectedOrder.id ? 'opacity-50' : 'hover:text-[var(--color-brand-accent)]'
+                      }`}
+                      title="Trocar forma de pagamento"
+                    >
+                      {availablePaymentMethods.map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                      {!availablePaymentMethods.includes(selectedOrder.payment_method) && (
+                        <option value={selectedOrder.payment_method}>{selectedOrder.payment_method}</option>
+                      )}
+                    </select>
                     {selectedOrder.order_time && selectedOrder.order_time !== 'Para agora' && (
                       <span className="ml-auto text-[9.5px] text-gray-400">Agendado: {selectedOrder.order_time}</span>
                     )}

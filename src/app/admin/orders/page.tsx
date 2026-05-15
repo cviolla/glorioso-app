@@ -28,6 +28,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomModal } from '@/components/CustomModal';
 import { useCashStore } from '@/store/cashStore';
+import { useSettingsStore } from '@/store/settingsStore';
 
 type OrderStatus = 'draft' | 'pending' | 'preparing' | 'shipped' | 'delivered' | 'cancelled' | 'archived';
 
@@ -90,6 +91,38 @@ export default function AdminOrdersPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [showRefreshSuccess, setShowRefreshSuccess] = useState(false);
   const { currentSession, fetchCurrentSession, openCashSession, closeCashSession } = useCashStore();
+  const { paymentMethods: storePaymentMethods } = useSettingsStore();
+  const [savingPaymentId, setSavingPaymentId] = useState<string | null>(null);
+
+  const FALLBACK_METHODS = ['PIX', 'Dinheiro', 'Cartão de Débito', 'Cartão de Crédito', 'Voucher'];
+  const availablePaymentMethods = storePaymentMethods.length > 0 ? storePaymentMethods : FALLBACK_METHODS;
+
+  const updatePaymentMethod = async (orderId: string, newMethod: string) => {
+    const original = orders.find(o => o.id === orderId)?.payment_method;
+    // Optimistic update
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, payment_method: newMethod } : o));
+    if (selectedOrder?.id === orderId) {
+      setSelectedOrder(prev => prev ? { ...prev, payment_method: newMethod } : null);
+    }
+    setSavingPaymentId(orderId);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ payment_method: newMethod })
+        .eq('id', orderId);
+      if (error) throw error;
+    } catch {
+      // Revert on failure
+      if (original !== undefined) {
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, payment_method: original } : o));
+        if (selectedOrder?.id === orderId) {
+          setSelectedOrder(prev => prev ? { ...prev, payment_method: original } : null);
+        }
+      }
+    } finally {
+      setSavingPaymentId(null);
+    }
+  };
 
   const fetchOrders = useCallback(async (isInitial = false) => {
     if (!isInitial) setLoading(true);
@@ -757,7 +790,23 @@ export default function AdminOrdersPage() {
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-200">
-                      <CreditCard className="w-3 h-3" /> {selectedOrder.payment_method}
+                      <CreditCard className="w-3 h-3 shrink-0" />
+                      <select
+                        value={selectedOrder.payment_method}
+                        onChange={(e) => updatePaymentMethod(selectedOrder.id, e.target.value)}
+                        disabled={savingPaymentId === selectedOrder.id}
+                        className={`flex-1 text-xs font-bold bg-transparent border-0 outline-none cursor-pointer rounded transition-colors ${
+                          savingPaymentId === selectedOrder.id ? 'opacity-50' : 'hover:text-[var(--color-brand-accent)]'
+                        }`}
+                        title="Trocar forma de pagamento"
+                      >
+                        {availablePaymentMethods.map(m => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                        {!availablePaymentMethods.includes(selectedOrder.payment_method) && (
+                          <option value={selectedOrder.payment_method}>{selectedOrder.payment_method}</option>
+                        )}
+                      </select>
                     </div>
                   </div>
 
@@ -936,7 +985,23 @@ export default function AdminOrdersPage() {
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-xs text-gray-500 pt-2 border-t border-gray-200">
-                  <CreditCard className="w-3 h-3" /> {selectedOrder.payment_method}
+                  <CreditCard className="w-3 h-3 shrink-0" />
+                  <select
+                    value={selectedOrder.payment_method}
+                    onChange={(e) => updatePaymentMethod(selectedOrder.id, e.target.value)}
+                    disabled={savingPaymentId === selectedOrder.id}
+                    className={`flex-1 text-xs font-bold bg-transparent border-0 outline-none cursor-pointer rounded transition-colors ${
+                      savingPaymentId === selectedOrder.id ? 'opacity-50' : 'hover:text-[var(--color-brand-accent)]'
+                    }`}
+                    title="Trocar forma de pagamento"
+                  >
+                    {availablePaymentMethods.map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                    {!availablePaymentMethods.includes(selectedOrder.payment_method) && (
+                      <option value={selectedOrder.payment_method}>{selectedOrder.payment_method}</option>
+                    )}
+                  </select>
                 </div>
               </div>
 
