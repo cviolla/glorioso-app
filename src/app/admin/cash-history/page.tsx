@@ -15,7 +15,9 @@ import {
   Clock,
   Printer,
   X,
-  Wallet
+  Wallet,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -61,6 +63,8 @@ export default function AdminCashHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState<CashSession | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchHistory = useCallback(async () => {
     setLoading(true);
@@ -148,6 +152,27 @@ export default function AdminCashHistoryPage() {
     window.open(`/admin/orders/${selectedOrder.id}/print`, '_blank');
   };
 
+  const handleDeleteCashHistory = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('cash_sessions')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // delete all rows
+      if (error) throw error;
+      // Clear local state after successful delete
+      setSessions([]);
+      setSelectedSession(null);
+      setSelectedOrder(null);
+    } catch (err) {
+      console.error('Erro ao apagar histórico de caixa:', err);
+      alert('Erro ao apagar o histórico. Tente novamente.');
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('pt-BR', {
       timeZone: 'America/Sao_Paulo',
@@ -166,7 +191,59 @@ export default function AdminCashHistoryPage() {
           <h1 className="text-lg md:text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Histórico de Caixa</h1>
           <p className="text-gray-400 font-medium text-[9px] md:text-[11px] uppercase tracking-wider">Gestão de aberturas e fechamentos</p>
         </div>
+        <button
+          onClick={() => setDeleteConfirm(true)}
+          disabled={sessions.length === 0}
+          className="flex items-center gap-1.5 h-9 px-3 bg-red-50 text-red-500 border border-red-100 rounded-xl font-black text-[10px] uppercase tracking-wide hover:bg-red-100 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed self-end md:self-auto shrink-0"
+          title="Apagar histórico de caixa"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+          <span>Apagar Histórico</span>
+        </button>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(false); }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="font-black text-[var(--color-brand-dark)] text-[15px] leading-tight">Apagar histórico de caixa?</h3>
+                <p className="text-[10px] text-gray-400 font-medium mt-0.5">Esta ação não pode ser desfeita.</p>
+              </div>
+            </div>
+            <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
+              Todas as <strong className="text-[var(--color-brand-dark)]">sessões de caixa</strong> serão permanentemente removidas do banco de dados. Os pedidos e produtos não serão afetados.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 h-10 rounded-xl border border-gray-200 font-black text-[11px] text-gray-500 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteCashHistory}
+                disabled={deleting}
+                className="flex-1 h-10 rounded-xl bg-red-500 text-white font-black text-[11px] hover:bg-red-600 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-1.5"
+              >
+                {deleting ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Apagando...</>
+                ) : (
+                  <><Trash2 className="w-3.5 h-3.5" /> Sim, apagar</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
         {/* List of Sessions */}

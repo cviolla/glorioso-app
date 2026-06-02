@@ -16,7 +16,9 @@ import {
   Truck,
   Clock,
   Printer,
-  X
+  X,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -63,6 +65,8 @@ export default function AdminHistoryPage() {
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
   const [savingPaymentId, setSavingPaymentId] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const { paymentMethods: storePaymentMethods } = useSettingsStore();
 
   const FALLBACK_METHODS = ['PIX', 'Dinheiro', 'Cartão de Débito', 'Cartão de Crédito', 'Voucher'];
@@ -188,6 +192,29 @@ export default function AdminHistoryPage() {
     window.open(`/admin/orders/${selectedOrder.id}/print`, '_blank');
   };
 
+  const handleDeleteHistory = async () => {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('status', 'delivered');
+      if (error) throw error;
+      // Clear local state after successful delete
+      setDailySummaries([]);
+      setAvailableMethods([]);
+      setSelectedDay(null);
+      setSelectedOrder(null);
+      setPaymentFilter('all');
+    } catch (err) {
+      console.error('Erro ao apagar histórico de vendas:', err);
+      alert('Erro ao apagar o histórico. Tente novamente.');
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('pt-BR', {
       timeZone: 'America/Sao_Paulo',
@@ -206,8 +233,8 @@ export default function AdminHistoryPage() {
           <h1 className="text-lg md:text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Histórico de Vendas</h1>
           <p className="text-gray-400 font-medium text-[9px] md:text-[11px] uppercase tracking-wider">Gestão financeira diária</p>
         </div>
-        <div className="flex justify-end w-full md:w-auto">
-          <div className="relative w-full md:w-48">
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="relative flex-1 md:w-48">
             <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <select 
               className="w-full h-9 pl-8 pr-6 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-[10px] md:text-[11.5px] font-bold appearance-none cursor-pointer uppercase"
@@ -220,8 +247,60 @@ export default function AdminHistoryPage() {
               ))}
             </select>
           </div>
+          <button
+            onClick={() => setDeleteConfirm(true)}
+            disabled={dailySummaries.length === 0}
+            className="flex items-center gap-1.5 h-9 px-3 bg-red-50 text-red-500 border border-red-100 rounded-xl font-black text-[10px] uppercase tracking-wide hover:bg-red-100 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+            title="Apagar histórico de vendas"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Apagar</span>
+          </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(false); }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="font-black text-[var(--color-brand-dark)] text-[15px] leading-tight">Apagar histórico de vendas?</h3>
+                <p className="text-[10px] text-gray-400 font-medium mt-0.5">Esta ação não pode ser desfeita.</p>
+              </div>
+            </div>
+            <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
+              Todos os pedidos com status <strong className="text-[var(--color-brand-dark)]">entregue</strong> serão permanentemente removidos do banco de dados. Os dados de estoque e produtos não serão afetados.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 h-10 rounded-xl border border-gray-200 font-black text-[11px] text-gray-500 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteHistory}
+                disabled={deleting}
+                className="flex-1 h-10 rounded-xl bg-red-500 text-white font-black text-[11px] hover:bg-red-600 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-1.5"
+              >
+                {deleting ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Apagando...</>
+                ) : (
+                  <><Trash2 className="w-3.5 h-3.5" /> Sim, apagar</>  
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
         {/* List of Days - Compacted */}
