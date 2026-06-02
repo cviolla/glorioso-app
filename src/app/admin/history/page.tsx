@@ -65,7 +65,7 @@ export default function AdminHistoryPage() {
   const [paymentFilter, setPaymentFilter] = useState('all');
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
   const [savingPaymentId, setSavingPaymentId] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [dayToDelete, setDayToDelete] = useState<DailySummary | null>(null);
   const [deleting, setDeleting] = useState(false);
   const { paymentMethods: storePaymentMethods } = useSettingsStore();
 
@@ -192,26 +192,36 @@ export default function AdminHistoryPage() {
     window.open(`/admin/orders/${selectedOrder.id}/print`, '_blank');
   };
 
-  const handleDeleteHistory = async () => {
+  const handleDeleteDay = async () => {
+    if (!dayToDelete) return;
     setDeleting(true);
     try {
+      // Delete only the orders belonging to this specific day by their IDs
+      const ids = dayToDelete.orders.map((o) => o.id);
       const { error } = await supabase
         .from('orders')
         .delete()
-        .eq('status', 'delivered');
+        .in('id', ids);
       if (error) throw error;
-      // Clear local state after successful delete
-      setDailySummaries([]);
-      setAvailableMethods([]);
-      setSelectedDay(null);
-      setSelectedOrder(null);
-      setPaymentFilter('all');
+      // Remove this day from local state without reloading
+      setDailySummaries((prev) => {
+        const next = prev.filter((s) => s.date !== dayToDelete.date);
+        // Recalculate available methods from remaining orders
+        const allOrders = next.flatMap((s) => s.orders);
+        const methods = Array.from(new Set(allOrders.map((o) => o.payment_method))).filter(Boolean) as string[];
+        setAvailableMethods(methods);
+        return next;
+      });
+      if (selectedDay?.date === dayToDelete.date) {
+        setSelectedDay(null);
+        setSelectedOrder(null);
+      }
     } catch (err) {
-      console.error('Erro ao apagar histórico de vendas:', err);
-      alert('Erro ao apagar o histórico. Tente novamente.');
+      console.error('Erro ao apagar dia:', err);
+      alert('Erro ao apagar o dia. Tente novamente.');
     } finally {
       setDeleting(false);
-      setDeleteConfirm(false);
+      setDayToDelete(null);
     }
   };
 
@@ -227,14 +237,14 @@ export default function AdminHistoryPage() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* Header Section - Refined for Mobile */}
+      {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1 md:px-0">
         <div>
           <h1 className="text-lg md:text-xl font-black text-[var(--color-brand-dark)] tracking-tight">Histórico de Vendas</h1>
           <p className="text-gray-400 font-medium text-[9px] md:text-[11px] uppercase tracking-wider">Gestão financeira diária</p>
         </div>
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:w-48">
+        <div className="flex justify-end w-full md:w-auto">
+          <div className="relative w-full md:w-48">
             <Filter className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <select 
               className="w-full h-9 pl-8 pr-6 bg-white border border-gray-100 rounded-xl outline-none focus:border-[var(--color-brand-accent)]/20 transition-all text-[10px] md:text-[11.5px] font-bold appearance-none cursor-pointer uppercase"
@@ -247,23 +257,14 @@ export default function AdminHistoryPage() {
               ))}
             </select>
           </div>
-          <button
-            onClick={() => setDeleteConfirm(true)}
-            disabled={dailySummaries.length === 0}
-            className="flex items-center gap-1.5 h-9 px-3 bg-red-50 text-red-500 border border-red-100 rounded-xl font-black text-[10px] uppercase tracking-wide hover:bg-red-100 active:scale-95 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
-            title="Apagar histórico de vendas"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Apagar</span>
-          </button>
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
+      {/* Delete Day Confirmation Modal */}
+      {dayToDelete && (
         <div
           className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(false); }}
+          onClick={(e) => { if (e.target === e.currentTarget) setDayToDelete(null); }}
         >
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -271,30 +272,30 @@ export default function AdminHistoryPage() {
                 <AlertTriangle className="w-5 h-5 text-red-500" />
               </div>
               <div>
-                <h3 className="font-black text-[var(--color-brand-dark)] text-[15px] leading-tight">Apagar histórico de vendas?</h3>
+                <h3 className="font-black text-[var(--color-brand-dark)] text-[15px] leading-tight">Apagar dia {dayToDelete.date}?</h3>
                 <p className="text-[10px] text-gray-400 font-medium mt-0.5">Esta ação não pode ser desfeita.</p>
               </div>
             </div>
             <p className="text-[12px] text-gray-500 mb-5 leading-relaxed">
-              Todos os pedidos com status <strong className="text-[var(--color-brand-dark)]">entregue</strong> serão permanentemente removidos do banco de dados. Os dados de estoque e produtos não serão afetados.
+              Os <strong className="text-[var(--color-brand-dark)]">{dayToDelete.count} {dayToDelete.count === 1 ? 'pedido' : 'pedidos'}</strong> deste dia serão permanentemente removidos do banco de dados.
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => setDeleteConfirm(false)}
+                onClick={() => setDayToDelete(null)}
                 disabled={deleting}
                 className="flex-1 h-10 rounded-xl border border-gray-200 font-black text-[11px] text-gray-500 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
-                onClick={handleDeleteHistory}
+                onClick={handleDeleteDay}
                 disabled={deleting}
                 className="flex-1 h-10 rounded-xl bg-red-500 text-white font-black text-[11px] hover:bg-red-600 active:scale-95 transition-all disabled:opacity-70 flex items-center justify-center gap-1.5"
               >
                 {deleting ? (
                   <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Apagando...</>
                 ) : (
-                  <><Trash2 className="w-3.5 h-3.5" /> Sim, apagar</>  
+                  <><Trash2 className="w-3.5 h-3.5" /> Sim, apagar</>
                 )}
               </button>
             </div>
@@ -339,7 +340,16 @@ export default function AdminHistoryPage() {
                 </div>
                 <div className="mt-2.5 pt-2.5 border-t border-gray-50 flex justify-between items-center">
                    <span className="text-[8.5px] font-bold text-gray-300 uppercase">{summary.count} {summary.count === 1 ? 'pedido' : 'pedidos'}</span>
-                   <ChevronRight className={`w-3.5 h-3.5 transition-transform ${selectedDay?.date === summary.date ? 'text-[var(--color-brand-accent)] translate-x-1' : 'text-gray-200'}`} />
+                   <div className="flex items-center gap-2">
+                     <button
+                       onClick={(e) => { e.stopPropagation(); setDayToDelete(summary); }}
+                       className="p-1 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                       title={`Apagar dia ${summary.date}`}
+                     >
+                       <Trash2 className="w-3 h-3" />
+                     </button>
+                     <ChevronRight className={`w-3.5 h-3.5 transition-transform ${selectedDay?.date === summary.date ? 'text-[var(--color-brand-accent)] translate-x-1' : 'text-gray-200'}`} />
+                   </div>
                 </div>
               </motion.div>
             ))
