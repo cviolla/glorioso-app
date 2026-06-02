@@ -1,7 +1,6 @@
 "use client";
 
 import { useSettingsStore } from "@/store/settingsStore";
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -10,12 +9,6 @@ import { StoreStatus } from "@/components/StoreStatus";
 
 export default function Home() {
   const { whatsappNumber } = useSettingsStore();
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsHydrated(true);
-  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -45,45 +38,29 @@ export default function Home() {
     return phone;
   };
 
-  if (!isHydrated) return null;
+  // No hydration gate — the page renders immediately.
+  // whatsappNumber has a safe default value in the store so no flash occurs.
 
   return (
     <div 
       className="flex flex-col min-h-[100dvh] text-[#f8ece3] font-sans selection:bg-[#ff914a] selection:text-[#381010] overflow-hidden relative bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/background_home.jpg')" }}
     >
-      {/* Overlay removido para máxima fidelidade da imagem de fundo */}
       <div className="absolute inset-0 bg-transparent z-0 pointer-events-none"></div>
 
       <StoreStatus className="absolute top-4 right-4 z-40 scale-90 origin-top-right" />
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 w-full">
         <div className="flex flex-col items-center text-center w-full max-w-md mt-10 sm:mt-0">
-          {/* Official Logo - Optimized Size and Floating Animation */}
+          {/* Official Logo — CSS float animation (GPU-accelerated, no JS thread) */}
           <motion.div 
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-            }}
-            transition={{ 
-              duration: 1.2, 
-              ease: [0.22, 1, 0.36, 1], // easeOutExpo
-            }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative w-64 h-64 sm:w-80 sm:h-80 mb-8 sm:mb-10 drop-shadow-[0_25px_50px_rgba(0,0,0,0.4)]"
           >
-            <motion.div
-              animate={{ 
-                y: [0, -12, 0],
-              }}
-              transition={{ 
-                duration: 5, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-              className="w-full h-full relative"
-            >
+            {/* Float animation moved to CSS — runs on GPU, not JS thread */}
+            <div className="w-full h-full relative animate-float">
               <Image 
                 src="/GloriosoBrownie_Logo_fuul.png" 
                 alt="Logo Glorioso Brownie" 
@@ -91,7 +68,7 @@ export default function Home() {
                 className="object-contain"
                 priority
               />
-            </motion.div>
+            </div>
           </motion.div>
           
           <motion.h1 
@@ -142,22 +119,14 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="w-full flex justify-center"
           >
+            {/* CTA button — CSS shimmer animation instead of JS color animation */}
             <Link 
               href="/menu"
-              className="w-full sm:w-3/4 max-w-[280px] sm:max-w-none bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_25px_rgba(255,145,74,0.4)] hover:scale-105 hover:bg-[#ff9f61] active:scale-95 transition-all flex items-center justify-center gap-3 mb-8 sm:mb-10 group"
+              className="w-full sm:w-3/4 max-w-[280px] sm:max-w-none bg-[#ff914a] text-[#381010] font-black text-lg py-4 px-6 rounded-full shadow-[0_8px_25px_rgba(255,145,74,0.4)] hover:scale-105 hover:bg-[#ff9f61] active:scale-95 transition-all flex items-center justify-center gap-3 mb-8 sm:mb-10 group relative overflow-hidden"
             >
-              <motion.span
-                animate={{ 
-                  color: ["#381010", "#ffffff", "#381010"],
-                }}
-                transition={{ 
-                  duration: 2, 
-                  repeat: Infinity, 
-                  ease: "easeInOut" 
-                }}
-              >
-                Peça seu Lanche
-              </motion.span>
+              {/* Shimmer overlay — pure CSS, GPU-accelerated */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shimmer pointer-events-none" />
+              <span>Peça seu Lanche</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </motion.div>

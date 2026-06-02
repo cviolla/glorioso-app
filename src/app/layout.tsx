@@ -5,11 +5,6 @@ import "./globals.css";
 import { CopyProtection } from "@/components/CopyProtection";
 import { VisibilityRefresh } from "@/components/VisibilityRefresh";
 
-// Estas constantes garantem que o Next.js nunca faça cache agressivo em borda
-// Isso impede o problema do cliente precisar limpar o cache
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

@@ -35,7 +35,24 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
+
+  /* Float animation — replaces framer-motion repeat:Infinity on the logo (GPU-only via transform) */
+  --animate-float: float 5s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* Shimmer animation — replaces JS color animation on CTA button */
+  --animate-shimmer: shimmer 2.5s ease-in-out infinite;
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    60%, 100% { transform: translateX(200%); }
+  }
 }
+
 
 body {
   background: var(--background);

@@ -22,10 +22,18 @@ export default function MenuPage() {
   const fetchMenu = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: cats } = await supabase.from('categories').select('*').order('sort_order');
-      const { data: subs } = await supabase.from('subcategories').select('*').order('sort_order');
-      const { data: prods } = await supabase.from('products').select('*').eq('is_active', true).order('sort_order');
-      const { data: vars } = await supabase.from('product_variants').select('*').order('sort_order');
+      // Run all 4 queries in parallel — was sequential before (RTT × 4)
+      const [
+        { data: cats },
+        { data: subs },
+        { data: prods },
+        { data: vars },
+      ] = await Promise.all([
+        supabase.from('categories').select('id, name, sort_order').order('sort_order'),
+        supabase.from('subcategories').select('id, name, category_id, sort_order').order('sort_order'),
+        supabase.from('products').select('id, name, description, price, image_url, category_id, subcategory_id, sort_order').eq('is_active', true).order('sort_order'),
+        supabase.from('product_variants').select('id, name, price, product_id, sort_order').order('sort_order'),
+      ]);
       
       if (cats && prods) {
         const assembled: MenuCategory[] = cats.map(cat => {
@@ -79,6 +87,7 @@ export default function MenuPage() {
       setLoading(false);
     }
   }, []);
+
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -178,9 +187,9 @@ export default function MenuPage() {
           backgroundImage: "url('/background_home.jpg')",
           backgroundRepeat: 'repeat',
           backgroundSize: '320px',
-          backgroundAttachment: 'fixed'
         }}
       />
+
       
       {/* Sticky Top Category Navigation */}
       {!loading && categories.length > 0 && !searchQuery && (

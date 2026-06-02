@@ -192,15 +192,12 @@ export function ProductCard({ item }: { item: MenuItem }) {
 
   return (
     <>
-      {/* Product Card */}
-      <motion.div 
+      {/* Product Card — CSS animation instead of framer-motion whileInView (no per-card IntersectionObserver) */}
+      <div
         onClick={handleOpenModal}
-        initial={{ opacity: 0, scale: 0.92, y: 20 }}
-        whileInView={{ opacity: 1, scale: 1, y: 0 }}
-        viewport={{ once: true, margin: "-20px" }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="bg-[#ffffff] rounded-2xl p-3 shadow-sm border border-[#f8ece3] mb-3 cursor-pointer hover:shadow-md transition-all group"
+        className="bg-[#ffffff] rounded-2xl p-3 shadow-sm border border-[#f8ece3] mb-3 cursor-pointer hover:shadow-md transition-all group animate-in fade-in slide-in-from-bottom-2 duration-300"
       >
+
         <div className="flex justify-between items-center gap-3">
           <div className="flex-1">
             <h3 className="text-base font-bold text-[#532120] leading-tight">{item.name}</h3>
@@ -276,7 +273,8 @@ export function ProductCard({ item }: { item: MenuItem }) {
             );
           })}
         </div>
-      </motion.div>
+      </div>
+
 
       {/* Product Details Modal Overlay */}
       {isModalOpen && (

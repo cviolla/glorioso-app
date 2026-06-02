@@ -1,24 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Clock } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useStoreStatusStore } from "@/store/storeStatusStore";
 import { supabase } from "@/lib/supabase";
 
 export function StoreStatus({ className = "" }: { className?: string }) {
-  const router = useRouter();
   const { fetchStatus, isManualOpen } = useStoreStatusStore();
   const [loading, setLoading] = useState(true);
-  const [tick, setTick] = useState(0); // Força re-render a cada minuto
+  // Tick forces re-render every minute to recompute time-based open/close logic
+  const [tick, setTick] = useState(0);
+  const subscribedRef = useRef(false);
 
+  // Initial fetch — runs only once on mount
   useEffect(() => {
     fetchStatus().then(() => {
       setLoading(false);
-      console.log("[StoreStatus] Status inicial carregado:", isManualOpen ? "ABERTO" : "FECHADO");
     });
+  }, [fetchStatus]);
 
-    // Subscribe to real-time changes
+  // Realtime subscription — separate effect so it never re-subscribes on state changes
+  useEffect(() => {
+    if (subscribedRef.current) return;
+    subscribedRef.current = true;
+
     const channel = supabase
       .channel('store_config_changes')
       .on(
@@ -29,32 +34,26 @@ export function StoreStatus({ className = "" }: { className?: string }) {
           table: 'store_config',
         },
         (payload) => {
-          console.log("[StoreStatus] Mudança detectada via Realtime:", payload);
-          // Atualiza o store global com os novos dados do payload diretamente
           const { is_manual_open } = payload.new;
-          
           if (is_manual_open !== undefined) {
-            // Acessamos o store diretamente para atualizar o estado sem re-fetch
-            useStoreStatusStore.setState({ 
-              isManualOpen: is_manual_open 
-            });
-
-            router.refresh();
+            useStoreStatusStore.setState({ isManualOpen: is_manual_open });
             setTick(t => t + 1);
           }
         }
       )
-      .subscribe((status) => {
-        console.log("[StoreStatus] Status da inscrição Realtime:", status);
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      subscribedRef.current = false;
     };
-  }, [fetchStatus, router, isManualOpen]);
+  // Empty deps — subscribe once for the lifetime of this component mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  // Re-render every minute (for time-based open/close logic)
   useEffect(() => {
-    const interval = setInterval(() => setTick(t => t + 1), 60000);
+    const interval = setInterval(() => setTick(t => t + 1), 60_000);
     return () => clearInterval(interval);
   }, []);
 
@@ -77,4 +76,3 @@ export function StoreStatus({ className = "" }: { className?: string }) {
     </div>
   );
 }
-

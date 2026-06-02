@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createBrowserClient } from "@supabase/ssr";
+import { supabase } from "@/lib/supabase";
 import { ShoppingBag, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -13,10 +13,7 @@ interface OrderNotification {
 
 export function NotificationListener() {
   const [newOrder, setNewOrder] = useState<OrderNotification | null>(null);
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+
 
   useEffect(() => {
     const playNotificationSound = () => {
@@ -45,7 +42,10 @@ export function NotificationListener() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [supabase]);
+  // supabase is a stable singleton — no need to re-run when it "changes"
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   return (
     <AnimatePresence>
